@@ -1,0 +1,193 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+}
+
+.hiddenComponents {
+  background-color: #E1E0DD;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+}
+
+@keyframes openCard {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.25;
+  }
+  75% {
+    opacity: 0.75;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes closeCard {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+  75% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+@media (max-width: 1600px) {
+  .home {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    width: 100vw;
+    height: 100vh;
+  }
+}
+
+@media (min-width: 1600px) {
+   .home,
+   .verticalFlap {
+    height: calc(100vh - 50px);
+   }
+
+   .home {
+    width: 1600px;
+   }
+}
+
+.home {
+  text-align: center;
+  display: flex;
+  max-width: 1600px;
+  background-color: #F0F2F5;
+  position: relative;
+}
+
+.options {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-radius: 4px;
+  background-color: white;
+  font-size: 14px;
+  color: #3B4A54;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  flex-wrap: wrap;
+  min-width: 0;
+  box-shadow: 0 2px 5px 0 rgba(11,20,26,.26),0 2px 10px 0 rgba(11,20,26,.16);
+}
+
+.openFlap {
+  z-index: 1;
+  left: 0px;
+  animation-name: openCard;
+  animation-duration: 0.5s;
+}
+
+.closeFlap {
+  z-index: -1;
+  left: -415px;
+  animation-name: closeCard;
+  animation-duration: 0.5s;
+}
+
+.chatList {
+  flex: 1;
+  background-color: #FFF;
+  overflow-y: auto;
+}
+
+.chatList::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.chatList::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.2);
+}
+
+.chatWindow--body {
+    flex: 1;
+    overflow-y: auto;
+    background-size: cover;
+    background-position: center;
+    background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+    padding: 20px 30px;
+}
+
+.chatWindow--body::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.chatWindow--body::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.2);
+}
+
+.chatWindow--emojiArea {
+  overflow-y: hidden;
+  position: absolute;
+  bottom: 62px;
+  transition: all ease 0.3s;
+}
+
+.newChat--list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.newChat--list::-webkit-scrollbar {
+width: 6px;
+height: 6px;
+}
+
+.newChat--list::-webkit-scrollbar-thumb {
+background-color: rgba(0,0,0,0.2);
+}
+.iconTheme {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+aside.EmojiPickerReact {
+  background: none;
+}
+
+h2.epr-emoji-category-label{
+  background: none;
+}
