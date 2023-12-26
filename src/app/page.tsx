@@ -12,6 +12,7 @@ import Login from '@/components/Login';
 import Api from '@/Api';
 import Perfil from '@/components/Perfil';
 import DropDownOptions from '@/components/DropDownOptions';
+import { redirect, useRouter } from 'next/navigation';
 
 export default function Home() {
 
@@ -23,6 +24,7 @@ export default function Home() {
   const [listContacts, setListContacts] = useState<any[]>([]);
   const [showGeneralOptions, setShowGeneralOptions] = useState(false);
   const [showUserOptions, setShowUserOptions] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     if (user !== null) {
@@ -82,8 +84,9 @@ export default function Home() {
             <DropDownOptions
               options={
                 [
-                  { id: 1, name: 'Configurações', action: () => alert('Configurações') },
-                  { id: 2, name: 'Desconectar', action: () => alert('Desconectar') }
+                  { id: 1, name: 'Visite a página do Dev', action: () => router.push('https://github.com/lucas3147')},
+                  { id: 2, name: 'Configurações', action: () => alert('Em desenvolvimento...') },
+                  { id: 3, name: 'Desconectar', action: () => alert('Em desenvolvimento...') }
                 ]
               }
               right={20}

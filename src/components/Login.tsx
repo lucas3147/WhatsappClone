@@ -22,7 +22,7 @@ const Login = ({onReceive}: Props) => {
                     onClick={handleLogin} 
                     className="rounded-md px-4 py-2 border-[1px] border-black text-white bg-[#161A1F]"
                 >
-                    Logar com o github 1
+                    Logar com o github
                 </button>
         </div>
     )
