@@ -67,6 +67,13 @@ export default function Home() {
     }
   }
 
+  const handleSignOut = async () => {
+    var logout = await Api.signOut();
+    if (logout) {
+      setUser(null);
+    }
+  }
+
   if (user === null) {
     return (
       <Login onReceive={handleLoginData}/>
@@ -86,7 +93,7 @@ export default function Home() {
                 [
                   { id: 1, name: 'Visite a página do Dev', action: () => router.push('https://github.com/lucas3147')},
                   { id: 2, name: 'Configurações', action: () => alert('Em desenvolvimento...') },
-                  { id: 3, name: 'Desconectar', action: () => alert('Em desenvolvimento...') }
+                  { id: 3, name: 'Desconectar', action: () => handleSignOut() }
                 ]
               }
               right={20}

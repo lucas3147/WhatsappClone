@@ -1,7 +1,7 @@
 import 'firebase/auth';
 import 'firebase/firestore';
 import {app, auth} from './firebase.config';
-import { GithubAuthProvider, signInWithPopup, getAuth, updateCurrentUser } from "firebase/auth";
+import { GithubAuthProvider, signInWithPopup, getAuth, updateCurrentUser, signOut } from "firebase/auth";
 import { getFirestore, collection, addDoc, onSnapshot, query, where, getDocs, doc, updateDoc, arrayUnion, getDoc, deleteField } from 'firebase/firestore';
 
 const db = getFirestore(app);
@@ -30,6 +30,17 @@ export default {
                                     const credential = GithubAuthProvider.credentialFromError(error);
                                     // ...
                                 });
+    },
+    signOut: async () => {
+        const auth = getAuth();
+        return await signOut(auth).then(() => {
+            // Sign-out successful.
+            return true;
+        }).catch((error) => {
+            // An error happened.
+            alert('Ocorreu um erro ao sair!');
+            return false;
+        });
     },
     addUser: async (user) => {
         const q = query(collection(db, "users"), where("uid", "==", user.id));
