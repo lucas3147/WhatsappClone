@@ -52,6 +52,7 @@ export default function Home() {
   }
 
   const handleGeneralOptions = (e: MouseEvent) => {
+    e.preventDefault();
     setShowGeneralOptions(!showGeneralOptions);
   }
 
@@ -86,8 +87,7 @@ export default function Home() {
       </div>
       <div className="home" onClick={(e) => handleDisableFeatures(e)}>
         <div className="sidebar w-2/6 max-w-[415px] min-w-[350px] flex flex-col border-r-2 border-[#ddd]">
-          <div className="relative">
-          {showGeneralOptions &&
+          <div className='relative'>
             <DropDownOptions
               options={
                 [
@@ -97,8 +97,8 @@ export default function Home() {
                 ]
               }
               right={20}
+              state={showGeneralOptions ? 'openOptions' : 'closeOptions'}
             />
-          }
           </div>
           
           <NewChat

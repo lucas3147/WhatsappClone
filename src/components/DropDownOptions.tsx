@@ -4,11 +4,12 @@ import { OptionsType } from "@/types/Options";
 
 type Props = {
     options: OptionsType[],
+    state: 'openOptions' | 'closeOptions',
     left?: number,
     right?: number,
 };
 
-const DropDownOptions = ({options, left, right} : Props) => {
+const DropDownOptions = ({options, left, right, state} : Props) => {
     var myStyle: any = {
         position: 'absolute', 
         top: '50px', 
@@ -29,14 +30,14 @@ const DropDownOptions = ({options, left, right} : Props) => {
     }
 
     return (
-        <div 
-            className="options"
+        <div
+            className={"options " + state}
             style={myStyle}
         >
             <ul>
                 {options.map((item) => (
                     <li key={item.id}>
-                        <div 
+                        <div
                             className="flex w-64 hover:bg-[#F5F5F5] cursor-pointer"
                             onClick={item.action}
                         >

@@ -103,16 +103,15 @@ const ChatWindow = ({user, activeChat, showUserOptions, setShowUserOptions}: Pro
 
     return (
         <div className="flex flex-col h-full" onClick={handleDisableFeatures}>
-            {showUserOptions &&
-                <DropDownOptions
-                    options={
-                        [
-                            { id: 1, name: 'Apagar conversa', action: deleteConversation },
-                        ]
-                    }
-                    right={27}
-                />
-            }
+            <DropDownOptions
+                options={
+                    [
+                        { id: 1, name: 'Apagar conversa', action: deleteConversation },
+                    ]
+                }
+                right={27}
+                state={showUserOptions ? 'openOptions' : 'closeOptions'}
+            />
             <div className="h-16 border-b-2 border-[#CCC] flex justify-between items-center">
 
                 <div
