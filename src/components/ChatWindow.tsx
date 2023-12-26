@@ -84,13 +84,6 @@ const ChatWindow = ({user, activeChat, showUserOptions, setShowUserOptions}: Pro
         setShowUserOptions(!showUserOptions);
     }
 
-    const handleDisableFeatures = (e: MouseEvent) => {
-        var divElement: any = e.target;
-        if (divElement.classList[0] != 'options' && showUserOptions) {
-            setShowUserOptions(false);
-        }
-    }
-
     const deleteConversation = async () => {
         setShowUserOptions(false);
         if (await Api.validationUser(user.id)) {
@@ -102,7 +95,7 @@ const ChatWindow = ({user, activeChat, showUserOptions, setShowUserOptions}: Pro
     }
 
     return (
-        <div className="flex flex-col h-full" onClick={handleDisableFeatures}>
+        <div className="flex flex-col h-full">
             <DropDownOptions
                 options={
                     [

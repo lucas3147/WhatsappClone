@@ -57,6 +57,7 @@ export default function Home() {
   }
 
   const handleDisableFeatures = (e: MouseEvent) => {
+    e.preventDefault();
     var divElement: any = e.target;
     if (divElement.classList[0] != 'options') {
       if (showGeneralOptions) {

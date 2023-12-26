@@ -111,15 +111,18 @@ export default {
     getContactList: async (myContactsIncluded) => {
         let list = [];
         const usersRef = collection(db, "users");
-        const q = query(usersRef, where("uid", "not-in", myContactsIncluded));
+        const q = query(usersRef);
         const querySnapshot = await getDocs(q);
         querySnapshot.forEach((doc) => {
-            list.push({
-                id: doc.data().uid,
-                photoURL: doc.data().photoUrl,
-                displayName: doc.data().name,
-                codeDataBase: doc.id
-            });
+            if (myContactsIncluded.some(c => c == doc.data().uid) == false) 
+            {
+                list.push({
+                    id: doc.data().uid,
+                    photoURL: doc.data().photoUrl,
+                    displayName: doc.data().name,
+                    codeDataBase: doc.id
+                });
+            }
         });
 
         return list;
