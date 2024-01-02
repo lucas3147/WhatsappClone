@@ -31,6 +31,12 @@ const Perfil = ({show , setShow, user, setUser}: Props) => {
         }
     }
 
+    const handleSynchronizeUser = async () => {
+        const user = await Api.syncronizeUser();
+        if (user) {
+        }
+    }
+
     return (
         <div
             className={`verticalFlap ${show ? 'openFlap' : 'closeFlap'} transition-all duration-500 w-[35%] max-w-[415px] absolute top-0 bottom-0 bg-[white] flex flex-col border-r-[1px] border-[#DDD]`}
@@ -53,13 +59,25 @@ const Perfil = ({show , setShow, user, setUser}: Props) => {
                 </div>
             </div>
             
-            <div 
-                className="my-[28px] w-full">
-                <img 
-                    src={user.photoURL ? user.photoURL : 'https://c0.klipartz.com/pngpicture/178/595/gratis-png-perfil-de-usuario-iconos-de-computadora-inicio-de-sesion-avatares-de-usuario.png'} 
-                    alt="Foto do perfil" 
-                    className="w-[200px] h-[200px] m-[auto] rounded-[50%]"
-                />
+            <div
+                className="my-[28px] w-full ">
+                <div
+                    className="relative w-[200px] h-[200px] m-[auto]">
+                    <img
+                        src={user.photoURL ? user.photoURL : 'https://c0.klipartz.com/pngpicture/178/595/gratis-png-perfil-de-usuario-iconos-de-computadora-inicio-de-sesion-avatares-de-usuario.png'}
+                        alt="Foto do perfil"
+                        className="rounded-[50%]"
+                    />
+                    <div
+                        onClick={handleSynchronizeUser}
+                        className="absolute right-[15px] bottom-0">
+                        <IconItem
+                            type="AutorenewIcon"
+                            style={{ color: '#8696A0', width: '30px', height: '30px', marginBottom: '10px', backgroundColor: 'white', borderRadius: '50%' }}
+                            className="iconTheme"
+                        />
+                    </div>
+                </div>
             </div>
             <div
                 className="w-full px-[30px] pt-[14px] pb-[10px]"

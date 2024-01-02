@@ -11,6 +11,8 @@ import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
 import CheckIcon from '@mui/icons-material/Check';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import AutorenewIcon from '@mui/icons-material/Autorenew';
 
 type Props = {
     type: IconType,
@@ -18,7 +20,7 @@ type Props = {
     className?: string
 }
 
-type IconType = 'CheckIcon' | 'EditIcon' | 'ArrowBackIcon' | 'InsertEmoticonIcon' | 'MicIcon' | 'SendIcon' | 'CloseIcon' | 'EmojiEmotionsIcon' | 'DonutLargeIcon' |'AttachFileIcon' | 'ChatIcon' | 'MoreVertIcon' | 'SearchIcon';
+type IconType = 'AutorenewIcon' | 'RefreshIcon' | 'CheckIcon' | 'EditIcon' | 'ArrowBackIcon' | 'InsertEmoticonIcon' | 'MicIcon' | 'SendIcon' | 'CloseIcon' | 'EmojiEmotionsIcon' | 'DonutLargeIcon' |'AttachFileIcon' | 'ChatIcon' | 'MoreVertIcon' | 'SearchIcon';
 
 const IconItem = ({type, style, className}: Props) => {
     return (
@@ -61,6 +63,12 @@ const IconItem = ({type, style, className}: Props) => {
             }
             {type == 'CheckIcon' &&
                 <CheckIcon style={style}/>
+            }
+            {type == 'RefreshIcon' &&
+                <RefreshIcon style={style}/>
+            }
+            {type == 'AutorenewIcon' &&
+                <AutorenewIcon style={style}/>
             }
         </div>
     )
