@@ -126,6 +126,7 @@ body {
   max-width: 1600px;
   background-color: #F0F2F5;
   position: relative;
+  box-shadow: 0 2px 30px 0 rgba(11,20,26,.26),0 2px 10px 0 rgba(11,20,26,.16);
 }
 
 .options {
