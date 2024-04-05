@@ -84,7 +84,7 @@ const Perfil = ({show , setShow, user, setUser}: Props) => {
             >
                 <p className="mb-[14px] text-[#008069] text-[14px]">Seu nome</p>
                 <div
-                    className="w-full h-[34px] flex" style={{borderBottom: showNameConfirm ? '2px solid #667781' : 'none'}}
+                    className="w-full h-[34px] flex " style={{borderBottom: showNameConfirm ? '2px solid #667781' : 'none'}}
                 >
                     <input
                         className="flex-1 inline text-[#3B4A54] text-[16px] border-0 outline-none" 
