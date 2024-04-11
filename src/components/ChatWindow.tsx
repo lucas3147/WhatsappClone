@@ -7,6 +7,7 @@ import { UserType } from "@/types/UserType";
 import { ChatItem } from "@/types/ChatType";
 import Api from "@/Api";
 import DropDownOptions from "./DropDownOptions";
+import OtherPerfil from "@/components/OtherPerfil";
 
 type Props = {
     showUserOptions: boolean,
@@ -30,6 +31,7 @@ const ChatWindow = ({user, activeChat, showUserOptions, setShowUserOptions}: Pro
     const [listening, setListening] = useState(false);
     const [list, setList] = useState([]);
     const [users, setUsers] = useState<UserType[]>();
+    const [viewPerfil, setViewPerfil] = useState(false);
 
     useEffect(() => {
         if (body.current && body.current.scrollHeight > body.current.offsetHeight){
@@ -94,8 +96,18 @@ const ChatWindow = ({user, activeChat, showUserOptions, setShowUserOptions}: Pro
         }
     }
 
+    if (viewPerfil == true) {
+        return (
+            <OtherPerfil 
+                name={activeChat.title}
+                image={activeChat.image}
+            />
+        )
+    }
+
     return (
         <div className="flex flex-col h-full">
+
             <DropDownOptions
                 options={
                     [
@@ -105,10 +117,11 @@ const ChatWindow = ({user, activeChat, showUserOptions, setShowUserOptions}: Pro
                 right={27}
                 state={showUserOptions ? 'openOptions' : 'closeOptions'}
             />
-            <div className="h-16 border-b-2 border-[#CCC] flex justify-between items-center">
 
+            <div className="h-16 border-b-2 border-[#CCC] flex justify-between items-center">
                 <div
                     className="flex items-center cursor-pointer"
+                    onClick={() => setViewPerfil(true)}
                 >
                     <img
                         className="h-10 w-10 rounded-[50%] ml-4 mr-4"
