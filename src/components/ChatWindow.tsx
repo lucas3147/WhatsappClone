@@ -101,6 +101,7 @@ const ChatWindow = ({user, activeChat, showUserOptions, setShowUserOptions}: Pro
             <OtherPerfil 
                 name={activeChat.title}
                 image={activeChat.image}
+                setViewPerfil={setViewPerfil}
             />
         )
     }

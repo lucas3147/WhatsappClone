@@ -115,7 +115,7 @@ export default function Home() {
             user={user}
             setUser={setUser}
           />
-          <header className="h-16 px-4 flex justify-between items-center">
+          <header className="h-16 px-4 flex justify-between items-center bg-[#F6F6F6]">
             <div onClick={handlePerfil}>
               <img
                 className="w-10 h-10 rounded-[20px] cursor-pointer"
