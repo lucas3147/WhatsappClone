@@ -243,3 +243,18 @@ aside.EmojiPickerReact {
 h2.epr-emoji-category-label{
   background: none;
 }
+
+.otherPerfil {
+  flex: 1;
+  min-width: 520px;
+  overflow-y: auto;
+}
+
+.otherPerfil::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.otherPerfil::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.2);
+}
