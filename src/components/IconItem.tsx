@@ -14,14 +14,13 @@ import CheckIcon from '@mui/icons-material/Check';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+import VideoCameraFrontRoundedIcon from '@mui/icons-material/VideoCameraFrontRounded';
 
 type Props = {
     type: IconType,
     style: {},
     className?: string
 }
-
-type IconType = 'CloseOutlinedIcon' | 'AutorenewIcon' | 'RefreshIcon' | 'CheckIcon' | 'EditIcon' | 'ArrowBackIcon' | 'InsertEmoticonIcon' | 'MicIcon' | 'SendIcon' | 'CloseIcon' | 'EmojiEmotionsIcon' | 'DonutLargeIcon' |'AttachFileIcon' | 'ChatIcon' | 'MoreVertIcon' | 'SearchIcon';
 
 const IconItem = ({type, style, className}: Props) => {
     return (
@@ -73,6 +72,9 @@ const IconItem = ({type, style, className}: Props) => {
             }
             {type == 'CloseOutlinedIcon' &&
                 <CloseOutlinedIcon style={style}/>
+            }
+            {type == 'VideoCameraFrontRoundedIcon' &&
+                <VideoCameraFrontRoundedIcon style={style}/>
             }
         </div>
     )

@@ -1,0 +1,18 @@
+type IconType = 
+'VideoCameraFrontRoundedIcon' 
+| 'CloseOutlinedIcon' 
+| 'AutorenewIcon' 
+| 'RefreshIcon' 
+| 'CheckIcon' 
+| 'EditIcon' 
+| 'ArrowBackIcon' 
+| 'InsertEmoticonIcon' 
+| 'MicIcon' 
+| 'SendIcon' 
+| 'CloseIcon' 
+| 'EmojiEmotionsIcon' 
+| 'DonutLargeIcon' 
+|'AttachFileIcon' 
+| 'ChatIcon' 
+| 'MoreVertIcon' 
+| 'SearchIcon';
