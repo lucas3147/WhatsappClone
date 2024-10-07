@@ -1,6 +1,6 @@
 import 'firebase/auth';
 import 'firebase/firestore';
-import {app, auth} from './firebase.config';
+import {app, auth} from '../config/firebase.config';
 import { GithubAuthProvider, signInWithPopup, getAuth, signOut, getRedirectResult } from "firebase/auth";
 import { getFirestore, collection, addDoc, onSnapshot, query, where, getDocs, doc, updateDoc, arrayUnion } from 'firebase/firestore';
 
@@ -59,14 +59,16 @@ export default {
             id: data.uid,
             photoURL: data.photoUrl,
             displayName: data.name,
-            codeDataBase: docSnap.docs[0].id
+            codeDataBase: docSnap.docs[0].id,
+            message: data.message
         }
     },
     updateUser: async (user) => {
         await updateDoc(doc(db, 'users', user.codeDataBase), {
             uid: user.id,
             name: user.displayName,
-            photoUrl: user.photoURL
+            photoUrl: user.photoURL,
+            message: user.message
         });
 
         const q = query(collection(db, "users"), where("uid", "!=", user.id));
@@ -84,6 +86,7 @@ export default {
                             listChatsOfUser.push({
                                 ...chat,
                                 title: user.displayName,
+                                message: user.message
                             });
                         } else {
                             listChatsOfUser.push({

@@ -5,4 +5,5 @@ export type UserType = {
     photoURL: string | null,
     displayName: string | null,
     codeDataBase?: string | null,
+    message: string | null
 }

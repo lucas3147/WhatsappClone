@@ -1,37 +1,22 @@
 'use client'
 
 import { OptionsType } from "@/types/Options";
+import { OptionsStateType } from "@/types/OptionsStateType";
 
 type Props = {
     options: OptionsType[],
-    state: 'openOptions' | 'closeOptions',
+    stateOption: OptionsStateType,
     left?: number,
     right?: number,
 };
 
-const DropDownOptions = ({options, left, right, state} : Props) => {
-    var myStyle: any = {
-        position: 'absolute', 
-        top: '50px', 
-    }
-
-    if (left) {
-        myStyle = {
-            ...myStyle,
-            left: `${left.toFixed()}px`
-        }
-    }
-
-    if (right) {
-        myStyle = {
-            ...myStyle,
-            right: `${right.toFixed()}px`
-        }
-    }
+const DropDownOptions = ({options, left, right, stateOption} : Props) => {
+    var myStyle = setStyleBox(left, right);
 
     return (
         <div
-            className={"options " + state}
+            className={"options " + setStateBox(stateOption.open)}
+            onClick={() => stateOption.setOpen(!stateOption.open)}
             style={myStyle}
         >
             <ul>
@@ -50,6 +35,33 @@ const DropDownOptions = ({options, left, right, state} : Props) => {
             </ul>
         </div>
     )
+}
+
+const setStyleBox = (leftPosition?: number, righPosition?: number) : any => {
+    var style: any = {
+        position: 'absolute', 
+        top: '50px', 
+    }
+
+    if (leftPosition) {
+        style = {
+            ...style,
+            left: `${leftPosition.toFixed()}px`
+        }
+    }
+
+    if (righPosition) {
+        style = {
+            ...style,
+            right: `${righPosition.toFixed()}px`
+        }
+    }
+
+    return style;
+}
+
+const setStateBox = (isOpen : boolean | null) : string => {
+    return (isOpen == null ? '' : isOpen ? 'openOptions' : 'closeOptions')
 }
 
 export default DropDownOptions;

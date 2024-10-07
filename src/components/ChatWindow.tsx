@@ -5,33 +5,31 @@ import Picker from '@emoji-mart/react'
 import MessageItem from "./MessageItem";
 import { UserType } from "@/types/UserType";
 import { ChatItem } from "@/types/ChatType";
-import Api from "@/Api";
+import Api from "@/services/firebase.services";
 import DropDownOptions from "./DropDownOptions";
-import OtherPerfil from "@/components/OtherPerfil";
+import { OptionsStateType } from "@/types/OptionsStateType";
 
 type Props = {
-    showUserOptions: boolean,
-    setShowUserOptions: (showUserOptions: boolean) => void,
     user: UserType,
-    activeChat: ChatItem
+    activeChat: ChatItem,
+    setViewPerfil: (viewPerfil: boolean) => void
+    stateOption: OptionsStateType,
 }
 
-const ChatWindow = ({user, activeChat, showUserOptions, setShowUserOptions}: Props) => {
-
+const ChatWindow = ({user, activeChat, stateOption, setViewPerfil}: Props) => {
+    const [emojiOpen, setEmojiOpen] = useState(false);
+    const [text, setText] = useState('');
+    const [listening, setListening] = useState(false);
+    const [list, setList] = useState([]);
+    const [users, setUsers] = useState<UserType[]>();
     const body = useRef<HTMLInputElement>(null);
+
     let recognition:SpeechRecognition;
     let SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (SpeechRecognition !== undefined) {
         recognition = new SpeechRecognition();
     }
-
-    const [emojiOpen, setEmojiOpen] = useState(false);
-    const [text, setText] = useState('');
-    const [listening, setListening] = useState(false);
-    const [list, setList] = useState([]);
-    const [users, setUsers] = useState<UserType[]>();
-    const [viewPerfil, setViewPerfil] = useState(false);
 
     useEffect(() => {
         if (body.current && body.current.scrollHeight > body.current.offsetHeight){
@@ -83,11 +81,11 @@ const ChatWindow = ({user, activeChat, showUserOptions, setShowUserOptions}: Pro
     }
 
     const handleUserOptions = (e: MouseEvent) => {
-        setShowUserOptions(!showUserOptions);
+        stateOption.setOpen(!stateOption.open);
     }
 
     const deleteConversation = async () => {
-        setShowUserOptions(false);
+        stateOption.setOpen(false);
         if (await Api.validationUser(user.id)) {
             await Api.deleteConversation(users);
             setList([]);
@@ -96,14 +94,8 @@ const ChatWindow = ({user, activeChat, showUserOptions, setShowUserOptions}: Pro
         }
     }
 
-    if (viewPerfil == true) {
-        return (
-            <OtherPerfil 
-                name={activeChat.title}
-                image={activeChat.image}
-                setViewPerfil={setViewPerfil}
-            />
-        )
+    const viewerPerfil = () => {
+        setViewPerfil(true);
     }
 
     return (
@@ -116,13 +108,13 @@ const ChatWindow = ({user, activeChat, showUserOptions, setShowUserOptions}: Pro
                     ]
                 }
                 right={27}
-                state={showUserOptions ? 'openOptions' : 'closeOptions'}
+                stateOption={stateOption}
             />
 
             <div className="h-16 border-b-2 border-[#CCC] flex justify-between items-center">
                 <div
                     className="flex items-center cursor-pointer"
-                    onClick={() => setViewPerfil(true)}
+                    onClick={viewerPerfil}
                 >
                     <img
                         className="h-10 w-10 rounded-[50%] ml-4 mr-4"
@@ -149,7 +141,7 @@ const ChatWindow = ({user, activeChat, showUserOptions, setShowUserOptions}: Pro
                     />
                     <div 
                         onClick={(e) => handleUserOptions(e)}
-                        style={{pointerEvents: showUserOptions ? 'none' : 'auto'}}
+                        style={{pointerEvents: stateOption.open ? 'none' : 'auto'}}
                      >
                         <IconItem
                             className="iconTheme"

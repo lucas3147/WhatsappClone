@@ -9,21 +9,24 @@ import IconItem from '@/components/IconItem';
 import NewChat from '@/components/NewChat';
 import { UserType } from '@/types/UserType';
 import Login from '@/components/Login';
-import Api from '@/Api';
+import Api from '@/services/firebase.services';
 import Perfil from '@/components/Perfil';
 import DropDownOptions from '@/components/DropDownOptions';
-import { redirect, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import OtherPerfil from '@/components/OtherPerfil';
+import { DropDownOptionsGeneralProvider, DropDownOptionsUserProvider } from '@/contexts/DropDownContext';
 
 export default function Home() {
 
   const [chatList, setChatList] = useState<ChatItem[]>([]);
+  const [listContacts, setListContacts] = useState<any[]>([]);
   const [activeChat, setActiveChat] = useState<ChatItem>();
   const [user, setUser] = useState<UserType | null>(null);
   const [showNewChat, setShowNewChat] = useState(false);
   const [showPerfil, setShowPerfil] = useState(false);
-  const [listContacts, setListContacts] = useState<any[]>([]);
-  const [showGeneralOptions, setShowGeneralOptions] = useState(false);
-  const [showUserOptions, setShowUserOptions] = useState(false);
+  const [showGeneralOptions, setShowGeneralOptions] = useState<boolean | null>(null);
+  const [showUserOptions, setShowUserOptions] = useState<boolean | null>(null);
+  const [viewPerfil, setViewPerfil] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -98,7 +101,10 @@ export default function Home() {
                 ]
               }
               right={20}
-              state={showGeneralOptions ? 'openOptions' : 'closeOptions'}
+              stateOption={{
+                open: showGeneralOptions,
+                setOpen: setShowGeneralOptions
+              }}
             />
           </div>
           
@@ -168,18 +174,32 @@ export default function Home() {
                 key={key}
                 chatItem={chatList[key]}
                 active={activeChat?.chatId == chatList[key].chatId}
-                onClick={() => setActiveChat(chatList[key])}
+                onClick={() => {
+                  setActiveChat(chatList[key]); 
+                  setViewPerfil(false);
+                  setShowUserOptions(null);
+                }}
               />
             ))}
           </div>
         </div>
         <div className="flex-1">
-          {activeChat?.chatId !== undefined &&
+          {activeChat?.chatId !== undefined && !viewPerfil &&
             <ChatWindow
               user={user}
               activeChat={activeChat}
-              showUserOptions={showUserOptions}
-              setShowUserOptions={setShowUserOptions}
+              setViewPerfil={setViewPerfil}
+              stateOption={{
+                open: showUserOptions,
+                setOpen: setShowUserOptions
+              }}
+            />
+          }
+          {activeChat?.chatId !== undefined && viewPerfil &&
+            <OtherPerfil 
+              name={activeChat.title}
+              image={activeChat.image}
+              setViewPerfil={setViewPerfil}
             />
           }
           {activeChat?.chatId == undefined &&

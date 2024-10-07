@@ -1,7 +1,7 @@
 import { UserType } from "@/types/UserType";
 import IconItem from "./IconItem";
 import { ChangeEvent, useState } from "react";
-import Api from "@/Api";
+import Api from "@/services/firebase.services";
 
 type Props = {
     show: boolean, 
@@ -12,9 +12,12 @@ type Props = {
 
 const Perfil = ({show , setShow, user, setUser}: Props) => {
     let nameUser = user.displayName ? user.displayName : '';
+    let messageUser = user.message ? user.message : '...';
 
     const [showNameConfirm, setShowNameConfirm] = useState(false);
     const [name, setName] = useState(nameUser);
+    const [showMessage, setShowMessage] = useState(false);
+    const [message, setMessage] = useState(messageUser);
 
     const handleUpdateName = async () => {
         if (name !== '') {
@@ -28,6 +31,21 @@ const Perfil = ({show , setShow, user, setUser}: Props) => {
     const handleDisplayName = (e: ChangeEvent<HTMLInputElement>) => {
         if (showNameConfirm) {
             setName(e.target.value);
+        }
+    }
+
+    const handleUpdateMessage = async () => {
+        if (message !== '') {
+            setShowNameConfirm(false);
+            let newUser = {...user, displayMessage: message}
+            await Api.updateUser(newUser);
+            setUser(newUser);
+        }
+    }
+
+    const handleDisplayMessage = (e: ChangeEvent<HTMLInputElement>) => {
+        if (showMessage) {
+            setMessage(e.target.value);
         }
     }
 
@@ -80,38 +98,71 @@ const Perfil = ({show , setShow, user, setUser}: Props) => {
                 </div>
             </div>
             <div
-                className="w-full px-[30px] pt-[14px] pb-[10px]"
+                className="grid grid-rows-2 gap-y-16 w-full px-[30px] pt-[14px] pb-[10px]"
             >
-                <p className="mb-[14px] text-[#008069] text-[14px]">Seu nome</p>
-                <div
-                    className="w-full h-[34px] flex " style={{borderBottom: showNameConfirm ? '2px solid #667781' : 'none'}}
-                >
-                    <input
-                        className="flex-1 inline text-[#3B4A54] text-[16px] border-0 outline-none" 
-                        type="text" 
-                        name=""
-                        value={name}
-                        onChange={(e) => handleDisplayName(e)}
-                    />
-                    <div onClick={() => setShowNameConfirm(!showNameConfirm)}>
-                        {!showNameConfirm && 
-                            <IconItem
-                                className="iconTheme"
-                                type="EditIcon"
-                                style={{ color: '#8696A0', marginBottom: '10px' }}
-                            />
-                        }
-                        {showNameConfirm && 
-                            <div onClick={handleUpdateName}>
+                <div>
+                    <p className="mb-[14px] text-[#008069] text-[14px] flex">Seu nome</p>
+                    <div
+                        className="w-full h-[34px] flex" style={{borderBottom: showNameConfirm ? '2px solid #667781' : 'none'}}
+                    >
+                        <input
+                            className="flex-1 inline text-[#3B4A54] text-[16px] border-0 outline-none" 
+                            type="text" 
+                            name=""
+                            value={name}
+                            onChange={(e) => handleDisplayName(e)}
+                        />
+                        <div onClick={() => setShowNameConfirm(!showNameConfirm)}>
+                            {!showNameConfirm && 
                                 <IconItem
                                     className="iconTheme"
-                                    type="CheckIcon"
+                                    type="EditIcon"
                                     style={{ color: '#8696A0', marginBottom: '10px' }}
                                 />
-                            </div>
-                        }
+                            }
+                            {showNameConfirm && 
+                                <div onClick={handleUpdateName}>
+                                    <IconItem
+                                        className="iconTheme"
+                                        type="CheckIcon"
+                                        style={{ color: '#8696A0', marginBottom: '10px' }}
+                                    />
+                                </div>
+                            }
+                        </div>
                     </div>
-                    
+                </div>
+                <div>
+                    <p className="mb-[14px] text-[#008069] text-[14px] flex">Recado</p>
+                    <div
+                        className="w-full h-[34px] flex" style={{borderBottom: showMessage ? '2px solid #667781' : 'none'}}
+                    >
+                        <input
+                            className="flex-1 inline text-[#3B4A54] text-[16px] border-0 outline-none" 
+                            type="text" 
+                            name=""
+                            value={message}
+                            onChange={(e) => handleDisplayMessage(e)}
+                        />
+                        <div onClick={() => setShowMessage(!showMessage)}>
+                            {!showMessage && 
+                                <IconItem
+                                    className="iconTheme"
+                                    type="EditIcon"
+                                    style={{ color: '#8696A0', marginBottom: '10px' }}
+                                />
+                            }
+                            {showMessage && 
+                                <div onClick={handleUpdateMessage}>
+                                    <IconItem
+                                        className="iconTheme"
+                                        type="CheckIcon"
+                                        style={{ color: '#8696A0', marginBottom: '10px' }}
+                                    />
+                                </div>
+                            }
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
