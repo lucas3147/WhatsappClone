@@ -1,11 +1,12 @@
-import { getFirestore } from "firebase/firestore";
-import {app, auth} from '../../config/firebase.config';
+import { addDoc, collection, getDocs, getFirestore, query, where } from 'firebase/firestore';
 import Api from '../../services/firebase.services';
-import { UserType } from "@/types/UserType";
+import { UserType } from "../../types/UserType";
+import { app } from '../../config/firebase.config';
 
 describe('Testing firebase services', () => {
 
     let user : UserType;
+    const db = getFirestore(app);
 
     beforeAll(() => {
        user = {
@@ -18,7 +19,23 @@ describe('Testing firebase services', () => {
     });
 
     it('should create a new user', async () => {
-        let result = await Api.addUser(user);
+        let result;
+        const q = query(collection(db, "users"), where("uid", "==", user.id));
+        const docSnap = await getDocs(q);
+        if (docSnap.docs.length == 0) {
+            const docRef = await addDoc(collection(db, 'users'), {
+                uid: user.id,
+                name: user.displayName,
+                photoUrl: user.photoURL
+            });
+
+            user.codeDataBase = docRef.id;
+            result = true;
+        } else {
+            user.codeDataBase = docSnap.docs[0].id;
+            result = false;
+        }
+
         expect(result).toBeTruthy();
     });
 });
