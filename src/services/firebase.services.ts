@@ -1,10 +1,8 @@
 import 'firebase/auth';
 import 'firebase/firestore';
-import {app, auth} from '../config/firebase.config';
+import { db, auth } from '../config/firebase.config';
 import { GithubAuthProvider, signInWithPopup, getAuth, signOut, getRedirectResult } from "firebase/auth";
-import { getFirestore, collection, addDoc, onSnapshot, query, where, getDocs, doc, updateDoc, arrayUnion } from 'firebase/firestore';
-
-const db = getFirestore(app);
+import { collection, addDoc, onSnapshot, query, where, getDocs, doc, updateDoc, arrayUnion, deleteDoc, setDoc, getDoc } from 'firebase/firestore';
 
 export default {
     githubPopup: async () => {
@@ -50,21 +48,26 @@ export default {
             return false;
         }
     },
-    getUser: async (myUserId) => {
-        const q = query(collection(db, "users"), where("uid", "==", myUserId));
-        const docSnap = await getDocs(q);
-        let data = docSnap.docs[0].data();
+    getUser: async (userId) => {
+        const docSnap = await getDoc(doc(db, "users", userId));
+        let user;
 
-        return {
-            id: data.uid,
-            photoURL: data.photoUrl,
-            displayName: data.name,
-            codeDataBase: docSnap.docs[0].id,
-            message: data.message
+        if (docSnap.exists()) {
+            let data = docSnap.data();
+
+            user = {
+                id: data.uid,
+                photoURL: data.photoUrl,
+                displayName: data.name,
+                codeDataBase: userId,
+                message: data.message
+            }
         }
+
+        return user;
     },
     updateUser: async (user) => {
-        await updateDoc(doc(db, 'users', user.codeDataBase), {
+        await updateDoc(doc(db, 'users', user.id), {
             uid: user.id,
             name: user.displayName,
             photoUrl: user.photoURL,
@@ -122,8 +125,8 @@ export default {
         return list;
     },
     addNewChat: async (user, otherUser) => {
-        const usersRef = collection(db, "chats");
-        const q = query(usersRef, where("users", "array-contains", user.id));
+        const chatsRef = collection(db, "chats");
+        const q = query(chatsRef, where("users", "array-contains", user.id));
         const docSnapshot = await getDocs(q);
         let data = true;
         data = docSnapshot.docs.some(d => d.data().users[0] == otherUser.id || d.data().users[1] == otherUser.id);
@@ -133,7 +136,7 @@ export default {
                 users: [user.id, otherUser.id]
             });
 
-            let docRef = doc(db, 'users', user.codeDataBase);
+            let docRef = doc(db, 'users', user.id);
 
             await updateDoc(docRef, {
                 chats: arrayUnion({
@@ -144,7 +147,7 @@ export default {
                 })
             });
 
-            docRef = doc(db, 'users', otherUser.codeDataBase);
+            docRef = doc(db, 'users', otherUser.id);
 
             await updateDoc(docRef, {
                 chats: arrayUnion({
@@ -156,40 +159,36 @@ export default {
             });
         }
     },
-    onChatList: (codeUser, setChatList) => {
-        return onSnapshot(doc(db, 'users', codeUser), (doc) => {
-            if (doc.exists) {
-                let data = doc.data();
-                if (data.chats) {
-                    let chats = [...data.chats];
+    onChatList: async (userId) => {
+        const userSnap = await getDoc(doc(db, 'users', userId));
+        if (userSnap.exists()) {
+            let data = userSnap.data();
+            if (data.chats) {
+                let chats = [...data.chats];
 
-                    chats.sort((a,b) => {
-                        if (a.lastMessageDate === undefined) {
-                            return -1;
-                        }
-                        if (b.lastMessageDate === undefined) {
-                            return -1;
-                        }
-                        if (a.lastMessageDate.seconds < b.lastMessageDate.seconds) {
-                            return 1;
-                        } else {
-                            return -1;
-                        }
-                    })
+                chats.sort((a,b) => {
+                    if (a.lastMessageDate === undefined) {
+                        return -1;
+                    }
+                    if (b.lastMessageDate === undefined) {
+                        return -1;
+                    }
+                    if (a.lastMessageDate.seconds < b.lastMessageDate.seconds) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                })
 
-                    setChatList(chats);
-                }
+                return chats;
             }
-        });
+        }
     },
-    onChatContent: (chatId, setList, setUsers) => {
-        return onSnapshot(doc(db, 'chats', chatId), (doc) => {
-            if (doc.exists) {
-                let data = doc.data();
-                setList(data.messages);
-                setUsers(data.users);
-            }
-        });
+    onChatContent: async (chatId) => {
+        const snapChat = await getDoc(doc(db, 'chats', chatId));
+        if (snapChat.exists()) {
+            return snapChat.data();
+        }
     },
     sendMessage: async (chatData, userId, type, body, users) => {
         let now = new Date();
@@ -206,11 +205,9 @@ export default {
         });
         
         for(let i in users) {
-            const q = query(usersRef, where("uid", "==", users[i]));
-            const docSnap = await getDocs(q);
-            let data = docSnap.docs[0];
-            if (data.data().chats) {
-                let chats = [...data.data().chats];
+            const docSnap = await getDoc(doc(db, "users", users[i]));
+            if (docSnap.data().chats) {
+                let chats = [...docSnap.data().chats];
 
                 for (let e in chats) {
                     if (chats[e].chatId == chatData.chatId) {
@@ -219,7 +216,7 @@ export default {
                     }
                 }
 
-                await updateDoc(doc(db, 'users', data.id), {
+                await updateDoc(doc(db, 'users', users[i]), {
                     chats
                 });
             }
@@ -227,8 +224,8 @@ export default {
     },
     getContactsIncluded: async (myUserId) => {
         let list = [];
-        const usersRef = collection(db, "chats");
-        const q = query(usersRef, where("users", "array-contains", myUserId));
+        const chatsRef = collection(db, "chats");
+        const q = query(chatsRef, where("users", "array-contains", myUserId));
         const docSnapshot = await getDocs(q);
         docSnapshot.forEach((doc) => {
             list.push(doc.data().users[0]);
@@ -240,9 +237,7 @@ export default {
         return list;
     },
     deleteConversation: async (users) => {
-        const listUsers = users;
         const chatsRef = collection(db, "chats");
-        const usersRef = collection(db, "users");
         let q = query(chatsRef, where("users", "==", users));
         let docSnapshot = await getDocs(q);
         let chatData = docSnapshot.docs[0];
@@ -253,11 +248,10 @@ export default {
         }
 
         for(let i in users) {
-            const q = query(usersRef, where("uid", "==", users[i]));
-            const docSnap = await getDocs(q);
-            let userData = docSnap.docs[0];
-            if (userData.data().chats) {
-                let chats = [...userData.data().chats];
+            const docSnap = await getDoc(doc(db, "users", users[i]));
+            let user = docSnap.data();
+            if (user.chats) {
+                let chats = [...user.chats];
 
                 for (let e in chats) {
                     if (chats[e].chatId == chatData.id) {
@@ -266,29 +260,63 @@ export default {
                     }
                 }
 
-                await updateDoc(doc(db, 'users', userData.id), {
+                await updateDoc(doc(db, "users", users[i]), {
                     chats
                 });
             }
         }
     },
-    validationUser: async (idUser) => {
-        if (idUser) {
-            const usersRef = collection(db, "users");
-            const q = query(usersRef, where("uid", "==", idUser));
-            const docSnap = await getDocs(q);
-            let userData = docSnap.docs[0];
-            if (userData.data().admin) {
-                return true;
-            } else {
-                return false
-            }
+    validationUser: async (userId) => {
+        const userRef = doc(db, "users", userId); 
+        const userSnap = await getDoc(userRef);
+        let user = userSnap.data();
+        if (user.admin) {
+            return true;
         } else {
-            return false;
+            return false
         }
     },
     syncronizeUser: async () => {
-        const result = await getRedirectResult(getAuth());
-        return result;
+        return await getRedirectResult(getAuth());
+    },
+    deleteUser: async (userId) => {
+        try {
+          await deleteDoc(doc(db, 'users', userId));
+          return true;
+        } catch (error) {
+          return false;
+        }
+    },
+    setUser: async (user) => {
+
+        const docRef = doc(db, "users", user.id);
+
+        const userData = {
+            name: user.displayName,
+            photoUrl: user.photoURL
+        };
+
+        try {
+            await setDoc(docRef, userData);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    },
+    existUser: async (userId) => {
+        const userRef = doc(db, "users", userId); 
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+            return true; 
+        } else {
+            return false; 
+        }
+    },
+    existChat: async (userId, otherUserId) : Promise<boolean> => {
+        const chatsRef = collection(db, "chats");
+        const q = query(chatsRef, where("users", "array-contains", userId));
+        const docSnapshot = await getDocs(q);
+        return docSnapshot.docs.some(d => d.data().users[0] == otherUserId || d.data().users[1] == otherUserId);
     }
 };

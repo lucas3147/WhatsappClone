@@ -2,7 +2,7 @@ import { Props } from "@/types/NewChatType";
 import IconItem from "./IconItem";
 import { useState, useEffect } from "react";
 import { UserType } from "@/types/UserType";
-import Api from "@/Api";
+import Api from "@/services/firebase.services";
 
 const NewChat = ({listContacts, setListContacts, user, show, setShow}: Props) => {
     const [list, setList] = useState<UserType[]>([]);

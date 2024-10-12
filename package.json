@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "emulator": "firebase emulators:start --only firestore",
     "test": "set NODE_ENV=test& jest --runInBand",
     "dev": "next dev",
     "build": "next build",
@@ -21,9 +22,11 @@
     "emoji-mart": "^5.5.2",
     "emoji-picker-react": "^4.5.15",
     "firebase": "^10.7.0",
+    "my-app": "file:",
     "next": "14.0.2",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.7",

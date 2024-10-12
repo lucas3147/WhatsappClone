@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import { getAuth } from "firebase/auth";
 import { initializeApp } from 'firebase/app';
 import apiCredentials from './firebase.credentials';
+import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
 
 dotenv.config();
 
@@ -14,5 +15,12 @@ const firebaseConfig = {
     appId: apiCredentials.app_id
 };
 
+
 export const app = initializeApp(firebaseConfig);
+export const db = getFirestore(app);
 export const auth = getAuth(app);
+
+if (process.env.NODE_ENV === 'test') {
+    connectFirestoreEmulator(db, 'localhost', 8080);
+}
+
