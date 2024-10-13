@@ -39,7 +39,7 @@ export default {
             photoUrl: user.photoURL
         };
 
-        try {
+        try { 
             await setDoc(docRef, userData);
             return true;
         } catch (error) {
@@ -153,36 +153,18 @@ export default {
             });
         }
     },
-    onChatList: async (userId) => {
-        const userSnap = await getDoc(doc(db, 'users', userId));
-        if (userSnap.exists()) {
-            let data = userSnap.data();
-            if (data.chats) {
-                let chats = [...data.chats];
-
-                chats.sort((a,b) => {
-                    if (a.lastMessageDate === undefined) {
-                        return -1;
-                    }
-                    if (b.lastMessageDate === undefined) {
-                        return -1;
-                    }
-                    if (a.lastMessageDate.seconds < b.lastMessageDate.seconds) {
-                        return 1;
-                    } else {
-                        return -1;
-                    }
-                })
-
-                return chats;
+    onChatList: (userId, submit) => {
+        return onSnapshot(doc(db, 'users', userId), (doc) => {
+            if (doc.exists) {
+                if (doc.data().chats) 
+                    submit(doc.data().chats);
             }
-        }
+        });
     },
-    onChatContent: async (chatId) => {
-        const snapChat = await getDoc(doc(db, 'chats', chatId));
-        if (snapChat.exists()) {
-            return snapChat.data();
-        }
+    onChatContent: (chatId, submit) => {
+        return onSnapshot(doc(db, 'chats', chatId), (doc) => {
+            if (doc.exists) submit(doc.data());
+        });
     },
     sendMessage: async (chatData, userId, type, body, users) => {
         let now = new Date();
@@ -296,5 +278,16 @@ export default {
         const q = query(chatsRef, where("users", "array-contains", userId));
         const docSnapshot = await getDocs(q);
         return docSnapshot.docs.some(d => d.data().users[0] == otherUserId || d.data().users[1] == otherUserId);
+    },
+    getChatsUser: async (userId) : Promise<any[]> => {
+        const userRef = doc(db, "users", userId); 
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.data()) {
+            return userSnap.data().chats;
+        }
+        else {
+            return [];
+        }
     }
 };

@@ -10,7 +10,7 @@ let apiCredentials = {
     app_id: process.env.NEXT_PUBLIC_APP_ID as string
 }
 
-if (process.env.NEXT_PUBLIC_NODE_ENV === 'test') {
+if (process.env.NEXT_PUBLIC_ENV === 'test') {
     apiCredentials = {
         api_key: process.env.NEXT_PUBLIC_API_TEST_KEY as string,
         auth_domain: process.env.NEXT_PUBLIC_AUTH_TEST_DOMAIN as string,

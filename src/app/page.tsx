@@ -28,23 +28,41 @@ export default function Home() {
   const [viewPerfil, setViewPerfil] = useState(false);
   const router = useRouter();
 
-  const getChatList = async () => {
-    let chatList = await Api.onChatList(user.id);
-    setChatList(chatList);
-  }
-
   useEffect(() => {
-    if (user !== null) getChatList();
+    if (user !== null) {
+      return Api.onChatList(user.id, (myChats) => {
+        setChatList(handleSortChats(myChats));
+      });
+    }
   },[listContacts]);
 
-  const handleLoginData = async (newUser: UserType) => {
-    let userAdded = await Api.addUser(newUser);
-    if (userAdded == false) {
-      newUser = await Api.getUser(newUser.id);
+  const handleSortChats = (chats) => {
+    chats.sort((a,b) => {
+      if (a.lastMessageDate === undefined) {
+          return -1;
+      }
+      if (b.lastMessageDate === undefined) {
+          return -1;
+      }
+      if (a.lastMessageDate.seconds < b.lastMessageDate.seconds) {
+          return 1;
+      } else {
+          return -1;
+      }
+    });
+
+    return chats;
+  }
+
+  const handleLoginData = async (user: UserType) => {
+    let existUser = await Api.existUser(user.id);
+    if (!existUser) 
+    {
+      await Api.addUser(user);
     }
-    let contacts = await Api.getContactsIncluded(newUser.id);
+    let contacts = await Api.getContactsIncluded(user.id);
+    setUser(user);
     setListContacts(contacts);
-    setUser(newUser);
   }
 
   const handleNewChat = async () => {

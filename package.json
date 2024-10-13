@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "emulator": "firebase emulators:start --only firestore",
-    "test": "set NEXT_PUBLIC_NODE_ENV=test& set EMULATOR=true& jest --runInBand",
-    "dev": "set NEXT_PUBLIC_NODE_ENV=test& next dev",
+    "uiemulator": "firebase emulators:start",
+    "test": "set EMULATOR=true& jest --runInBand",
+    "dev": "set NEXT_PUBLIC_ENV=test& next dev",
+    "emulatordev": "set EMULATOR=true& next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

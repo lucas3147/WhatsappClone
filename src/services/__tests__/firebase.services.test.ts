@@ -1,6 +1,7 @@
 import apiFirebase from '../../services/firebase.services';
 import { UserType } from "../../types/UserType";
 import { generateId } from '../../library/resources';
+import { ChatItem } from '@/types/ChatType';
 
 describe('Testing firebase services', () => {
 
@@ -59,36 +60,43 @@ describe('Testing firebase services', () => {
     });
 
     it('should grab a complete user chat list', async () => {
-        let chatList = await apiFirebase.onChatList(user.id);
-        
-        expect(chatList.length).toBeGreaterThan(0);
-        expect(chatList[0].with).toBe(otherUser.id);
+        let unsubscribe = apiFirebase.onChatList(user.id, (myChats) => {
+            expect(myChats.length).toBeGreaterThan(0);
+            expect(myChats[0].with).toBe(otherUser.id);
+        });
+
+        unsubscribe();
     });
 
     it('should grab the user chat content', async () => {
-        let chatList = await apiFirebase.onChatList(user.id);
-        let chatContent = await apiFirebase.onChatContent(chatList[0].chatId);
-        
-        expect(chatContent.messages).toBeDefined();
-        expect(chatContent.messages).toHaveLength(0);
-        expect(chatContent.users).toContain(user.id);
-        expect(chatContent.users).toContain(otherUser.id);
+        let unsubscribe = apiFirebase.onChatContent(user.id, (chatContent) => {
+            expect(chatContent.messages).toBeDefined();
+            expect(chatContent.messages).toHaveLength(0);
+            expect(chatContent.users).toContain(user.id);
+            expect(chatContent.users).toContain(otherUser.id);
+        });
+
+        unsubscribe();
     });
 
     it('should send chat messages', async () => {
         let message = 'oi, enviando mensagem de teste';
-        let chatList = await apiFirebase.onChatList(user.id);
         let users = [user.id, otherUser.id];
+
+        let chatList = await apiFirebase.getChatsUser(user.id);
+
         await apiFirebase.sendMessage(chatList[0], user.id, 'text', message, users);
 
-        let chatContent = await apiFirebase.onChatContent(chatList[0].chatId);
+        let unsubscribe = apiFirebase.onChatContent(user.id, (chatContent) => {
+            expect(chatContent.messages).toBeDefined();
+            expect(chatContent.messages.length).toBeGreaterThan(0);
+            expect(chatContent.messages[0]).toHaveProperty("body");
+            expect(chatContent.messages[0].body).toBe(message);
+            expect(chatContent.users).toContain(user.id);
+            expect(chatContent.users).toContain(otherUser.id);
+        });
 
-        expect(chatContent.messages).toBeDefined();
-        expect(chatContent.messages.length).toBeGreaterThan(0);
-        expect(chatContent.messages[0]).toHaveProperty("body");
-        expect(chatContent.messages[0].body).toBe(message);
-        expect(chatContent.users).toContain(user.id);
-        expect(chatContent.users).toContain(otherUser.id);
+        unsubscribe();
     });
 
     it('should verify on list contacts', async () => {
@@ -103,14 +111,20 @@ describe('Testing firebase services', () => {
         let users = [user.id, otherUser.id];
         await apiFirebase.deleteConversation(users);
 
-        let chatList = await apiFirebase.onChatList(user.id);
-        let chatContent = await apiFirebase.onChatContent(chatList[0].chatId);
+        let unsubscribe = apiFirebase.onChatContent(user.id, (chatContent) => {
+            expect(chatContent.messages).toBeDefined();
+            expect(chatContent.messages).toHaveLength(0);
+            expect(chatContent.messages[0]).toBeUndefined();
+        });
 
-        expect(chatContent.messages).toBeDefined();
-        expect(chatContent.messages).toHaveLength(0);
-        expect(chatContent.messages[0]).toBeUndefined();
-        expect(chatList[0].lastMessage).toHaveLength(0);
-        expect(chatList[0].lastMessageDate).toHaveLength(0);
+        unsubscribe();
+
+        unsubscribe = apiFirebase.onChatList(user.id, (chatList) => {
+            expect(chatList[0].lastMessage).toHaveLength(0);
+            expect(chatList[0].lastMessageDate).toHaveLength(0);
+        });
+        
+        unsubscribe();
     });
 
     it('should validation a user admin', async () => {
