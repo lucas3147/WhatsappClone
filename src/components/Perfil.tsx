@@ -12,7 +12,7 @@ type Props = {
 
 const Perfil = ({show , setShow, user, setUser}: Props) => {
     let nameUser = user.displayName ? user.displayName : '';
-    let messageUser = user.message ? user.message : '...';
+    let messageUser = false ? '' : '...teste...';
 
     const [showNameConfirm, setShowNameConfirm] = useState(false);
     const [name, setName] = useState(nameUser);

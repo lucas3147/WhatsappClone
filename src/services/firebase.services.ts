@@ -32,19 +32,17 @@ export default {
         });
     },
     addUser: async (user) => {
-        const q = query(collection(db, "users"), where("uid", "==", user.id));
-        const docSnap = await getDocs(q);
-        if (docSnap.docs.length == 0) {
-            const docRef = await addDoc(collection(db, 'users'), {
-                uid: user.id,
-                name: user.displayName,
-                photoUrl: user.photoURL
-            });
+        const docRef = doc(db, "users", user.id);
 
-            user.codeDataBase = docRef.id;
+        const userData = {
+            name: user.displayName,
+            photoUrl: user.photoURL
+        };
+
+        try {
+            await setDoc(docRef, userData);
             return true;
-        } else {
-            user.codeDataBase = docSnap.docs[0].id;
+        } catch (error) {
             return false;
         }
     },
@@ -56,11 +54,9 @@ export default {
             let data = docSnap.data();
 
             user = {
-                id: data.uid,
+                id: userId,
                 photoURL: data.photoUrl,
-                displayName: data.name,
-                codeDataBase: userId,
-                message: data.message
+                displayName: data.name
             }
         }
 
@@ -68,39 +64,38 @@ export default {
     },
     updateUser: async (user) => {
         await updateDoc(doc(db, 'users', user.id), {
-            uid: user.id,
             name: user.displayName,
-            photoUrl: user.photoURL,
-            message: user.message
+            photoUrl: user.photoURL
         });
 
-        const q = query(collection(db, "users"), where("uid", "!=", user.id));
-        const querySnapshot = await getDocs(q);
-        let listChatsOfUser = [];
-        if (querySnapshot){
-            querySnapshot.forEach(async (docRef) => {
-                if (docRef.data().chats){
-                    listChatsOfUser = [];
-
-                    docRef.data().chats.forEach((chat) => {
-
-                        if (chat.with == user.id) 
-                        {
-                            listChatsOfUser.push({
-                                ...chat,
-                                title: user.displayName,
-                                message: user.message
-                            });
-                        } else {
-                            listChatsOfUser.push({
-                                ...chat
-                            });
-                        }
-                    });
-
-                    await updateDoc(doc(db, 'users', docRef.id), {
-                        chats: listChatsOfUser
-                    });
+        const otherUsersSnap = await getDocs(collection(db, "users"));
+        let chatsOfUser = [];
+        if (otherUsersSnap){
+            otherUsersSnap.forEach(async (docRef) => {
+                if (docRef.id !== user.id) {
+                    let user = docRef.data();
+                    if (user.chats){
+                        chatsOfUser = [];
+    
+                        user.chats.forEach((chat) => {
+    
+                            if (chat.with == user.id) 
+                            {
+                                chatsOfUser.push({
+                                    ...chat,
+                                    title: user.displayName
+                                });
+                            } else {
+                                chatsOfUser.push({
+                                    ...chat
+                                });
+                            }
+                        });
+    
+                        await updateDoc(doc(db, 'users', docRef.id), {
+                            chats: chatsOfUser
+                        });
+                    }
                 }
             });
         }
@@ -111,13 +106,12 @@ export default {
         const q = query(usersRef);
         const querySnapshot = await getDocs(q);
         querySnapshot.forEach((doc) => {
-            if (myContactsIncluded.some(c => c == doc.data().uid) == false) 
+            if (myContactsIncluded.some(c => c == doc.id) == false) 
             {
                 list.push({
-                    id: doc.data().uid,
+                    id: doc.id,
                     photoURL: doc.data().photoUrl,
-                    displayName: doc.data().name,
-                    codeDataBase: doc.id
+                    displayName: doc.data().name
                 });
             }
         });
@@ -285,22 +279,6 @@ export default {
           return true;
         } catch (error) {
           return false;
-        }
-    },
-    setUser: async (user) => {
-
-        const docRef = doc(db, "users", user.id);
-
-        const userData = {
-            name: user.displayName,
-            photoUrl: user.photoURL
-        };
-
-        try {
-            await setDoc(docRef, userData);
-            return true;
-        } catch (error) {
-            return false;
         }
     },
     existUser: async (userId) => {

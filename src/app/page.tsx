@@ -14,7 +14,6 @@ import Perfil from '@/components/Perfil';
 import DropDownOptions from '@/components/DropDownOptions';
 import { useRouter } from 'next/navigation';
 import OtherPerfil from '@/components/OtherPerfil';
-import { DropDownOptionsGeneralProvider, DropDownOptionsUserProvider } from '@/contexts/DropDownContext';
 
 export default function Home() {
 
@@ -29,11 +28,13 @@ export default function Home() {
   const [viewPerfil, setViewPerfil] = useState(false);
   const router = useRouter();
 
+  const getChatList = async () => {
+    let chatList = await Api.onChatList(user.id);
+    setChatList(chatList);
+  }
+
   useEffect(() => {
-    if (user !== null) {
-      let onsub = Api.onChatList(user.codeDataBase, setChatList);
-      return onsub;
-    }
+    if (user !== null) getChatList();
   },[listContacts]);
 
   const handleLoginData = async (newUser: UserType) => {

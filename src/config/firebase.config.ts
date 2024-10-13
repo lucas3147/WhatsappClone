@@ -15,12 +15,11 @@ const firebaseConfig = {
     appId: apiCredentials.app_id
 };
 
-
 export const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 
-if (process.env.NODE_ENV === 'test') {
+if (process.env.EMULATOR === 'true') {
     connectFirestoreEmulator(db, 'localhost', 8080);
 }
 

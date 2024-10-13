@@ -1,4 +1,4 @@
-import Api from "@/Api";
+import Api from "@/services/firebase.services";
 import { UserType } from "@/types/UserType";
 import { useState } from "react";
 

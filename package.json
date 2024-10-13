@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "emulator": "firebase emulators:start --only firestore",
-    "test": "set NODE_ENV=test& jest --runInBand",
-    "dev": "next dev",
+    "test": "set NEXT_PUBLIC_NODE_ENV=test& set EMULATOR=true& jest --runInBand",
+    "dev": "set NEXT_PUBLIC_NODE_ENV=test& next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

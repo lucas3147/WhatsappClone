@@ -11,20 +11,18 @@ describe('Testing firebase services', () => {
         user = {
             id: generateId(),
             displayName: 'Lucas L.',
-            photoURL: 'teste_2.img',
-            message: ''
+            photoURL: 'teste_2.img'
         };
 
         otherUser = {
             id: generateId(),
             displayName: 'Gustavo L.',
-            photoURL: 'teste_2.img',
-            message: ''
+            photoURL: 'teste_2.img'
         }
     });
     
     it('should create a new user with name Lucas', async () => {
-        let result = await apiFirebase.setUser(user);
+        let result = await apiFirebase.addUser(user);
         let existUser = await apiFirebase.existUser(user.id);
 
         expect(result).toBeTruthy();
@@ -32,7 +30,7 @@ describe('Testing firebase services', () => {
     });
 
     it('should create a new user with name Gustavo', async () => {
-        let result = await apiFirebase.setUser(otherUser);
+        let result = await apiFirebase.addUser(otherUser);
         let existUser = await apiFirebase.existUser(otherUser.id);
 
         expect(result).toBeTruthy();
@@ -40,11 +38,11 @@ describe('Testing firebase services', () => {
     });
 
     it('should update a user', async () => {
-        user.message = 'oi, teste de mensagem!';
+        user.photoURL = 'teste_3_image.png';
         await apiFirebase.updateUser(user);
         let userChanged = await apiFirebase.getUser(user.id);
 
-        expect(userChanged.message).toBe(user.message);
+        expect(userChanged.photoURL).toBe(user.photoURL);
     });
 
     it('should get the contact lists', async () => {

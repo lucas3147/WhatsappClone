@@ -2,8 +2,6 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import NoSsr from '@/components/NoSsr'
-import { DropDownOptionsGeneralProvider } from '@/contexts/DropDownContext'
-import { useState } from 'react'
 
 const inter = Inter({ subsets: ['latin'] })
 
