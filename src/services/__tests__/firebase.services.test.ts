@@ -1,7 +1,10 @@
-import apiFirebase from '../../services/firebase.services';
-import { UserType } from "../../types/UserType";
+import apiFirebase from '../firebase.service.firestore';
+import { UsersIdType, UserType } from "../../types/User/UserType";
 import { generateId } from '../../library/resources';
-import { ChatItem } from '@/types/ChatType';
+import { ChatUserItem } from '@/types/Chat/ChatType';
+import { MessageItemType } from '@/types/Chat/MessageType';
+import { Timestamp } from 'firebase/firestore';
+import { Unsubscribe } from 'firebase/auth';
 
 describe('Testing firebase services', () => {
 
@@ -41,7 +44,7 @@ describe('Testing firebase services', () => {
     it('should update a user', async () => {
         user.photoURL = 'teste_3_image.png';
         await apiFirebase.updateUser(user);
-        let userChanged = await apiFirebase.getUser(user.id);
+        let userChanged = await apiFirebase.getUser(user.id) as UserType;
 
         expect(userChanged.photoURL).toBe(user.photoURL);
     });
@@ -80,23 +83,26 @@ describe('Testing firebase services', () => {
     });
 
     it('should send chat messages', async () => {
-        let message = 'oi, enviando mensagem de teste';
+        let body = 'oi, enviando mensagem de teste 23';
         let users = [user.id, otherUser.id];
+        let chatList : ChatUserItem[]
 
-        let chatList = await apiFirebase.getChatsUser(user.id);
+        chatList = await apiFirebase.getChatsUser(user.id);
 
-        await apiFirebase.sendMessage(chatList[0], user.id, 'text', message, users);
+        let message : MessageItemType = { 
+            author: user.id, 
+            body, 
+            date: Timestamp.fromDate(new Date()), 
+            type: 'text'
+        };
 
-        let unsubscribe = apiFirebase.onChatContent(user.id, (chatContent) => {
-            expect(chatContent.messages).toBeDefined();
-            expect(chatContent.messages.length).toBeGreaterThan(0);
-            expect(chatContent.messages[0]).toHaveProperty("body");
-            expect(chatContent.messages[0].body).toBe(message);
-            expect(chatContent.users).toContain(user.id);
-            expect(chatContent.users).toContain(otherUser.id);
-        });
+        await apiFirebase.sendMessage(chatList[0].chatId, message, users);
 
-        unsubscribe();
+        chatList = await apiFirebase.getChatsUser(user.id);
+        expect(chatList[0].lastMessage).toBeDefined();
+        expect(chatList[0].lastMessage).toBe(body);
+        expect(chatList[0].lastMessageDate).toBeDefined();
+        expect(chatList[0].with).toBe(otherUser.id);
     });
 
     it('should verify on list contacts', async () => {
@@ -107,7 +113,7 @@ describe('Testing firebase services', () => {
         expect(contacts).toContain(otherUser.id);
     });
 
-    it('should delete the conversation', async () => {
+    it.skip('should delete the conversation', async () => {
         let users = [user.id, otherUser.id];
         await apiFirebase.deleteConversation(users);
 

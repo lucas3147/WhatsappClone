@@ -1,17 +1,19 @@
 import { useState, useEffect, useRef, RefObject, MouseEvent } from "react";
-import IconItem from "./IconItem";
+import IconItem from "../Icons/IconItem";
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
 import MessageItem from "./MessageItem";
-import { UserType } from "@/types/UserType";
-import { ChatItem } from "@/types/ChatType";
-import Api from "@/services/firebase.services";
-import DropDownOptions from "./DropDownOptions";
-import { OptionsStateType } from "@/types/OptionsStateType";
+import { UsersIdType, UserType } from "@/types/User/UserType";
+import { ChatMessagesItem, ChatUserItem } from "@/types/Chat/ChatType";
+import Api from "@/services/firebase.service.firestore";
+import DropDownOptions from "../Options/DropDownOptions";
+import { OptionsStateType } from "@/types/Options/OptionsStateType";
+import { MessageItemType } from "@/types/Chat/MessageType";
+import { Timestamp } from "firebase/firestore";
 
 type Props = {
     user: UserType,
-    activeChat: ChatItem,
+    activeChat: ChatUserItem,
     setViewPerfil: (viewPerfil: boolean) => void
     stateOption: OptionsStateType,
 }
@@ -20,8 +22,8 @@ const ChatWindow = ({user, activeChat, stateOption, setViewPerfil}: Props) => {
     const [emojiOpen, setEmojiOpen] = useState(false);
     const [text, setText] = useState('');
     const [listening, setListening] = useState(false);
-    const [list, setList] = useState([]);
-    const [users, setUsers] = useState<UserType[]>();
+    const [listMessages, setListMessages] = useState<MessageItemType[]>([]);
+    const [users, setUsers] = useState<UsersIdType>([]);
     const body = useRef<HTMLInputElement>(null);
 
     let recognition:SpeechRecognition;
@@ -35,12 +37,12 @@ const ChatWindow = ({user, activeChat, stateOption, setViewPerfil}: Props) => {
         if (body.current && body.current.scrollHeight > body.current.offsetHeight){
             body.current.scrollTop = body.current.scrollHeight - body.current.offsetHeight;
         }
-    }, [list]);
+    }, [listMessages]);
 
     useEffect(() => {
         return Api.onChatContent(activeChat.chatId, (chat) => {
-            setList([]);
-            setList(chat.messages);
+            setListMessages([]);
+            setListMessages(chat.messages);
             setUsers(chat.users);
         });
     }, [activeChat.chatId]);
@@ -72,7 +74,8 @@ const ChatWindow = ({user, activeChat, stateOption, setViewPerfil}: Props) => {
         if (text !== '') {
             setText('');
             setEmojiOpen(false);
-            await Api.sendMessage(activeChat, user.id, 'text', text, users);
+            const message : MessageItemType = { author: user.id, body: text, date: Timestamp.fromDate(new Date()), type: 'text'};
+            await Api.sendMessage(activeChat.chatId, message, users);
         }
     }
 
@@ -90,7 +93,7 @@ const ChatWindow = ({user, activeChat, stateOption, setViewPerfil}: Props) => {
         stateOption.setOpen(false);
         if (await Api.validationUser(user.id)) {
             await Api.deleteConversation(users);
-            setList([]);
+            setListMessages([]);
         } else {
             alert('Sinto muito. Você não tem acesso!');
         }
@@ -155,7 +158,7 @@ const ChatWindow = ({user, activeChat, stateOption, setViewPerfil}: Props) => {
                 </div>
             </div>
             <div ref={body} className="chatWindow--body">
-                {list.length > 0 && list.map((item, key) => (
+                {listMessages.length > 0 && listMessages.map((item, key) => (
                     <MessageItem
                         key={key}
                         data={item} 

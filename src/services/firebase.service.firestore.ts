@@ -1,37 +1,13 @@
 import 'firebase/auth';
 import 'firebase/firestore';
-import { db, auth } from '../config/firebase.config';
-import { GithubAuthProvider, signInWithPopup, getAuth, signOut, getRedirectResult } from "firebase/auth";
+import { db } from '../config/firebase.config';
 import { collection, addDoc, onSnapshot, query, where, getDocs, doc, updateDoc, arrayUnion, deleteDoc, setDoc, getDoc } from 'firebase/firestore';
+import { UsersIdType, UserType } from '@/types/User/UserType';
+import { ChatMessagesItem, ChatUserItem } from '@/types/Chat/ChatType';
+import { MessageItemType } from '@/types/Chat/MessageType';
 
 export default {
-    githubPopup: async () => {
-        const provider = new GithubAuthProvider();
-
-        const result = await signInWithPopup(auth, provider);
-        if (result) {
-            const credential = GithubAuthProvider.credentialFromResult(result);
-            const token = credential.accessToken;
-            const user = result.user;
-            return {
-                ...user,
-                token,
-                credential
-            };
-        }
-    },
-    signOut: async () => {
-        const auth = getAuth();
-        return await signOut(auth).then(() => {
-            // Sign-out successful.
-            return true;
-        }).catch((error) => {
-            // An error happened.
-            alert('Ocorreu um erro ao sair!');
-            return false;
-        });
-    },
-    addUser: async (user) => {
+    addUser: async (user : UserType) => {
         const docRef = doc(db, "users", user.id);
 
         const userData = {
@@ -46,7 +22,7 @@ export default {
             return false;
         }
     },
-    getUser: async (userId) => {
+    getUser: async (userId : string) => {
         const docSnap = await getDoc(doc(db, "users", userId));
         let user;
 
@@ -62,14 +38,14 @@ export default {
 
         return user;
     },
-    updateUser: async (user) => {
+    updateUser: async (user : UserType) => {
         await updateDoc(doc(db, 'users', user.id), {
             name: user.displayName,
             photoUrl: user.photoURL
         });
 
         const otherUsersSnap = await getDocs(collection(db, "users"));
-        let chatsOfUser = [];
+        let chatsOfUser : ChatUserItem[] = [];
         if (otherUsersSnap){
             otherUsersSnap.forEach(async (docRef) => {
                 if (docRef.id !== user.id) {
@@ -77,7 +53,7 @@ export default {
                     if (user.chats){
                         chatsOfUser = [];
     
-                        user.chats.forEach((chat) => {
+                        user.chats.forEach((chat : ChatUserItem) => {
     
                             if (chat.with == user.id) 
                             {
@@ -100,8 +76,8 @@ export default {
             });
         }
     },
-    getContactList: async (myContactsIncluded) => {
-        let list = [];
+    getContactList: async (myContactsIncluded : string[]) => {
+        let list : UserType[] = [];
         const usersRef = collection(db, "users");
         const q = query(usersRef);
         const querySnapshot = await getDocs(q);
@@ -118,7 +94,7 @@ export default {
 
         return list;
     },
-    addNewChat: async (user, otherUser) => {
+    addNewChat: async (user : UserType, otherUser : UserType) => {
         const chatsRef = collection(db, "chats");
         const q = query(chatsRef, where("users", "array-contains", user.id));
         const docSnapshot = await getDocs(q);
@@ -153,66 +129,66 @@ export default {
             });
         }
     },
-    onChatList: (userId, submit) => {
+    onChatList: (userId : string, submit : (chat : ChatUserItem[]) => void) => {
         return onSnapshot(doc(db, 'users', userId), (doc) => {
-            if (doc.exists) {
+            if (doc.exists()) {
                 if (doc.data().chats) 
                     submit(doc.data().chats);
             }
         });
     },
-    onChatContent: (chatId, submit) => {
+    onChatContent: (chatId : string, submit : (chatMessages : ChatMessagesItem) => void) => {
         return onSnapshot(doc(db, 'chats', chatId), (doc) => {
-            if (doc.exists) submit(doc.data());
+            if (doc.exists()) submit(doc.data() as ChatMessagesItem);
         });
     },
-    sendMessage: async (chatData, userId, type, body, users) => {
-        let now = new Date();
-        let chatsRef = doc(db, 'chats', chatData.chatId);
-        let usersRef = collection(db, "users");
+    sendMessage: async (chatId : string, message : MessageItemType, users : UsersIdType) => {
+        let chatsRef = doc(db, 'chats', chatId);
     
         await updateDoc(chatsRef, {
             messages: arrayUnion({
-                type,
-                author: userId,
-                body,
-                date: now
+                type: message.type,
+                author: message.author,
+                body: message.body,
+                date: message.date.toDate()
             })
         });
         
         for(let i in users) {
             const docSnap = await getDoc(doc(db, "users", users[i]));
-            if (docSnap.data().chats) {
-                let chats = [...docSnap.data().chats];
-
-                for (let e in chats) {
-                    if (chats[e].chatId == chatData.chatId) {
-                        chats[e].lastMessage = body;
-                        chats[e].lastMessageDate = now;
+            if (docSnap.exists()) {
+                if (docSnap.data().chats) {
+                    let chats : ChatUserItem[] = [...docSnap.data().chats];
+    
+                    for (let e in chats) {
+                        if (chats[e].chatId == chatId) {
+                            chats[e].lastMessage = message.body;
+                            chats[e].lastMessageDate = message.date;
+                        }
                     }
+    
+                    await updateDoc(doc(db, 'users', users[i]), {
+                        chats
+                    });
                 }
-
-                await updateDoc(doc(db, 'users', users[i]), {
-                    chats
-                });
             }
         }
     },
-    getContactsIncluded: async (myUserId) => {
+    getContactsIncluded: async (userId : string) => {
         let list = [];
         const chatsRef = collection(db, "chats");
-        const q = query(chatsRef, where("users", "array-contains", myUserId));
+        const q = query(chatsRef, where("users", "array-contains", userId));
         const docSnapshot = await getDocs(q);
         docSnapshot.forEach((doc) => {
             list.push(doc.data().users[0]);
             list.push(doc.data().users[1]);
         });
         if(list.length == 0){
-            list.push(myUserId);
+            list.push(userId);
         }
         return list;
     },
-    deleteConversation: async (users) => {
+    deleteConversation: async (users : UsersIdType) => {
         const chatsRef = collection(db, "chats");
         let q = query(chatsRef, where("users", "==", users));
         let docSnapshot = await getDocs(q);
@@ -225,37 +201,38 @@ export default {
 
         for(let i in users) {
             const docSnap = await getDoc(doc(db, "users", users[i]));
-            let user = docSnap.data();
-            if (user.chats) {
-                let chats = [...user.chats];
-
-                for (let e in chats) {
-                    if (chats[e].chatId == chatData.id) {
-                        chats[e].lastMessage = '';
-                        chats[e].lastMessageDate = '';
+            if (docSnap.exists()) {
+                let user = docSnap.data();
+                if (user.chats) {
+                    let chats = [...user.chats];
+    
+                    for (let e in chats) {
+                        if (chats[e].chatId == chatData.id) {
+                            chats[e].lastMessage = '';
+                            chats[e].lastMessageDate = '';
+                        }
                     }
+    
+                    await updateDoc(doc(db, "users", users[i]), {
+                        chats
+                    });
                 }
-
-                await updateDoc(doc(db, "users", users[i]), {
-                    chats
-                });
             }
         }
     },
-    validationUser: async (userId) => {
+    validationUser: async (userId : string) => {
         const userRef = doc(db, "users", userId); 
         const userSnap = await getDoc(userRef);
-        let user = userSnap.data();
-        if (user.admin) {
-            return true;
-        } else {
-            return false
+        if (userSnap.exists()) 
+        {
+            return userSnap.data().admin;
+        }
+        else 
+        {
+            return false;
         }
     },
-    syncronizeUser: async () => {
-        return await getRedirectResult(getAuth());
-    },
-    deleteUser: async (userId) => {
+    deleteUser: async (userId : string) => {
         try {
           await deleteDoc(doc(db, 'users', userId));
           return true;
@@ -263,7 +240,7 @@ export default {
           return false;
         }
     },
-    existUser: async (userId) => {
+    existUser: async (userId : string) => {
         const userRef = doc(db, "users", userId); 
         const userSnap = await getDoc(userRef);
 
@@ -273,17 +250,17 @@ export default {
             return false; 
         }
     },
-    existChat: async (userId, otherUserId) : Promise<boolean> => {
+    existChat: async (userId : string, otherUserId : string) : Promise<boolean> => {
         const chatsRef = collection(db, "chats");
         const q = query(chatsRef, where("users", "array-contains", userId));
         const docSnapshot = await getDocs(q);
         return docSnapshot.docs.some(d => d.data().users[0] == otherUserId || d.data().users[1] == otherUserId);
     },
-    getChatsUser: async (userId) : Promise<any[]> => {
+    getChatsUser: async (userId : string) : Promise<any[]> => {
         const userRef = doc(db, "users", userId); 
         const userSnap = await getDoc(userRef);
 
-        if (userSnap.data()) {
+        if (userSnap.exists()) {
             return userSnap.data().chats;
         }
         else {

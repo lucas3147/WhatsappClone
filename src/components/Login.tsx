@@ -1,6 +1,5 @@
-import Api from "@/services/firebase.services";
-import { UserType } from "@/types/UserType";
-import { useState } from "react";
+import Auth from "@/services/firebase.service.auth";
+import { UserType } from "@/types/User/UserType";
 
 type Props = {
     onReceive: (userRegister: UserType) => Promise<void>
@@ -8,7 +7,7 @@ type Props = {
 
 const Login = ({onReceive}: Props) => {
     const handleLogin = async () => {
-        let user = await Api.githubPopup();
+        let user = await Auth.githubPopup();
         if (user){
             onReceive({id: user.uid, displayName: user.displayName, photoURL: user.photoURL});
         } else {

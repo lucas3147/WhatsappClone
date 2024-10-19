@@ -3,3 +3,5 @@ export type UserType = {
     photoURL: string | null,
     displayName: string | null
 }
+
+export type UsersIdType = string[];

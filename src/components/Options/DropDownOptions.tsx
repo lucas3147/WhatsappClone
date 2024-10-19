@@ -1,7 +1,7 @@
 'use client'
 
-import { OptionsType } from "@/types/Options";
-import { OptionsStateType } from "@/types/OptionsStateType";
+import { OptionsType } from "@/types/Options/Options";
+import { OptionsStateType } from "@/types/Options/OptionsStateType";
 
 type Props = {
     options: OptionsType[],

@@ -1,7 +1,8 @@
-import { UserType } from "@/types/UserType";
-import IconItem from "./IconItem";
+import { UserType } from "@/types/User/UserType";
+import IconItem from "../Icons/IconItem";
 import { ChangeEvent, useState } from "react";
-import Api from "@/services/firebase.services";
+import Auth from "@/services/firebase.service.auth";
+import Firestore from "@/services/firebase.service.firestore";
 
 type Props = {
     show: boolean, 
@@ -23,7 +24,7 @@ const Perfil = ({show , setShow, user, setUser}: Props) => {
         if (name !== '') {
             setShowNameConfirm(false);
             let newUser = {...user, displayName: name}
-            await Api.updateUser(newUser);
+            await Firestore.updateUser(newUser);
             setUser(newUser);
         }
     }
@@ -38,7 +39,7 @@ const Perfil = ({show , setShow, user, setUser}: Props) => {
         if (message !== '') {
             setShowNameConfirm(false);
             let newUser = {...user, displayMessage: message}
-            await Api.updateUser(newUser);
+            await Firestore.updateUser(newUser);
             setUser(newUser);
         }
     }
@@ -50,7 +51,7 @@ const Perfil = ({show , setShow, user, setUser}: Props) => {
     }
 
     const handleSynchronizeUser = async () => {
-        const user = await Api.syncronizeUser();
+        const user = await Auth.syncronizeUser();
         if (user) {
         }
     }

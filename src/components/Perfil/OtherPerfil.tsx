@@ -1,5 +1,5 @@
-import { PerfilType } from "@/types/PerfilType";
-import IconItem from "./IconItem";
+import { PerfilType } from "@/types/User/PerfilType";
+import IconItem from "../Icons/IconItem";
 
 
 const OtherPerfil = ({name, image, setViewPerfil} : PerfilType) => {

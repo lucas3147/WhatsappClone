@@ -1,9 +1,9 @@
-import { ChatItem } from "@/types/ChatType"
+import { ChatUserItem } from "@/types/Chat/ChatType"
 
 type Props = {
     onClick: () => void,
     active: boolean,
-    chatItem: ChatItem
+    chatItem: ChatUserItem
 }
 
 const ChatListItem = ({onClick, active, chatItem}: Props) => {

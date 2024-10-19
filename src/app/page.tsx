@@ -1,25 +1,25 @@
 "use client"
 
 import { MouseEvent, useEffect, useState } from 'react';
-import ChatListItem from '@/components/ChatListItem';
-import ChatIntro from '@/components/ChatIntro';
-import ChatWindow from '@/components/ChatWindow';
-import { ChatItem } from '@/types/ChatType';
-import IconItem from '@/components/IconItem';
-import NewChat from '@/components/NewChat';
-import { UserType } from '@/types/UserType';
+import ChatListItem from '@/components/Chats/ChatListItem';
+import ChatIntro from '@/components/Chats/ChatIntro';
+import ChatWindow from '@/components/Chats/ChatWindow';
+import { ChatUserItem } from '@/types/Chat/ChatType';
+import IconItem from '@/components/Icons/IconItem';
+import NewChat from '@/components/Chats/NewChat';
+import { UserType } from '@/types/User/UserType';
 import Login from '@/components/Login';
-import Api from '@/services/firebase.services';
-import Perfil from '@/components/Perfil';
-import DropDownOptions from '@/components/DropDownOptions';
+import Api from '@/services/firebase.service.firestore';
+import Perfil from '@/components/Perfil/Perfil';
+import DropDownOptions from '@/components/Options/DropDownOptions';
 import { useRouter } from 'next/navigation';
-import OtherPerfil from '@/components/OtherPerfil';
+import OtherPerfil from '@/components/Perfil/OtherPerfil';
 
 export default function Home() {
 
-  const [chatList, setChatList] = useState<ChatItem[]>([]);
+  const [chatList, setChatList] = useState<ChatUserItem[]>([]);
   const [listContacts, setListContacts] = useState<any[]>([]);
-  const [activeChat, setActiveChat] = useState<ChatItem>();
+  const [activeChat, setActiveChat] = useState<ChatUserItem>();
   const [user, setUser] = useState<UserType | null>(null);
   const [showNewChat, setShowNewChat] = useState(false);
   const [showPerfil, setShowPerfil] = useState(false);
