@@ -9,7 +9,8 @@ import IconItem from '@/components/Icons/IconItem';
 import NewChat from '@/components/Chats/NewChat';
 import { UserType } from '@/types/User/UserType';
 import Login from '@/components/Login';
-import Api from '@/services/firebase.service.firestore';
+import Firebase from '@/services/firebase.service.firestore';
+import Auth from '@/services/firebase.service.auth';
 import Perfil from '@/components/Perfil/Perfil';
 import DropDownOptions from '@/components/Options/DropDownOptions';
 import { useRouter } from 'next/navigation';
@@ -21,6 +22,7 @@ export default function Home() {
   const [listContacts, setListContacts] = useState<any[]>([]);
   const [activeChat, setActiveChat] = useState<ChatUserItem>();
   const [user, setUser] = useState<UserType | null>(null);
+  const [otherUser, setOtherUser] = useState<UserType>();
   const [showNewChat, setShowNewChat] = useState(false);
   const [showPerfil, setShowPerfil] = useState(false);
   const [showGeneralOptions, setShowGeneralOptions] = useState<boolean | null>(null);
@@ -30,24 +32,24 @@ export default function Home() {
 
   useEffect(() => {
     if (user !== null) {
-      return Api.onChatList(user.id, (myChats) => {
+      return Firebase.onChatList(user.id, (myChats) => {
         setChatList(handleSortChats(myChats));
       });
     }
   },[listContacts]);
 
-  const handleSortChats = (chats) => {
+  const handleSortChats = (chats : ChatUserItem[]) => {
     chats.sort((a,b) => {
       if (a.lastMessageDate === undefined) {
-          return -1;
+        return -1;
       }
       if (b.lastMessageDate === undefined) {
-          return -1;
+        return -1;
       }
       if (a.lastMessageDate.seconds < b.lastMessageDate.seconds) {
-          return 1;
+        return 1;
       } else {
-          return -1;
+        return -1;
       }
     });
 
@@ -55,21 +57,21 @@ export default function Home() {
   }
 
   const handleLoginData = async (user: UserType) => {
-    let existUser = await Api.existUser(user.id);
+    let existUser = await Firebase.existUser(user.id);
     if (!existUser) 
     {
-      await Api.addUser(user);
+      await Firebase.addUser(user);
     }
-    let contacts = await Api.getContactsIncluded(user.id);
+    let contacts = await Firebase.getContactsIncluded(user.id);
     setUser(user);
     setListContacts(contacts);
   }
 
-  const handleNewChat = async () => {
+  const handleNewChat = () => {
     setShowNewChat(true);
   }
 
-  const handlePerfil = async () => {
+  const handlePerfil = () => {
     setShowPerfil(true);
   }
 
@@ -92,9 +94,16 @@ export default function Home() {
   }
 
   const handleSignOut = async () => {
-    var logout = await Api.signOut();
+    var logout = await Auth.signOut();
     if (logout) {
       setUser(null);
+    }
+  }
+
+  const handleOtherUser = async (userId : string) => {
+    const user = await Firebase.getUser(userId);
+    if (user) {
+      setOtherUser(user);
     }
   }
 
@@ -197,6 +206,7 @@ export default function Home() {
                   setActiveChat(chatList[key]); 
                   setViewPerfil(false);
                   setShowUserOptions(null);
+                  handleOtherUser(chatList[key].with);
                 }}
               />
             ))}
@@ -214,10 +224,9 @@ export default function Home() {
               }}
             />
           }
-          {activeChat?.chatId !== undefined && viewPerfil &&
+          {activeChat?.chatId !== undefined && viewPerfil && otherUser &&
             <OtherPerfil 
-              name={activeChat.title}
-              image={activeChat.image}
+              user={otherUser}
               setViewPerfil={setViewPerfil}
             />
           }

@@ -1,5 +1,6 @@
+import { UserType } from "./UserType"
+
 export type PerfilType = {
-    name: string,
-    image: string,
+    user: UserType,
     setViewPerfil: (viewPerfil: boolean) => void
 }

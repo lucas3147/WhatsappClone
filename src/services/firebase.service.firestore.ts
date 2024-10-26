@@ -22,9 +22,9 @@ export default {
             return false;
         }
     },
-    getUser: async (userId : string) => {
+    getUser: async (userId : string) : Promise<UserType | undefined> => {
         const docSnap = await getDoc(doc(db, "users", userId));
-        let user;
+        let user : UserType | undefined;
 
         if (docSnap.exists()) {
             let data = docSnap.data();
@@ -32,7 +32,9 @@ export default {
             user = {
                 id: userId,
                 photoURL: data.photoUrl,
-                displayName: data.name
+                displayName: data.name,
+                screenName: data.screenName,
+                note: data.note
             }
         }
 
@@ -41,7 +43,8 @@ export default {
     updateUser: async (user : UserType) => {
         await updateDoc(doc(db, 'users', user.id), {
             name: user.displayName,
-            photoUrl: user.photoURL
+            photoUrl: user.photoURL,
+            note: user.note
         });
 
         const otherUsersSnap = await getDocs(collection(db, "users"));
@@ -87,7 +90,9 @@ export default {
                 list.push({
                     id: doc.id,
                     photoURL: doc.data().photoUrl,
-                    displayName: doc.data().name
+                    displayName: doc.data().name,
+                    screenName: doc.data().screenName,
+                    note: doc.data().note
                 });
             }
         });

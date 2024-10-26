@@ -12,41 +12,47 @@ type Props = {
 }
 
 const Perfil = ({show , setShow, user, setUser}: Props) => {
-    let nameUser = user.displayName ? user.displayName : '';
-    let messageUser = false ? '' : '...teste...';
+    let nameUser = user.displayName ?? '';
+    let noteUser = user.note ?? '';
 
-    const [showNameConfirm, setShowNameConfirm] = useState(false);
-    const [name, setName] = useState(nameUser);
-    const [showMessage, setShowMessage] = useState(false);
-    const [message, setMessage] = useState(messageUser);
+    const [showConfirm, setShowConfirm] = useState(false);
+    const [showNote, setShowNote] = useState(false);
+    const [displayName, setDisplayName] = useState(nameUser);
+    const [note, setNote] = useState(noteUser);
 
     const handleUpdateName = async () => {
-        if (name !== '') {
-            setShowNameConfirm(false);
-            let newUser = {...user, displayName: name}
+        if (displayName !== '') {
+            setShowConfirm(false);
+            let newUser : UserType = {
+                ...user, 
+                displayName
+            }
             await Firestore.updateUser(newUser);
             setUser(newUser);
         }
     }
 
     const handleDisplayName = (e: ChangeEvent<HTMLInputElement>) => {
-        if (showNameConfirm) {
-            setName(e.target.value);
+        if (showConfirm) {
+            setDisplayName(e.target.value);
         }
     }
 
-    const handleUpdateMessage = async () => {
-        if (message !== '') {
-            setShowNameConfirm(false);
-            let newUser = {...user, displayMessage: message}
+    const handleUpdateNote = async () => {
+        if (note !== '') {
+            setShowConfirm(false);
+            let newUser : UserType = {
+                ...user, 
+                note
+            }
             await Firestore.updateUser(newUser);
             setUser(newUser);
         }
     }
 
-    const handleDisplayMessage = (e: ChangeEvent<HTMLInputElement>) => {
-        if (showMessage) {
-            setMessage(e.target.value);
+    const handleDisplayNote = (e: ChangeEvent<HTMLInputElement>) => {
+        if (showNote) {
+            setNote(e.target.value);
         }
     }
 
@@ -104,24 +110,24 @@ const Perfil = ({show , setShow, user, setUser}: Props) => {
                 <div>
                     <p className="mb-[14px] text-[#008069] text-[14px] flex">Seu nome</p>
                     <div
-                        className="w-full h-[34px] flex" style={{borderBottom: showNameConfirm ? '2px solid #667781' : 'none'}}
+                        className="w-full h-[34px] flex" style={{borderBottom: showConfirm ? '2px solid #667781' : 'none'}}
                     >
                         <input
                             className="flex-1 inline text-[#3B4A54] text-[16px] border-0 outline-none" 
                             type="text" 
                             name=""
-                            value={name}
+                            value={displayName}
                             onChange={(e) => handleDisplayName(e)}
                         />
-                        <div onClick={() => setShowNameConfirm(!showNameConfirm)}>
-                            {!showNameConfirm && 
+                        <div onClick={() => setShowConfirm(!showConfirm)}>
+                            {!showConfirm && 
                                 <IconItem
                                     className="iconTheme"
                                     type="EditIcon"
                                     style={{ color: '#8696A0', marginBottom: '10px' }}
                                 />
                             }
-                            {showNameConfirm && 
+                            {showConfirm && 
                                 <div onClick={handleUpdateName}>
                                     <IconItem
                                         className="iconTheme"
@@ -135,26 +141,24 @@ const Perfil = ({show , setShow, user, setUser}: Props) => {
                 </div>
                 <div>
                     <p className="mb-[14px] text-[#008069] text-[14px] flex">Recado</p>
-                    <div
-                        className="w-full h-[34px] flex" style={{borderBottom: showMessage ? '2px solid #667781' : 'none'}}
-                    >
+                    <div className="w-full h-[34px] flex" style={{borderBottom: showNote ? '2px solid #667781' : 'none'}}>
                         <input
                             className="flex-1 inline text-[#3B4A54] text-[16px] border-0 outline-none" 
                             type="text" 
                             name=""
-                            value={message}
-                            onChange={(e) => handleDisplayMessage(e)}
+                            value={note}
+                            onChange={(e) => handleDisplayNote(e)}
                         />
-                        <div onClick={() => setShowMessage(!showMessage)}>
-                            {!showMessage && 
+                        <div onClick={() => setShowNote(!showNote)}>
+                            {!showNote && 
                                 <IconItem
                                     className="iconTheme"
                                     type="EditIcon"
                                     style={{ color: '#8696A0', marginBottom: '10px' }}
                                 />
                             }
-                            {showMessage && 
-                                <div onClick={handleUpdateMessage}>
+                            {showNote && 
+                                <div onClick={handleUpdateNote}>
                                     <IconItem
                                         className="iconTheme"
                                         type="CheckIcon"

@@ -1,4 +1,5 @@
 import Auth from "@/services/firebase.service.auth";
+import Firestore from "@/services/firebase.service.firestore";
 import { UserType } from "@/types/User/UserType";
 
 type Props = {
@@ -7,9 +8,16 @@ type Props = {
 
 const Login = ({onReceive}: Props) => {
     const handleLogin = async () => {
-        let user = await Auth.githubPopup();
-        if (user){
-            onReceive({id: user.uid, displayName: user.displayName, photoURL: user.photoURL});
+        let userGithub = await Auth.githubPopup();
+        if (userGithub){
+            let user = await Firestore.getUser(userGithub.uid);
+            onReceive({
+                id: userGithub.uid, 
+                displayName: userGithub.displayName, 
+                photoURL: userGithub.photoURL, 
+                screenName: userGithub?.reloadUserInfo.screenName,
+                note: user?.note
+            });
         } else {
             alert('Não foi possível logar')
         }
