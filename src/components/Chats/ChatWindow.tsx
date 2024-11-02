@@ -1,24 +1,31 @@
 import { useState, useEffect, useRef, RefObject, MouseEvent } from "react";
-import IconItem from "./IconItem";
+import IconItem from "../Icons/IconItem";
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
 import MessageItem from "./MessageItem";
-import { UserType } from "@/types/UserType";
-import { ChatItem } from "@/types/ChatType";
-import Api from "@/Api";
-import DropDownOptions from "./DropDownOptions";
-import OtherPerfil from "@/components/OtherPerfil";
+import { UsersIdType, UserType } from "@/types/User/UserType";
+import { ChatMessagesItem, ChatUserItem } from "@/types/Chat/ChatType";
+import Api from "@/services/firebase.service.firestore";
+import DropDownOptions from "../Options/DropDownOptions";
+import { OptionsStateType } from "@/types/Options/OptionsStateType";
+import { MessageItemType } from "@/types/Chat/MessageType";
+import { Timestamp } from "firebase/firestore";
 
 type Props = {
-    showUserOptions: boolean,
-    setShowUserOptions: (showUserOptions: boolean) => void,
     user: UserType,
-    activeChat: ChatItem
+    activeChat: ChatUserItem,
+    setViewPerfil: (viewPerfil: boolean) => void
+    stateOption: OptionsStateType,
 }
 
-const ChatWindow = ({user, activeChat, showUserOptions, setShowUserOptions}: Props) => {
-
+const ChatWindow = ({user, activeChat, stateOption, setViewPerfil}: Props) => {
+    const [emojiOpen, setEmojiOpen] = useState(false);
+    const [text, setText] = useState('');
+    const [listening, setListening] = useState(false);
+    const [listMessages, setListMessages] = useState<MessageItemType[]>([]);
+    const [users, setUsers] = useState<UsersIdType>([]);
     const body = useRef<HTMLInputElement>(null);
+
     let recognition:SpeechRecognition;
     let SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -26,23 +33,22 @@ const ChatWindow = ({user, activeChat, showUserOptions, setShowUserOptions}: Pro
         recognition = new SpeechRecognition();
     }
 
-    const [emojiOpen, setEmojiOpen] = useState(false);
-    const [text, setText] = useState('');
-    const [listening, setListening] = useState(false);
-    const [list, setList] = useState([]);
-    const [users, setUsers] = useState<UserType[]>();
-    const [viewPerfil, setViewPerfil] = useState(false);
-
     useEffect(() => {
         if (body.current && body.current.scrollHeight > body.current.offsetHeight){
             body.current.scrollTop = body.current.scrollHeight - body.current.offsetHeight;
         }
-    }, [list]);
+    }, [listMessages]);
 
     useEffect(() => {
-        setList([]);
-        let unsub = Api.onChatContent(activeChat.chatId, setList, setUsers);
-        return unsub;
+        const onChatContent = async () => {
+            return Api.onChatContent(activeChat.chatId, (chat) => {
+                setListMessages([]);
+                setListMessages(chat.messages);
+                setUsers(chat.users);
+            });
+        }
+
+        onChatContent();
     }, [activeChat.chatId]);
 
     const handleEmojiClick = (data: any) => {
@@ -72,7 +78,8 @@ const ChatWindow = ({user, activeChat, showUserOptions, setShowUserOptions}: Pro
         if (text !== '') {
             setText('');
             setEmojiOpen(false);
-            await Api.sendMessage(activeChat, user.id, 'text', text, users);
+            const message : MessageItemType = { author: user.id, body: text, date: Timestamp.fromDate(new Date()), type: 'text'};
+            await Api.sendMessage(activeChat.chatId, message, users);
         }
     }
 
@@ -83,31 +90,25 @@ const ChatWindow = ({user, activeChat, showUserOptions, setShowUserOptions}: Pro
     }
 
     const handleUserOptions = (e: MouseEvent) => {
-        setShowUserOptions(!showUserOptions);
+        stateOption.setOpen(!stateOption.open);
     }
 
     const deleteConversation = async () => {
-        setShowUserOptions(false);
+        stateOption.setOpen(false);
         if (await Api.validationUser(user.id)) {
             await Api.deleteConversation(users);
-            setList([]);
+            setListMessages([]);
         } else {
             alert('Sinto muito. Você não tem acesso!');
         }
     }
 
-    if (viewPerfil == true) {
-        return (
-            <OtherPerfil 
-                name={activeChat.title}
-                image={activeChat.image}
-                setViewPerfil={setViewPerfil}
-            />
-        )
+    const viewerPerfil = () => {
+        setViewPerfil(true);
     }
 
     return (
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col absolute w-full h-full">
 
             <DropDownOptions
                 options={
@@ -116,13 +117,13 @@ const ChatWindow = ({user, activeChat, showUserOptions, setShowUserOptions}: Pro
                     ]
                 }
                 right={27}
-                state={showUserOptions ? 'openOptions' : 'closeOptions'}
+                stateOption={stateOption}
             />
 
-            <div className="h-16 border-b-2 border-[#CCC] flex justify-between items-center">
+            <div className="h-16 border-b-2 border-[#CCC] flex justify-between items-center no-select">
                 <div
                     className="flex items-center cursor-pointer"
-                    onClick={() => setViewPerfil(true)}
+                    onClick={viewerPerfil}
                 >
                     <img
                         className="h-10 w-10 rounded-[50%] ml-4 mr-4"
@@ -149,7 +150,7 @@ const ChatWindow = ({user, activeChat, showUserOptions, setShowUserOptions}: Pro
                     />
                     <div 
                         onClick={(e) => handleUserOptions(e)}
-                        style={{pointerEvents: showUserOptions ? 'none' : 'auto'}}
+                        style={{pointerEvents: stateOption.open ? 'none' : 'auto'}}
                      >
                         <IconItem
                             className="iconTheme"
@@ -161,7 +162,7 @@ const ChatWindow = ({user, activeChat, showUserOptions, setShowUserOptions}: Pro
                 </div>
             </div>
             <div ref={body} className="chatWindow--body">
-                {list.length > 0 && list.map((item, key) => (
+                {listMessages.length > 0 && listMessages.map((item, key) => (
                     <MessageItem
                         key={key}
                         data={item} 

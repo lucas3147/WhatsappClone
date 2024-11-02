@@ -1,9 +1,9 @@
-import { ChatItem } from "@/types/ChatType"
+import { ChatUserItem } from "@/types/Chat/ChatType"
 
 type Props = {
     onClick: () => void,
     active: boolean,
-    chatItem: ChatItem
+    chatItem: ChatUserItem
 }
 
 const ChatListItem = ({onClick, active, chatItem}: Props) => {
@@ -23,16 +23,16 @@ const ChatListItem = ({onClick, active, chatItem}: Props) => {
                 <div
                     className="flex justify-between items-center w-full"
                 >
-                    <div className="text-base text-[#111B21] overflow-hidden whitespace-nowrap text-ellipsis m-0">
+                    <div className="text-base text-[#111B21] overflow-hidden whitespace-nowrap text-ellipsis m-0 select-none">
                         {chatItem.title}
                     </div>
-                    <div className="text-xs text-[#999]">
+                    <div className="text-xs text-[#999] select-none">
                         {chatItem.lastMessageDate && `${chatItem.lastMessageDate.toDate().getHours().toString().padStart(2, '0')}:${chatItem.lastMessageDate.toDate().getMinutes().toString().padStart(2, '0')}`}
                     </div>
                 </div>
                 <div className="flex text-sm text-[#999] w-full">
                     <p
-                        className="overflow-hidden whitespace-nowrap text-ellipsis m-0"
+                        className="overflow-hidden whitespace-nowrap text-ellipsis m-0 select-none"
                     >
                         {chatItem.lastMessage}
                     </p>

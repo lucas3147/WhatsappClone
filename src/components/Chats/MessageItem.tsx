@@ -1,12 +1,8 @@
-import { UserType } from "@/types/UserType";
-import { Timestamp } from "firebase/firestore";
+import { MessageItemType } from "@/types/Chat/MessageType";
+import { UserType } from "@/types/User/UserType";
 
 type Props = {
-    data: {
-        body: string,
-        author: string,
-        date: Timestamp
-    };
+    data: MessageItemType;
     user: UserType
 }
 

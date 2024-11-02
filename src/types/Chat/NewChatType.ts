@@ -1,5 +1,4 @@
-import { ChatItem } from '@/types/ChatType';
-import { UserType } from './UserType';
+import { UserType } from '../User/UserType';
 
 export type Props = {
     listContacts: any[],
