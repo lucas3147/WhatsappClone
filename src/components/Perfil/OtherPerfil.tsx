@@ -1,18 +1,21 @@
-import { PerfilType } from "@/types/User/PerfilType";
 import IconItem from "../Icons/IconItem";
+import { UserType } from "@/types/User/UserType";
 
+type Props = {
+    show: boolean, 
+    setShow: (show: boolean) => void,
+    user: UserType
+}
 
-const OtherPerfil = ({user, setViewPerfil} : PerfilType) => {
+const OtherPerfil = ({show, setShow, user} : Props) => {
     return (
-        <div className="h-full flex flex-col">
-            <div 
-                className="flex items-center w-full h-16 bg-[#F6F6F6] px-4"
-                onClick={() => setViewPerfil(false)}
-            >
+        <div className={`relative top-0 right-0 transition-all duration-500 w-full h-full bg-[#F0F2F5] no-select ${show ? 'openFlap translate-x-0' : 'closeFlap translate-x-full'}`}>
+            <div className="flex items-center w-full h-16 bg-[#F6F6F6] px-4">
                 <IconItem
                     type="CloseOutlinedIcon"
                     className="iconTheme bg-[#e0e0e0] hover:bg-[#cecece]"
                     style={{ color: 'black', width: '40px', height: '40px', padding: '10px 10px', borderRadius: '50%' }}
+                    onclick={() => setShow(false)}
                 />
             </div>
 
@@ -24,15 +27,10 @@ const OtherPerfil = ({user, setViewPerfil} : PerfilType) => {
                     </div>
                 </div>
                 <div className="py-6 px-8 bg-[white] w-full mt-4 flex flex-col items-start">
-                    <p className="text-[16px] text-[#607783] mb-2 select-none">Github</p>
-                    <p className="text-[18px] cursor-pointer text-[#383838]">Meu github...</p>
-                </div>
-                <div className="py-6 px-8 bg-[white] w-full mt-4 flex flex-col items-start">
                     <p className="text-[16px] text-[#607783] mb-2 select-none">Recado</p>
                     <p className="text-[18px] text-[#383838]">{user.note}</p>
                 </div>
             </div>
-            
         </div>
     )
 }

@@ -21,7 +21,7 @@ const Perfil = ({show , setShow, user, setUser}: Props) => {
     const [note, setNote] = useState(noteUser);
 
     const handleUpdateName = async () => {
-        if (displayName !== '') {
+        if (displayName !== '' && displayName !== user.displayName) {
             setShowConfirm(false);
             let newUser : UserType = {
                 ...user, 
@@ -39,7 +39,7 @@ const Perfil = ({show , setShow, user, setUser}: Props) => {
     }
 
     const handleUpdateNote = async () => {
-        if (note !== '') {
+        if (note !== '' && note !== user.note) {
             setShowConfirm(false);
             let newUser : UserType = {
                 ...user, 
@@ -62,14 +62,20 @@ const Perfil = ({show , setShow, user, setUser}: Props) => {
         }
     }
 
+    const handleClose = () => {
+        setShowNote(false);
+        setShowConfirm(false);
+        setShow(false);
+    }
+
     return (
         <div
-            className={`verticalFlap ${show ? 'openFlap' : 'closeFlap'} transition-all duration-500 w-[35%] max-w-[415px] absolute top-0 bottom-0 bg-[white] flex flex-col border-r-[1px] border-[#DDD]`}
+            className={`verticalFlap ${show ? 'openFlap openPositionPerfil' : 'closeFlap closePositionPerfil'} transition-all duration-500 w-[35%] max-w-[415px] absolute top-0 bottom-0 bg-[white] flex flex-col border-r-[1px] border-[#DDD]`}
         >
             <div
                 className="flex bg-[#008069] items-center px-4 pb-4 pt-[60px]">
 
-                <div onClick={() => setShow(false)}>
+                <div onClick={handleClose}>
                     <IconItem
                         className="iconTheme"
                         type="ArrowBackIcon"
@@ -110,7 +116,7 @@ const Perfil = ({show , setShow, user, setUser}: Props) => {
                 <div>
                     <p className="mb-[14px] text-[#008069] text-[14px] flex">Seu nome</p>
                     <div
-                        className="w-full h-[34px] flex" style={{borderBottom: showConfirm ? '2px solid #667781' : 'none'}}
+                        className={`w-full h-[34px] flex ${showConfirm ? 'border-b-2 border-b-[#667781]' : 'border-b-0'}`}
                     >
                         <input
                             className="flex-1 inline text-[#3B4A54] text-[16px] border-0 outline-none" 

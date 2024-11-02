@@ -19,12 +19,13 @@ import VideoCameraFrontRoundedIcon from '@mui/icons-material/VideoCameraFrontRou
 type Props = {
     type: IconType,
     style: {},
-    className?: string
+    className?: string,
+    onclick?: () => void
 }
 
-const IconItem = ({type, style, className}: Props) => {
+const IconItem = ({type, style, className, onclick}: Props) => {
     return (
-        <div className={className}>
+        <div className={className} onClick={onclick}>
             {type == 'DonutLargeIcon' &&
                 <DonutLargeIcon style={style} />
             }

@@ -104,7 +104,7 @@ const ChatWindow = ({user, activeChat, stateOption, setViewPerfil}: Props) => {
     }
 
     return (
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col absolute w-full h-full">
 
             <DropDownOptions
                 options={
@@ -116,7 +116,7 @@ const ChatWindow = ({user, activeChat, stateOption, setViewPerfil}: Props) => {
                 stateOption={stateOption}
             />
 
-            <div className="h-16 border-b-2 border-[#CCC] flex justify-between items-center">
+            <div className="h-16 border-b-2 border-[#CCC] flex justify-between items-center no-select">
                 <div
                     className="flex items-center cursor-pointer"
                     onClick={viewerPerfil}

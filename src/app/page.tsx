@@ -25,9 +25,9 @@ export default function Home() {
   const [otherUser, setOtherUser] = useState<UserType>();
   const [showNewChat, setShowNewChat] = useState(false);
   const [showPerfil, setShowPerfil] = useState(false);
+  const [showOtherPerfil, setShowOtherPerfil] = useState(false);
   const [showGeneralOptions, setShowGeneralOptions] = useState<boolean | null>(null);
   const [showUserOptions, setShowUserOptions] = useState<boolean | null>(null);
-  const [viewPerfil, setViewPerfil] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -204,7 +204,7 @@ export default function Home() {
                 active={activeChat?.chatId == chatList[key].chatId}
                 onClick={() => {
                   setActiveChat(chatList[key]); 
-                  setViewPerfil(false);
+                  setShowOtherPerfil(false);
                   setShowUserOptions(null);
                   handleOtherUser(chatList[key].with);
                 }}
@@ -213,27 +213,30 @@ export default function Home() {
           </div>
         </div>
         <div className="flex-1">
-          {activeChat?.chatId !== undefined && !viewPerfil &&
-            <ChatWindow
-              user={user}
-              activeChat={activeChat}
-              setViewPerfil={setViewPerfil}
-              stateOption={{
-                open: showUserOptions,
-                setOpen: setShowUserOptions
-              }}
-            />
-          }
-          {activeChat?.chatId !== undefined && viewPerfil && otherUser &&
-            <OtherPerfil 
-              user={otherUser}
-              setViewPerfil={setViewPerfil}
-            />
+          {activeChat?.chatId !== undefined &&
+            <div className="h-full w-full relative">
+              <ChatWindow
+                user={user}
+                activeChat={activeChat}
+                setViewPerfil={setShowOtherPerfil}
+                stateOption={{
+                  open: showUserOptions,
+                  setOpen: setShowUserOptions
+                }}
+              />
+
+              {otherUser &&
+                <OtherPerfil
+                  user={otherUser}
+                  setShow={setShowOtherPerfil}
+                  show={showOtherPerfil}
+                />
+              }
+            </div>
           }
           {activeChat?.chatId == undefined &&
             <ChatIntro />
           }
-
         </div>
       </div>
     </div>

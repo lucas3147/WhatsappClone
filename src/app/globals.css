@@ -14,6 +14,7 @@ body {
   align-items: center;
   width: 100vw;
   height: 100vh;
+  overflow: hidden;
 }
 
 .hiddenComponents {
@@ -165,14 +166,29 @@ body {
 
 .openFlap {
   z-index: 1;
-  left: 0px;
   animation-duration: 0.5s;
+}
+
+.openPositionPerfil {
+  left: 0px;
+}
+
+.openPositionOtherPerfil {
+  right: 0;
 }
 
 .closeFlap {
   z-index: -1;
-  left: -415px;
   animation-duration: 0.5s;
+}
+
+.closePositionPerfil {
+  left: -415px;
+}
+
+.closePositionOtherPerfil {
+  right: 0;
+  transform: translateX(100%);
 }
 
 .chatList {
@@ -247,7 +263,6 @@ h2.epr-emoji-category-label{
 }
 
 .otherPerfil {
-  flex: 1;
   min-width: 520px;
   overflow-y: auto;
 }
@@ -259,4 +274,10 @@ h2.epr-emoji-category-label{
 
 .otherPerfil::-webkit-scrollbar-thumb {
   background-color: rgba(0,0,0,0.2);
+}
+
+.no-select {
+  user-select: none; 
+  -moz-user-select: none; 
+  -webkit-user-select: none; 
 }

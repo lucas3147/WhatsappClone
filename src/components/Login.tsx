@@ -15,11 +15,10 @@ const Login = ({onReceive}: Props) => {
                 id: userGithub.uid, 
                 displayName: userGithub.displayName, 
                 photoURL: userGithub.photoURL, 
-                screenName: userGithub?.reloadUserInfo.screenName,
                 note: user?.note
             });
         } else {
-            alert('Não foi possível logar')
+            alert('Não foi possível logar');
         }
     }
 
@@ -27,8 +26,7 @@ const Login = ({onReceive}: Props) => {
         <div className="flex justify-center items-center h-screen">
                 <button 
                     onClick={handleLogin} 
-                    className="rounded-md px-4 py-2 border-[1px] border-black text-white bg-[#161A1F]"
-                >
+                    className="rounded-md px-4 py-2 border-[1px] border-black text-white bg-[#161A1F]">
                     Logar com o github
                 </button>
         </div>

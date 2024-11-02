@@ -33,7 +33,6 @@ export default {
                 id: userId,
                 photoURL: data.photoUrl,
                 displayName: data.name,
-                screenName: data.screenName,
                 note: data.note
             }
         }
@@ -91,7 +90,6 @@ export default {
                     id: doc.id,
                     photoURL: doc.data().photoUrl,
                     displayName: doc.data().name,
-                    screenName: doc.data().screenName,
                     note: doc.data().note
                 });
             }
