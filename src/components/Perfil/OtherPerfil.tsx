@@ -9,7 +9,7 @@ type Props = {
 
 const OtherPerfil = ({show, setShow, user} : Props) => {
     return (
-        <div className={`relative top-0 right-0 transition-all duration-500 w-full h-full bg-[#F0F2F5] no-select ${show ? 'openFlap translate-x-0' : 'closeFlap translate-x-full'}`}>
+        <div className={`relative top-0 right-0 transition-all duration-500 w-full h-full bg-[#F6F6F6] no-select ${show ? 'openFlap translate-x-0' : 'closeFlap translate-x-full'}`}>
             <div className="flex items-center w-full h-16 bg-[#F6F6F6] px-4">
                 <IconItem
                     type="CloseOutlinedIcon"

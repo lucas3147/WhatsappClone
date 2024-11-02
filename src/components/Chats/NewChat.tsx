@@ -29,10 +29,9 @@ const NewChat = ({listContacts, setListContacts, user, show, setShow}: Props) =>
 
     return (
         <div
-            className={`verticalFlap ${show ? 'openFlap' : 'closeFlap'} transition-all duration-500 w-[35%] max-w-[415px] absolute top-0 bottom-0 bg-[white] flex flex-col border-r-[1px] border-[#DDD]`}
+            className={`transition-all duration-500 w-full border-[#DDD] bg-[white] flex flex-col border-r-[1px] verticalFlap absolute top-0 bottom-0 left-0 ${show ? 'openFlap translate-x-0' : 'closeFlap translate-x-[-100%]'}`}
         >
-            <div
-                className="flex bg-[#008069] items-center px-4 pb-4 pt-[60px]">
+            <div className="flex bg-[#008069] items-center px-4 pb-4 pt-[60px]">
 
                 <div onClick={() => setShow(false)}>
                     <IconItem
@@ -42,15 +41,12 @@ const NewChat = ({listContacts, setListContacts, user, show, setShow}: Props) =>
                     />
                 </div>
 
-                <div 
-                    className="text-[19px] leading-10 h-10 flex-1 font-bold text-white ml-5"
-                >
+                <div className="text-[19px] leading-10 h-10 flex-1 font-bold text-white ml-5">
                     Nova conversa
                 </div>
             </div>
             
-            <div 
-                className="newChat--list">
+            <div className="newChat--list">
                 {list.map((item, key) => (
                     <div 
                         key={key}

@@ -169,26 +169,9 @@ body {
   animation-duration: 0.5s;
 }
 
-.openPositionPerfil {
-  left: 0px;
-}
-
-.openPositionOtherPerfil {
-  right: 0;
-}
-
 .closeFlap {
   z-index: -1;
   animation-duration: 0.5s;
-}
-
-.closePositionPerfil {
-  left: -415px;
-}
-
-.closePositionOtherPerfil {
-  right: 0;
-  transform: translateX(100%);
 }
 
 .chatList {
