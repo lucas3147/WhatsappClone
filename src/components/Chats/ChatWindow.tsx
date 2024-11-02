@@ -40,11 +40,15 @@ const ChatWindow = ({user, activeChat, stateOption, setViewPerfil}: Props) => {
     }, [listMessages]);
 
     useEffect(() => {
-        return Api.onChatContent(activeChat.chatId, (chat) => {
-            setListMessages([]);
-            setListMessages(chat.messages);
-            setUsers(chat.users);
-        });
+        const onChatContent = async () => {
+            return Api.onChatContent(activeChat.chatId, (chat) => {
+                setListMessages([]);
+                setListMessages(chat.messages);
+                setUsers(chat.users);
+            });
+        }
+
+        onChatContent();
     }, [activeChat.chatId]);
 
     const handleEmojiClick = (data: any) => {

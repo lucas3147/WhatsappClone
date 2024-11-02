@@ -1,10 +1,10 @@
-import { auth } from "@/config/firebase.config";
+import { useFirebase } from "@/config/firebase.config";
 import { getAuth, getRedirectResult, GithubAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 
 export default {
     githubPopup: async () => {
         const provider = new GithubAuthProvider();
-
+        const auth = (await useFirebase()).auth;
         const result = await signInWithPopup(auth, provider);
         if (result) {
             const credential = GithubAuthProvider.credentialFromResult(result);

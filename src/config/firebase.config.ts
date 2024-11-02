@@ -1,25 +1,28 @@
 import dotenv from 'dotenv';
 import { getAuth } from "firebase/auth";
-import { initializeApp } from 'firebase/app';
-import apiCredentials from './firebase.credentials';
+import { FirebaseOptions, initializeApp } from 'firebase/app';
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
 
 dotenv.config();
 
-const firebaseConfig = {
-    apiKey: apiCredentials.api_key,
-    authDomain: apiCredentials.auth_domain,
-    projectId: apiCredentials.project_id,
-    storageBucket: apiCredentials.storage_bucket,
-    messagingSenderId: apiCredentials.messaging_sender_id,
-    appId: apiCredentials.app_id
+var firebaseConfig : FirebaseOptions = {};
+
+const getFirebaseConfig = async () => {
+    const res = await fetch('/api/firebase');
+    return await res.json();
 };
 
-export const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
-export const auth = getAuth(app);
+async function initializeFirebase() {
+    const firebaseConfig = await getFirebaseConfig();
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
 
-if (process.env.EMULATOR === 'true') {
-    connectFirestoreEmulator(db, 'localhost', 8080);
+    if (process.env.EMULATOR === 'true') {
+        connectFirestoreEmulator(db, 'localhost', 8080);
+    }
+    
+    return { app, db, auth };
 }
 
+export const useFirebase = async () => await initializeFirebase();

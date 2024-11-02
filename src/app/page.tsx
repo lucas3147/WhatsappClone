@@ -31,10 +31,14 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    if (user !== null) {
-      return Firebase.onChatList(user.id, (myChats) => {
+    const onChatList = async (userId : string) => {
+      return Firebase.onChatList(userId, (myChats) => {
         setChatList(handleSortChats(myChats));
       });
+    }
+
+    if (user !== null) {
+      onChatList(user.id);
     }
   },[listContacts]);
 

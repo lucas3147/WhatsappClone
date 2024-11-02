@@ -15,13 +15,15 @@ describe('Testing firebase services', () => {
         user = {
             id: generateId(),
             displayName: 'Lucas L.',
-            photoURL: 'teste_2.img'
+            photoURL: 'teste_2.img',
+            note: 'Meu recado 1'
         };
 
         otherUser = {
             id: generateId(),
             displayName: 'Gustavo L.',
-            photoURL: 'teste_2.img'
+            photoURL: 'teste_2.img',
+            note: 'Meu recado 2'
         }
     });
     
@@ -41,12 +43,20 @@ describe('Testing firebase services', () => {
         expect(existUser).toBeTruthy();
     });
 
-    it('should update a user', async () => {
+    it('should update a user image', async () => {
         user.photoURL = 'teste_3_image.png';
         await apiFirebase.updateUser(user);
         let userChanged = await apiFirebase.getUser(user.id) as UserType;
 
         expect(userChanged.photoURL).toBe(user.photoURL);
+    });
+
+    it('should update a user name', async () => {
+        user.displayName = 'Lucas L. de Souza';
+        await apiFirebase.updateUser(user);
+        let userChanged = await apiFirebase.getUser(user.id) as UserType;
+
+        expect(userChanged.photoURL).toBe(user.displayName);
     });
 
     it('should get the contact lists', async () => {
@@ -63,7 +73,7 @@ describe('Testing firebase services', () => {
     });
 
     it('should grab a complete user chat list', async () => {
-        let unsubscribe = apiFirebase.onChatList(user.id, (myChats) => {
+        let unsubscribe = await apiFirebase.onChatList(user.id, (myChats) => {
             expect(myChats.length).toBeGreaterThan(0);
             expect(myChats[0].with).toBe(otherUser.id);
         });
@@ -72,7 +82,7 @@ describe('Testing firebase services', () => {
     });
 
     it('should grab the user chat content', async () => {
-        let unsubscribe = apiFirebase.onChatContent(user.id, (chatContent) => {
+        let unsubscribe = await apiFirebase.onChatContent(user.id, (chatContent) => {
             expect(chatContent.messages).toBeDefined();
             expect(chatContent.messages).toHaveLength(0);
             expect(chatContent.users).toContain(user.id);
@@ -117,7 +127,7 @@ describe('Testing firebase services', () => {
         let users = [user.id, otherUser.id];
         await apiFirebase.deleteConversation(users);
 
-        let unsubscribe = apiFirebase.onChatContent(user.id, (chatContent) => {
+        let unsubscribe = await apiFirebase.onChatContent(user.id, (chatContent) => {
             expect(chatContent.messages).toBeDefined();
             expect(chatContent.messages).toHaveLength(0);
             expect(chatContent.messages[0]).toBeUndefined();
@@ -125,7 +135,7 @@ describe('Testing firebase services', () => {
 
         unsubscribe();
 
-        unsubscribe = apiFirebase.onChatList(user.id, (chatList) => {
+        unsubscribe = await apiFirebase.onChatList(user.id, (chatList) => {
             expect(chatList[0].lastMessage).toHaveLength(0);
             expect(chatList[0].lastMessageDate).toHaveLength(0);
         });

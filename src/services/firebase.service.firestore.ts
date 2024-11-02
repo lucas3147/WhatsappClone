@@ -1,13 +1,15 @@
 import 'firebase/auth';
 import 'firebase/firestore';
-import { db } from '../config/firebase.config';
-import { collection, addDoc, onSnapshot, query, where, getDocs, doc, updateDoc, arrayUnion, deleteDoc, setDoc, getDoc } from 'firebase/firestore';
+import { collection, addDoc, onSnapshot, query, where, getDocs, doc, updateDoc, arrayUnion, deleteDoc, setDoc, getDoc, Firestore } from 'firebase/firestore';
 import { UsersIdType, UserType } from '@/types/User/UserType';
 import { ChatMessagesItem, ChatUserItem } from '@/types/Chat/ChatType';
 import { MessageItemType } from '@/types/Chat/MessageType';
+import { useFirebase } from '@/config/firebase.config';
+import { Unsubscribe } from 'firebase/auth';
 
 export default {
     addUser: async (user : UserType) => {
+        const db = (await useFirebase()).db;
         const docRef = doc(db, "users", user.id);
 
         const userData = {
@@ -23,6 +25,7 @@ export default {
         }
     },
     getUser: async (userId : string) : Promise<UserType | undefined> => {
+        const db = (await useFirebase()).db;
         const docSnap = await getDoc(doc(db, "users", userId));
         let user : UserType | undefined;
 
@@ -40,6 +43,7 @@ export default {
         return user;
     },
     updateUser: async (user : UserType) => {
+        const db = (await useFirebase()).db;
         await updateDoc(doc(db, 'users', user.id), {
             name: user.displayName,
             photoUrl: user.photoURL,
@@ -51,17 +55,16 @@ export default {
         if (otherUsersSnap){
             otherUsersSnap.forEach(async (docRef) => {
                 if (docRef.id !== user.id) {
-                    let user = docRef.data();
-                    if (user.chats){
+                    let otherUser = docRef.data();
+                    if (otherUser.chats){
                         chatsOfUser = [];
     
-                        user.chats.forEach((chat : ChatUserItem) => {
-    
+                        otherUser.chats.forEach((chat : ChatUserItem) => {
                             if (chat.with == user.id) 
                             {
                                 chatsOfUser.push({
                                     ...chat,
-                                    title: user.displayName
+                                    title: user.displayName as string
                                 });
                             } else {
                                 chatsOfUser.push({
@@ -80,6 +83,7 @@ export default {
     },
     getContactList: async (myContactsIncluded : string[]) => {
         let list : UserType[] = [];
+        const db = (await useFirebase()).db;
         const usersRef = collection(db, "users");
         const q = query(usersRef);
         const querySnapshot = await getDocs(q);
@@ -98,6 +102,7 @@ export default {
         return list;
     },
     addNewChat: async (user : UserType, otherUser : UserType) => {
+        const db = (await useFirebase()).db;
         const chatsRef = collection(db, "chats");
         const q = query(chatsRef, where("users", "array-contains", user.id));
         const docSnapshot = await getDocs(q);
@@ -132,7 +137,9 @@ export default {
             });
         }
     },
-    onChatList: (userId : string, submit : (chat : ChatUserItem[]) => void) => {
+    onChatList: async (userId : string, submit : (chat : ChatUserItem[]) => void) => {
+        const db = (await useFirebase()).db;
+
         return onSnapshot(doc(db, 'users', userId), (doc) => {
             if (doc.exists()) {
                 if (doc.data().chats) 
@@ -140,12 +147,15 @@ export default {
             }
         });
     },
-    onChatContent: (chatId : string, submit : (chatMessages : ChatMessagesItem) => void) => {
+    onChatContent: async (chatId : string, submit : (chatMessages : ChatMessagesItem) => void) => {
+        const db = (await useFirebase()).db;
+
         return onSnapshot(doc(db, 'chats', chatId), (doc) => {
             if (doc.exists()) submit(doc.data() as ChatMessagesItem);
         });
     },
     sendMessage: async (chatId : string, message : MessageItemType, users : UsersIdType) => {
+        const db = (await useFirebase()).db;
         let chatsRef = doc(db, 'chats', chatId);
     
         await updateDoc(chatsRef, {
@@ -179,6 +189,7 @@ export default {
     },
     getContactsIncluded: async (userId : string) => {
         let list = [];
+        const db = (await useFirebase()).db;
         const chatsRef = collection(db, "chats");
         const q = query(chatsRef, where("users", "array-contains", userId));
         const docSnapshot = await getDocs(q);
@@ -192,6 +203,7 @@ export default {
         return list;
     },
     deleteConversation: async (users : UsersIdType) => {
+        const db = (await useFirebase()).db;
         const chatsRef = collection(db, "chats");
         let q = query(chatsRef, where("users", "==", users));
         let docSnapshot = await getDocs(q);
@@ -224,6 +236,7 @@ export default {
         }
     },
     validationUser: async (userId : string) => {
+        const db = (await useFirebase()).db;
         const userRef = doc(db, "users", userId); 
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) 
@@ -237,6 +250,7 @@ export default {
     },
     deleteUser: async (userId : string) => {
         try {
+          const db = (await useFirebase()).db;
           await deleteDoc(doc(db, 'users', userId));
           return true;
         } catch (error) {
@@ -244,6 +258,7 @@ export default {
         }
     },
     existUser: async (userId : string) => {
+        const db = (await useFirebase()).db;
         const userRef = doc(db, "users", userId); 
         const userSnap = await getDoc(userRef);
 
@@ -254,12 +269,14 @@ export default {
         }
     },
     existChat: async (userId : string, otherUserId : string) : Promise<boolean> => {
+        const db = (await useFirebase()).db;
         const chatsRef = collection(db, "chats");
         const q = query(chatsRef, where("users", "array-contains", userId));
         const docSnapshot = await getDocs(q);
         return docSnapshot.docs.some(d => d.data().users[0] == otherUserId || d.data().users[1] == otherUserId);
     },
     getChatsUser: async (userId : string) : Promise<any[]> => {
+        const db = (await useFirebase()).db;
         const userRef = doc(db, "users", userId); 
         const userSnap = await getDoc(userRef);
 
