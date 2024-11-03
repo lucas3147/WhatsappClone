@@ -1,6 +1,6 @@
 import { UserType } from '../User/UserType';
 
-export type Props = {
+export type NewChatProps = {
     listContacts: any[],
     setListContacts: (listContacts: any[]) => void
     user: UserType,

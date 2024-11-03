@@ -4,8 +4,7 @@ import { collection, addDoc, onSnapshot, query, where, getDocs, doc, updateDoc, 
 import { UsersIdType, UserType } from '@/types/User/UserType';
 import { ChatMessagesItem, ChatUserItem } from '@/types/Chat/ChatType';
 import { MessageItemType } from '@/types/Chat/MessageType';
-import { useFirebase } from '@/config/firebase.config';
-import { Unsubscribe } from 'firebase/auth';
+import { useFirebase } from '../config/firebase.config';
 
 export default {
     addUser: async (user : UserType) => {

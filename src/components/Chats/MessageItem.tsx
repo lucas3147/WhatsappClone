@@ -1,12 +1,6 @@
-import { MessageItemType } from "@/types/Chat/MessageType";
-import { UserType } from "@/types/User/UserType";
+import { MessageItemProps } from "@/types/Chat/MessageType";
 
-type Props = {
-    data: MessageItemType;
-    user: UserType
-}
-
-const MessageItem = ({data, user}: Props) => {
+const MessageItem = ({data, user}: MessageItemProps) => {
 
     const myMessageStyle = (myStyle: string, otherStyle: string) => {
         return user.id === data.author ? myStyle : otherStyle

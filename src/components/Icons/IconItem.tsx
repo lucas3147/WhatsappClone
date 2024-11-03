@@ -1,84 +1,13 @@
-import DonutLargeIcon from '@mui/icons-material/DonutLarge';
-import ChatIcon from '@mui/icons-material/Chat';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import SearchIcon from '@mui/icons-material/Search';
-import AttachFileIcon from '@mui/icons-material/AttachFile';
-import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
-import CloseIcon from '@mui/icons-material/Close';
-import SendIcon from '@mui/icons-material/Send';
-import MicIcon from '@mui/icons-material/Mic';
-import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import EditIcon from '@mui/icons-material/Edit';
-import CheckIcon from '@mui/icons-material/Check';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import AutorenewIcon from '@mui/icons-material/Autorenew';
-import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
-import VideoCameraFrontRoundedIcon from '@mui/icons-material/VideoCameraFrontRounded';
+import { IconItemProps, iconMap } from "@/types/Icons/IconItemProps";
 
-type Props = {
-    type: IconType,
-    style: {},
-    className?: string,
-    onclick?: () => void
-}
+const IconItem = ({type, className, style, onclick} : IconItemProps) => {
+    const IconComponent = iconMap[type];
 
-const IconItem = ({type, style, className, onclick}: Props) => {
     return (
         <div className={className} onClick={onclick}>
-            {type == 'DonutLargeIcon' &&
-                <DonutLargeIcon style={style} />
-            }
-            {type == 'ChatIcon' &&
-                <ChatIcon style={style} />
-            }
-            {type == 'MoreVertIcon' &&
-                <MoreVertIcon style={style} />
-            }
-            {type == 'SearchIcon' &&
-                <SearchIcon fontSize='small' style={style} />
-            }
-            {type == 'AttachFileIcon' &&
-                <AttachFileIcon style={style}/>
-            }
-            {type == 'EmojiEmotionsIcon' &&
-                <EmojiEmotionsIcon style={style}/>
-            }
-            {type == 'CloseIcon' &&
-                <CloseIcon style={style}/>
-            }
-            {type == 'SendIcon' &&
-                <SendIcon style={style}/>
-            }
-            {type == 'MicIcon' &&
-                <MicIcon style={style}/>
-            }
-            {type == 'InsertEmoticonIcon' &&
-                <InsertEmoticonIcon style={style}/>
-            }
-            {type == 'ArrowBackIcon' &&
-                <ArrowBackIcon style={style}/>
-            }
-            {type == 'EditIcon' &&
-                <EditIcon style={style}/>
-            }
-            {type == 'CheckIcon' &&
-                <CheckIcon style={style}/>
-            }
-            {type == 'RefreshIcon' &&
-                <RefreshIcon style={style}/>
-            }
-            {type == 'AutorenewIcon' &&
-                <AutorenewIcon style={style}/>
-            }
-            {type == 'CloseOutlinedIcon' &&
-                <CloseOutlinedIcon style={style}/>
-            }
-            {type == 'VideoCameraFrontRoundedIcon' &&
-                <VideoCameraFrontRoundedIcon style={style}/>
-            }
+            {IconComponent ? <IconComponent style={style} /> : null}
         </div>
-    )
-}
+    );
+};
 
 export default IconItem;
