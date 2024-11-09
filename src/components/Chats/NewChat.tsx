@@ -1,34 +1,7 @@
 import { NewChatProps } from "@/types/Chat/NewChatType";
 import IconItem from "../Icons/IconItem";
-import { useState, useEffect } from "react";
-import { UserType } from "@/types/User/UserType";
-import Api from "@/services/firebase.service.firestore";
 
-const NewChat = ({ listContacts, setListContacts, user, show, setShow }: NewChatProps) => {
-	const [list, setList] = useState<UserType[]>([]);
-	const [disabledContact, setDisabledContact] = useState(false);
-
-	useEffect(() => {
-		const getList = async () => {
-			if (user) {
-				console.log(listContacts);
-				const listUsers = await Api.getContactList(listContacts);
-				console.log(listUsers);
-				setList(listUsers);
-			}
-		}
-		getList();
-	}, [listContacts]);
-
-	const addNewChat = async (otherUser: UserType) => {
-		setDisabledContact(true);
-		await Api.addNewChat(user, otherUser);
-		let newContacts = await Api.getContactsIncluded(user.id);
-		setListContacts(newContacts);
-		setShow(false);
-		setDisabledContact(false);
-	}
-
+const NewChat = ({ addNewChat, listUsers, show, setShow }: NewChatProps) => {
 	return (
 		<div
 			className={`transition-all duration-500 w-full border-[#DDD] bg-[white] flex flex-col border-r-[1px] verticalFlap absolute top-0 bottom-0 left-0 ${show ? 'openFlap translate-x-0' : 'closeFlap translate-x-[-100%]'}`}
@@ -49,11 +22,11 @@ const NewChat = ({ listContacts, setListContacts, user, show, setShow }: NewChat
 			</div>
 
 			<div className="newChat--list">
-				{list.map((item, key) => (
+				{listUsers.map((item, key) => (
 					<div
 						key={key}
 						className="flex items-center p-4 cursor-pointer hover:bg-[#F5F5F5]"
-						style={{ pointerEvents: disabledContact ? 'none' : 'auto' }}
+						style={{ pointerEvents: show ? 'auto' : 'none' }}
 						onClick={() => addNewChat(item)}
 					>
 						<img

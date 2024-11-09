@@ -80,25 +80,30 @@ export default {
             });
         }
     },
-    getContactList: async (myContactsIncluded : string[]) => {
-        let list : UserType[] = [];
+    getUsersToConnect: async (userId: string): Promise<UserType[]> => {
+        let usersToConnect: UserType[] = [];
         const db = (await useFirebase()).db;
-        const usersRef = collection(db, "users");
-        const q = query(usersRef);
-        const querySnapshot = await getDocs(q);
-        querySnapshot.forEach((doc) => {
-            if (myContactsIncluded.some(c => c == doc.id) == false) 
-            {
-                list.push({
+    
+        const userSnap= await getDoc(doc(db, "users", userId));
+    
+        if (userSnap.exists()) {
+            const myChats : ChatUserItem[] = userSnap.data().chats;
+            const myChatsId = (myChats ?? []).map(chat => chat.with);
+            
+            const usersSnap = await getDocs(collection(db, "users"));
+    
+            usersSnap.forEach((doc) => {
+                if (doc.id === userId || myChatsId.includes(doc.id)) return;
+    
+                usersToConnect.push({
                     id: doc.id,
                     photoURL: doc.data().photoUrl,
                     displayName: doc.data().name,
                     note: doc.data().note
                 });
-            }
-        });
-
-        return list;
+            });
+        }
+        return usersToConnect;
     },
     addNewChat: async (user : UserType, otherUser : UserType) => {
         const db = (await useFirebase()).db;
@@ -151,6 +156,19 @@ export default {
 
         return onSnapshot(doc(db, 'chats', chatId), (doc) => {
             if (doc.exists()) submit(doc.data() as ChatMessagesItem);
+        });
+    },
+    onUsersToConnectList: async (userId : string, submit : () => void) => {
+        const db = (await useFirebase()).db;
+
+        return onSnapshot(collection(db, 'users'), (snapShot) => {
+            snapShot.docChanges().forEach((change) => {
+                if (change.type === 'added' ||
+                    change.type === 'removed'
+                ) {
+                    submit();
+                }
+            });
         });
     },
     sendMessage: async (chatId : string, message : MessageItemType, users : UsersIdType) => {

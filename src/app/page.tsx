@@ -15,32 +15,68 @@ import Perfil from '@/components/Perfil/Perfil';
 import DropDownOptions from '@/components/Options/DropDownOptions';
 import { useRouter } from 'next/navigation';
 import OtherPerfil from '@/components/Perfil/OtherPerfil';
+import { Unsubscribe } from 'firebase/auth';
 
 export default function Home() {
 
   const [chatList, setChatList] = useState<ChatUserItem[]>([]);
-  const [listContacts, setListContacts] = useState<any[]>([]);
   const [activeChat, setActiveChat] = useState<ChatUserItem>();
   const [user, setUser] = useState<UserType | null>(null);
+  const [listUsersToConnect, setListUsersToConnect] = useState<UserType[]>([]);
   const [otherUser, setOtherUser] = useState<UserType>();
   const [showNewChat, setShowNewChat] = useState(false);
   const [showPerfil, setShowPerfil] = useState(false);
   const [showOtherPerfil, setShowOtherPerfil] = useState(false);
   const [showGeneralOptions, setShowGeneralOptions] = useState<boolean | null>(null);
   const [showUserOptions, setShowUserOptions] = useState<boolean | null>(null);
+  const [listenerChats, setListenerChats] = useState<boolean>();
+  const [listenerUsers, setListenerUsers] = useState<boolean>();
   const router = useRouter();
 
   useEffect(() => {
+    let unsubscribeChats : Unsubscribe;
+    let unsubscribeUsers : Unsubscribe;
+
     const onChatList = async (userId : string) => {
-      return Firebase.onChatList(userId, (myChats) => {
+      unsubscribeChats = await Firebase.onChatList(userId, async (myChats) => {
+        handleUsersToConnect(userId);
         setChatList(handleSortChats(myChats));
       });
-    }
+    };
 
-    if (user !== null) {
+    const onUserList = async (userId : string) => {
+      unsubscribeUsers = await Firebase.onUsersToConnectList(userId, async () => {
+        handleUsersToConnect(userId);
+      });
+    };
+    
+    if (user !== null && listenerChats) {
       onChatList(user.id);
     }
-  },[listContacts]);
+
+    if (user !== null && listenerUsers) {
+      onUserList(user.id);
+    }
+
+    return () => {
+      if (unsubscribeChats) {
+        unsubscribeChats();
+      }
+
+      if (unsubscribeUsers) {
+        unsubscribeUsers();
+      }
+    };
+  },[listenerChats, listenerUsers]);
+
+  const addNewChat = async (otherUser: UserType) => {
+    if (user) {
+      await Firebase.addNewChat(user, otherUser);
+      setListenerChats(false);
+      setListenerChats(true);
+      setShowNewChat(false);
+    }
+	}
 
   const handleSortChats = (chats : ChatUserItem[]) => {
     chats.sort((a,b) => {
@@ -66,9 +102,15 @@ export default function Home() {
     {
       await Firebase.addUser(user);
     }
-    let contacts = await Firebase.getContactsIncluded(user.id);
     setUser(user);
-    setListContacts(contacts);
+    setListenerChats(true);
+    setListenerUsers(true);
+    handleUsersToConnect(user.id);
+  }
+
+  const handleUsersToConnect = async (userId : string) => {
+    const listUsers = await Firebase.getUsersToConnect(userId);
+    setListUsersToConnect(listUsers);
   }
 
   const handleNewChat = () => {
@@ -141,11 +183,10 @@ export default function Home() {
           </div>
           <div className="relative w-full h-full flex flex-col bg-[white]">
             <NewChat
-              listContacts={listContacts}
-              setListContacts={setListContacts}
-              user={user}
+              addNewChat={addNewChat}
               show={showNewChat}
               setShow={setShowNewChat}
+              listUsers={listUsersToConnect}
             />
             <Perfil
               show={showPerfil}
