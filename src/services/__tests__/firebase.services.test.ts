@@ -1,10 +1,9 @@
 import apiFirebase from '../firebase.service.firestore';
-import { UsersIdType, UserType } from "../../types/User/UserType";
+import { UserType } from "../../types/User/UserType";
 import { generateId } from '../../library/resources';
 import { ChatUserItem } from '@/types/Chat/ChatType';
 import { MessageItemType } from '@/types/Chat/MessageType';
 import { Timestamp } from 'firebase/firestore';
-import { Unsubscribe } from 'firebase/auth';
 
 describe('Testing firebase services', () => {
 
@@ -49,14 +48,6 @@ describe('Testing firebase services', () => {
         let userChanged = await apiFirebase.getUser(user.id) as UserType;
 
         expect(userChanged.photoURL).toBe(user.photoURL);
-    });
-
-    it('should update a user name', async () => {
-        user.displayName = 'Lucas L. de Souza';
-        await apiFirebase.updateUser(user);
-        let userChanged = await apiFirebase.getUser(user.id) as UserType;
-
-        expect(userChanged.photoURL).toBe(user.displayName);
     });
 
     it('should get the contact lists', async () => {
@@ -113,6 +104,17 @@ describe('Testing firebase services', () => {
         expect(chatList[0].lastMessage).toBe(body);
         expect(chatList[0].lastMessageDate).toBeDefined();
         expect(chatList[0].with).toBe(otherUser.id);
+    });
+
+    
+    it('should update a user name', async () => {
+        user.displayName = 'Lucas L. de Souza';
+        await apiFirebase.updateUser(user);
+        let userChanged = await apiFirebase.getUser(user.id) as UserType;
+        let chatChanged = await apiFirebase.getChatsUser(otherUser.id);
+        
+        expect(userChanged.displayName).toBe(user.displayName);
+        expect(chatChanged[0].title).toBe(user.displayName);
     });
 
     it('should verify on list contacts', async () => {

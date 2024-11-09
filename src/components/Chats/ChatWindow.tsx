@@ -1,24 +1,18 @@
-import { useState, useEffect, useRef, RefObject, MouseEvent } from "react";
+import { useState, useEffect, useRef, MouseEvent } from "react";
 import IconItem from "../Icons/IconItem";
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
 import MessageItem from "./MessageItem";
-import { UsersIdType, UserType } from "@/types/User/UserType";
-import { ChatMessagesItem, ChatUserItem } from "@/types/Chat/ChatType";
+import { UsersIdType } from "@/types/User/UserType";
+import { ChatWindowProps } from "@/types/Chat/ChatType";
 import Api from "@/services/firebase.service.firestore";
 import DropDownOptions from "../Options/DropDownOptions";
-import { OptionsStateType } from "@/types/Options/OptionsStateType";
 import { MessageItemType } from "@/types/Chat/MessageType";
 import { Timestamp } from "firebase/firestore";
 
-type Props = {
-    user: UserType,
-    activeChat: ChatUserItem,
-    setViewPerfil: (viewPerfil: boolean) => void
-    stateOption: OptionsStateType,
-}
 
-const ChatWindow = ({user, activeChat, stateOption, setViewPerfil}: Props) => {
+
+const ChatWindow = ({user, activeChat, stateOption, setViewPerfil}: ChatWindowProps) => {
     const [emojiOpen, setEmojiOpen] = useState(false);
     const [text, setText] = useState('');
     const [listening, setListening] = useState(false);

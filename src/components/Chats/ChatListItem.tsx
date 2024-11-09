@@ -1,12 +1,6 @@
-import { ChatUserItem } from "@/types/Chat/ChatType"
+import { ChatListItemProps, ChatUserItem } from "@/types/Chat/ChatType"
 
-type Props = {
-    onClick: () => void,
-    active: boolean,
-    chatItem: ChatUserItem
-}
-
-const ChatListItem = ({onClick, active, chatItem}: Props) => {
+const ChatListItem = ({onClick, active, chatItem}: ChatListItemProps) => {
     return (
         <div 
             className={"h-[68px] flex cursor-pointer items-center hover:bg-[#F5F5F5] " + (active ? "bg-[#EBEBEB]" : "")}

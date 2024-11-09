@@ -1,6 +1,7 @@
 import { Timestamp } from "firebase/firestore"
-import { UsersIdType } from "../User/UserType"
+import { UsersIdType, UserType } from "../User/UserType"
 import { MessageItemType } from "../Chat/MessageType"
+import { OptionsStateType } from "../Options/OptionsStateType"
 
 export type ChatUserItem = {
     chatId: string,
@@ -14,4 +15,17 @@ export type ChatUserItem = {
 export type ChatMessagesItem = {
     messages : MessageItemType[],
     users : UsersIdType,
+}
+
+export type ChatListItemProps = {
+    onClick: () => void,
+    active: boolean,
+    chatItem: ChatUserItem
+}
+
+export type ChatWindowProps = {
+    user: UserType,
+    activeChat: ChatUserItem,
+    setViewPerfil: (viewPerfil: boolean) => void
+    stateOption: OptionsStateType,
 }
