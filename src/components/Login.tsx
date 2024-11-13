@@ -1,5 +1,5 @@
 import Auth from "@/services/firebase.service.auth";
-import Firestore from "@/services/firebase.service.firestore";
+import * as Firestore from "@/communication/firestore";
 import { LoginProps } from "@/types/Login/LoginType";
 
 const Login = ({ onReceive }: LoginProps) => {

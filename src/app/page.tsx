@@ -9,7 +9,7 @@ import IconItem from '@/components/Icons/IconItem';
 import NewChat from '@/components/Chats/NewChat';
 import { UserType } from '@/types/User/UserType';
 import Login from '@/components/Login';
-import Firebase from '@/services/firebase.service.firestore';
+import * as Firebase from '@/communication/firestore';
 import Auth from '@/services/firebase.service.auth';
 import Perfil from '@/components/Perfil/Perfil';
 import DropDownOptions from '@/components/Options/DropDownOptions';

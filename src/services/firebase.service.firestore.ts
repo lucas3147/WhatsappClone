@@ -1,307 +1,59 @@
 import 'firebase/auth';
 import 'firebase/firestore';
-import { collection, addDoc, onSnapshot, query, where, getDocs, doc, updateDoc, arrayUnion, deleteDoc, setDoc, getDoc, Firestore } from 'firebase/firestore';
-import { UsersIdType, UserType } from '@/types/User/UserType';
-import { ChatMessagesItem, ChatUserItem } from '@/types/Chat/ChatType';
-import { MessageItemType } from '@/types/Chat/MessageType';
+import { collection, addDoc, onSnapshot, query, where, getDocs, doc, updateDoc, deleteDoc, setDoc, getDoc, DocumentReference, DocumentData, WhereFilterOp, DocumentSnapshot, QuerySnapshot } from 'firebase/firestore';
 import { useFirebase } from '../config/firebase.config';
 
+const getRef = async (path: string, pathSegments: string) => {
+    const db = (await useFirebase()).db;
+    return doc(db, path, pathSegments);
+}
+
+const getCollectionRef = async (path: string) => {
+    const db = (await useFirebase()).db;
+    return collection(db, path);
+}
+
 export default {
-    addUser: async (user : UserType) => {
-        const db = (await useFirebase()).db;
-        const docRef = doc(db, "users", user.id);
-
-        const userData = {
-            name: user.displayName,
-            photoUrl: user.photoURL
-        };
-
-        try { 
-            await setDoc(docRef, userData);
-            return true;
-        } catch (error) {
-            return false;
-        }
+    getRef: async (path: string, pathSegments: string) => {
+        return getRef(path, pathSegments)
     },
-    getUser: async (userId : string) : Promise<UserType | undefined> => {
-        const db = (await useFirebase()).db;
-        const docSnap = await getDoc(doc(db, "users", userId));
-        let user : UserType | undefined;
-
-        if (docSnap.exists()) {
-            let data = docSnap.data();
-
-            user = {
-                id: userId,
-                photoURL: data.photoUrl,
-                displayName: data.name,
-                note: data.note
-            }
-        }
-
-        return user;
+    getCollectionRef: async (path: string) => {
+        return getCollectionRef(path)
     },
-    updateUser: async (user : UserType) => {
-        const db = (await useFirebase()).db;
-        await updateDoc(doc(db, 'users', user.id), {
-            name: user.displayName,
-            photoUrl: user.photoURL,
-            note: user.note
-        });
-
-        const otherUsersSnap = await getDocs(collection(db, "users"));
-        let chatsOfUser : ChatUserItem[] = [];
-        if (otherUsersSnap){
-            otherUsersSnap.forEach(async (docRef) => {
-                if (docRef.id !== user.id) {
-                    let otherUser = docRef.data();
-                    if (otherUser.chats){
-                        chatsOfUser = [];
-    
-                        otherUser.chats.forEach((chat : ChatUserItem) => {
-                            if (chat.with == user.id) 
-                            {
-                                chatsOfUser.push({
-                                    ...chat,
-                                    title: user.displayName as string
-                                });
-                            } else {
-                                chatsOfUser.push({
-                                    ...chat
-                                });
-                            }
-                        });
-    
-                        await updateDoc(doc(db, 'users', docRef.id), {
-                            chats: chatsOfUser
-                        });
-                    }
-                }
-            });
-        }
+    addDoc: async (path: string, data: any) => {
+        const collectionRef = await getCollectionRef(path);
+        return await addDoc(collectionRef, data);
     },
-    getUsersToConnect: async (userId: string): Promise<UserType[]> => {
-        let usersToConnect: UserType[] = [];
-        const db = (await useFirebase()).db;
-    
-        const userSnap= await getDoc(doc(db, "users", userId));
-    
-        if (userSnap.exists()) {
-            const myChats : ChatUserItem[] = userSnap.data().chats;
-            const myChatsId = (myChats ?? []).map(chat => chat.with);
-            
-            const usersSnap = await getDocs(collection(db, "users"));
-    
-            usersSnap.forEach((doc) => {
-                if (doc.id === userId || myChatsId.includes(doc.id)) return;
-    
-                usersToConnect.push({
-                    id: doc.id,
-                    photoURL: doc.data().photoUrl,
-                    displayName: doc.data().name,
-                    note: doc.data().note
-                });
-            });
-        }
-        return usersToConnect;
+    setDoc: async (docRef: DocumentReference<any, DocumentData>, data: any) => {
+        await setDoc(docRef, data);
     },
-    addNewChat: async (user : UserType, otherUser : UserType) => {
-        const db = (await useFirebase()).db;
-        const chatsRef = collection(db, "chats");
-        const q = query(chatsRef, where("users", "array-contains", user.id));
-        const docSnapshot = await getDocs(q);
-        let data = true;
-        data = docSnapshot.docs.some(d => d.data().users[0] == otherUser.id || d.data().users[1] == otherUser.id);
-        if (data == false) {
-            let newChat = await addDoc(collection(db, 'chats'), {
-                messages: [],
-                users: [user.id, otherUser.id]
-            });
-
-            let docRef = doc(db, 'users', user.id);
-
-            await updateDoc(docRef, {
-                chats: arrayUnion({
-                    chatId: newChat.id,
-                    title: otherUser.displayName,
-                    image: otherUser.photoURL,
-                    with: otherUser.id
-                })
-            });
-
-            docRef = doc(db, 'users', otherUser.id);
-
-            await updateDoc(docRef, {
-                chats: arrayUnion({
-                    chatId: newChat.id,
-                    title: user.displayName,
-                    image: user.photoURL,
-                    with: user.id
-                })
-            });
-        }
+    getDocRef: async (path: string, pathSegments: string) => {
+        const ref = await getRef(path, pathSegments);
+        return await getDoc(ref);
     },
-    onChatList: async (userId : string, submit : (chat : ChatUserItem[]) => void) => {
-        const db = (await useFirebase()).db;
-
-        return onSnapshot(doc(db, 'users', userId), (doc) => {
-            if (doc.exists()) {
-                if (doc.data().chats) 
-                    submit(doc.data().chats);
-            }
-        });
+    getDocsRef: async (path: string) => {
+        const collectionRef = await getCollectionRef(path);
+        return await getDocs(collectionRef);
     },
-    onChatContent: async (chatId : string, submit : (chatMessages : ChatMessagesItem) => void) => {
-        const db = (await useFirebase()).db;
-
-        return onSnapshot(doc(db, 'chats', chatId), (doc) => {
-            if (doc.exists()) submit(doc.data() as ChatMessagesItem);
-        });
+    updateDocRef: async (path: string, pathSegments: string, data: any) => {
+        const ref = await getRef(path, pathSegments);
+        await updateDoc(ref, data);
     },
-    onUsersToConnectList: async (userId : string, submit : () => void) => {
-        const db = (await useFirebase()).db;
-
-        return onSnapshot(collection(db, 'users'), (snapShot) => {
-            snapShot.docChanges().forEach((change) => {
-                if (change.type === 'added' ||
-                    change.type === 'removed'
-                ) {
-                    submit();
-                }
-            });
-        });
+    deleteDocRef: async (path: string, pathSegments: string) => {
+        const ref = await getRef(path, pathSegments);
+        await deleteDoc(ref);
     },
-    sendMessage: async (chatId : string, message : MessageItemType, users : UsersIdType) => {
-        const db = (await useFirebase()).db;
-        let chatsRef = doc(db, 'chats', chatId);
-    
-        await updateDoc(chatsRef, {
-            messages: arrayUnion({
-                type: message.type,
-                author: message.author,
-                body: message.body,
-                date: message.date.toDate()
-            })
-        });
-        
-        for(let i in users) {
-            const docSnap = await getDoc(doc(db, "users", users[i]));
-            if (docSnap.exists()) {
-                if (docSnap.data().chats) {
-                    let chats : ChatUserItem[] = [...docSnap.data().chats];
-    
-                    for (let e in chats) {
-                        if (chats[e].chatId == chatId) {
-                            chats[e].lastMessage = message.body;
-                            chats[e].lastMessageDate = message.date;
-                        }
-                    }
-    
-                    await updateDoc(doc(db, 'users', users[i]), {
-                        chats
-                    });
-                }
-            }
-        }
+    getDocsQuery: async (path: string, fieldPath: string, opStr: WhereFilterOp, value: unknown) => {
+        const collectionRef = await getCollectionRef(path);
+        const q = query(collectionRef, where(fieldPath, opStr, value));
+        return await getDocs(q);
     },
-    getContactsIncluded: async (userId : string) => {
-        let list = [];
-        const db = (await useFirebase()).db;
-        const chatsRef = collection(db, "chats");
-        const q = query(chatsRef, where("users", "array-contains", userId));
-        const docSnapshot = await getDocs(q);
-        docSnapshot.forEach((doc) => {
-            list.push(doc.data().users[0]);
-            list.push(doc.data().users[1]);
-        });
-        if(list.length == 0){
-            list.push(userId);
-        }
-        return list;
+    onSnapShot: async (path: string, pathSegments: string, submit: (doc: DocumentSnapshot) => void) => {
+        const ref = await getRef(path, pathSegments);
+        return onSnapshot(ref, submit);
     },
-    deleteConversation: async (users : UsersIdType) => {
-        const db = (await useFirebase()).db;
-        const chatsRef = collection(db, "chats");
-        let q = query(chatsRef, where("users", "==", users));
-        let docSnapshot = await getDocs(q);
-        let chatData = docSnapshot.docs[0];
-        if (chatData.id) {
-            await updateDoc(doc(db, 'chats', chatData.id), {
-                messages: []
-            });
-        }
-
-        for(let i in users) {
-            const docSnap = await getDoc(doc(db, "users", users[i]));
-            if (docSnap.exists()) {
-                let user = docSnap.data();
-                if (user.chats) {
-                    let chats = [...user.chats];
-    
-                    for (let e in chats) {
-                        if (chats[e].chatId == chatData.id) {
-                            chats[e].lastMessage = '';
-                            chats[e].lastMessageDate = '';
-                        }
-                    }
-    
-                    await updateDoc(doc(db, "users", users[i]), {
-                        chats
-                    });
-                }
-            }
-        }
-    },
-    validationUser: async (userId : string) => {
-        const db = (await useFirebase()).db;
-        const userRef = doc(db, "users", userId); 
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) 
-        {
-            return userSnap.data().admin;
-        }
-        else 
-        {
-            return false;
-        }
-    },
-    deleteUser: async (userId : string) => {
-        try {
-          const db = (await useFirebase()).db;
-          await deleteDoc(doc(db, 'users', userId));
-          return true;
-        } catch (error) {
-          return false;
-        }
-    },
-    existUser: async (userId : string) => {
-        const db = (await useFirebase()).db;
-        const userRef = doc(db, "users", userId); 
-        const userSnap = await getDoc(userRef);
-
-        if (userSnap.exists()) {
-            return true; 
-        } else {
-            return false; 
-        }
-    },
-    existChat: async (userId : string, otherUserId : string) : Promise<boolean> => {
-        const db = (await useFirebase()).db;
-        const chatsRef = collection(db, "chats");
-        const q = query(chatsRef, where("users", "array-contains", userId));
-        const docSnapshot = await getDocs(q);
-        return docSnapshot.docs.some(d => d.data().users[0] == otherUserId || d.data().users[1] == otherUserId);
-    },
-    getChatsUser: async (userId : string) : Promise<any[]> => {
-        const db = (await useFirebase()).db;
-        const userRef = doc(db, "users", userId); 
-        const userSnap = await getDoc(userRef);
-
-        if (userSnap.exists()) {
-            return userSnap.data().chats;
-        }
-        else {
-            return [];
-        }
+    onSnapShotCollection: async (path: string, pathSegments: string, submit: (doc: QuerySnapshot) => void) => {
+        const collectionRef = await getCollectionRef(path);
+        return onSnapshot(collectionRef, submit);
     }
 };

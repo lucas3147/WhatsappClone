@@ -2,16 +2,10 @@ import { UserType } from "@/types/User/UserType";
 import IconItem from "../Icons/IconItem";
 import { ChangeEvent, useState } from "react";
 import Auth from "@/services/firebase.service.auth";
-import Firestore from "@/services/firebase.service.firestore";
+import * as Firestore from "@/communication/firestore";
+import { PerfilProps } from "@/types/User/PerfilType";
 
-type Props = {
-    show: boolean, 
-    setShow: (show: boolean) => void,
-    user: UserType,
-    setUser: (user: UserType) => void
-}
-
-const Perfil = ({show , setShow, user, setUser}: Props) => {
+const Perfil = ({show , setShow, user, setUser}: PerfilProps) => {
     let nameUser = user.displayName ?? '';
     let noteUser = user.note ?? '';
 
