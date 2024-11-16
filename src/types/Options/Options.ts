@@ -12,3 +12,8 @@ export type DropDownOptionsProps = {
     left?: number,
     right?: number,
 };
+
+export type optionsStateType = {
+    show: boolean | null,
+    setShow: (show: boolean | null) => void
+}

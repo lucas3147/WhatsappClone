@@ -29,3 +29,8 @@ export type ChatWindowProps = {
     setViewPerfil: (viewPerfil: boolean) => void
     stateOption: OptionsStateType,
 }
+
+export type ActiveChatContextType = {
+    chat: ChatUserItem | null;
+    setChat: (chat: ChatUserItem | null) => void
+}

@@ -1,4 +1,4 @@
-import apiFirebase from '../firebase.service.firestore';
+import * as apiFirebase from '../../communication/firebase/firestore';
 import { UserType } from "../../types/User/UserType";
 import { generateId } from '../../library/resources';
 import { ChatUserItem } from '@/types/Chat/ChatType';
@@ -50,17 +50,15 @@ describe('Testing firebase services', () => {
         expect(userChanged.photoURL).toBe(user.photoURL);
     });
 
-    it('should get the contact lists', async () => {
-        let result = await apiFirebase.getContactList([]);
-
-        expect(result.length).toBeGreaterThan(0);
-    });
-
     it('should create a new chat', async () => {
         await apiFirebase.addNewChat(user, otherUser);
         let isChatCreated = await apiFirebase.existChat(user.id, otherUser.id);
+        let myChatCreated = await apiFirebase.getChatsUser(user.id);
+        let otherChatCreated = await apiFirebase.getChatsUser(otherUser.id);
 
         expect(isChatCreated).toBeTruthy();
+        expect(otherChatCreated[0].title).toBe(user.displayName);
+        expect(myChatCreated[0].title).toBe(otherUser.displayName);
     });
 
     it('should grab a complete user chat list', async () => {
@@ -115,14 +113,6 @@ describe('Testing firebase services', () => {
         
         expect(userChanged.displayName).toBe(user.displayName);
         expect(chatChanged[0].title).toBe(user.displayName);
-    });
-
-    it('should verify on list contacts', async () => {
-        let contacts = await apiFirebase.getContactsIncluded(user.id);
-        
-        expect(contacts.length).toBeGreaterThan(0);
-        expect(contacts).toContain(user.id);
-        expect(contacts).toContain(otherUser.id);
     });
 
     it.skip('should delete the conversation', async () => {

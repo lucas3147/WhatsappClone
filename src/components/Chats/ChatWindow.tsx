@@ -5,12 +5,10 @@ import Picker from '@emoji-mart/react'
 import MessageItem from "./MessageItem";
 import { UsersIdType } from "@/types/User/UserType";
 import { ChatWindowProps } from "@/types/Chat/ChatType";
-import Api from "@/services/firebase.service.firestore";
+import * as Firebase from "@/communication/firebase/firestore";
 import DropDownOptions from "../Options/DropDownOptions";
 import { MessageItemType } from "@/types/Chat/MessageType";
 import { Timestamp } from "firebase/firestore";
-
-
 
 const ChatWindow = ({user, activeChat, stateOption, setViewPerfil}: ChatWindowProps) => {
     const [emojiOpen, setEmojiOpen] = useState(false);
@@ -35,7 +33,7 @@ const ChatWindow = ({user, activeChat, stateOption, setViewPerfil}: ChatWindowPr
 
     useEffect(() => {
         const onChatContent = async () => {
-            return Api.onChatContent(activeChat.chatId, (chat) => {
+            return Firebase.onChatContent(activeChat.chatId, (chat) => {
                 setListMessages([]);
                 setListMessages(chat.messages);
                 setUsers(chat.users);
@@ -73,7 +71,7 @@ const ChatWindow = ({user, activeChat, stateOption, setViewPerfil}: ChatWindowPr
             setText('');
             setEmojiOpen(false);
             const message : MessageItemType = { author: user.id, body: text, date: Timestamp.fromDate(new Date()), type: 'text'};
-            await Api.sendMessage(activeChat.chatId, message, users);
+            await Firebase.sendMessage(activeChat.chatId, message, users);
         }
     }
 
@@ -89,8 +87,8 @@ const ChatWindow = ({user, activeChat, stateOption, setViewPerfil}: ChatWindowPr
 
     const deleteConversation = async () => {
         stateOption.setOpen(false);
-        if (await Api.validationUser(user.id)) {
-            await Api.deleteConversation(users);
+        if (await Firebase.validationUser(user.id)) {
+            await Firebase.deleteConversation(users);
             setListMessages([]);
         } else {
             alert('Sinto muito. Você não tem acesso!');
