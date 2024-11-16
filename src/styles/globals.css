@@ -111,14 +111,14 @@ body {
 }
 
 @media (min-width: 1600px) {
-   .home,
-   .verticalFlap {
+  .home,
+  .verticalFlap {
     height: calc(100vh - 50px);
-   }
+  }
 
-   .home {
+  .home {
     width: 1600px;
-   }
+  }
 }
 
 .home {
@@ -285,7 +285,7 @@ h2.epr-emoji-category-label{
   background-color: white;
 }
 
-@media (max-width: 500px) {
+@media (max-width: 700px) {
   .menu-section {
       width: 100vw;
       min-width: 100vw;
@@ -301,4 +301,14 @@ h2.epr-emoji-category-label{
   overflow: hidden; 
   white-space: nowrap; 
   padding-right: 22px;
+}
+
+.closed-menu-section {
+  position: relative;
+  max-width: 45px;
+  min-width: 45px;
+  display: flex;
+  flex-direction: column;
+  border-right-width: 2px;
+  border-color: #ddd;
 }
