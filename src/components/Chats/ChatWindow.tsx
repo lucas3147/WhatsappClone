@@ -105,7 +105,7 @@ const ChatWindow = ({user, activeChat, stateOption, setViewPerfil}: ChatWindowPr
             <DropDownOptions
                 options={
                     [
-                        { id: 1, name: 'Apagar conversa', action: deleteConversation },
+                        { id: 1, name: 'Apagar conversa', action: deleteConversation }
                     ]
                 }
                 right={27}

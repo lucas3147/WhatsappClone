@@ -1,4 +1,3 @@
-import { NextRouter } from "next/router"
 import { ChatUserItem } from "../Chat/ChatType"
 import { UserType } from "../User/UserType"
 
@@ -13,4 +12,8 @@ export type MainMenuProps = {
     }
     onClickChatListItem: (chatUserItem: ChatUserItem) => void,
     activeChatId: string | null
+}
+
+export type ClosedMenuProps = {
+    handleOpenMenu: () => void
 }
