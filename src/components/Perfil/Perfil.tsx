@@ -1,8 +1,8 @@
 import { UserType } from "@/types/User/UserType";
 import IconItem from "../Icons/IconItem";
 import { ChangeEvent, useState } from "react";
-import Auth from "@/services/firebase.service.auth";
-import * as Firestore from "@/communication/firestore";
+import * as Auth from "@/communication/firebase/authorization";
+import * as Firestore from "@/communication/firebase/firestore";
 import { PerfilProps } from "@/types/User/PerfilType";
 
 const Perfil = ({show , setShow, user, setUser}: PerfilProps) => {

@@ -1,10 +1,10 @@
-import Auth from "@/services/firebase.service.auth";
-import * as Firestore from "@/communication/firestore";
+import * as Auth from "@/communication/firebase/authorization";
+import * as Firestore from "@/communication/firebase/firestore";
 import { LoginProps } from "@/types/Login/LoginType";
 
 const Login = ({ onReceive }: LoginProps) => {
 	const handleLogin = async () => {
-		let userGithub = await Auth.githubPopup();
+		let userGithub = await Auth.githubPopup() as any;
 		if (userGithub) {
 			let user = await Firestore.getUser(userGithub.uid);
 			onReceive({

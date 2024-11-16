@@ -1,4 +1,4 @@
-import * as apiFirebase from '../../communication/firestore';
+import * as apiFirebase from '../../communication/firebase/firestore';
 import { UserType } from "../../types/User/UserType";
 import { generateId } from '../../library/resources';
 import { ChatUserItem } from '@/types/Chat/ChatType';
@@ -53,8 +53,12 @@ describe('Testing firebase services', () => {
     it('should create a new chat', async () => {
         await apiFirebase.addNewChat(user, otherUser);
         let isChatCreated = await apiFirebase.existChat(user.id, otherUser.id);
+        let myChatCreated = await apiFirebase.getChatsUser(user.id);
+        let otherChatCreated = await apiFirebase.getChatsUser(otherUser.id);
 
         expect(isChatCreated).toBeTruthy();
+        expect(otherChatCreated[0].title).toBe(user.displayName);
+        expect(myChatCreated[0].title).toBe(otherUser.displayName);
     });
 
     it('should grab a complete user chat list', async () => {

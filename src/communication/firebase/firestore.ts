@@ -2,7 +2,7 @@
 import { UsersIdType, UserType } from '@/types/User/UserType';
 import { ChatMessagesItem, ChatUserItem } from '@/types/Chat/ChatType';
 import { MessageItemType } from '@/types/Chat/MessageType';
-import firestoreService from '../services/firebase.service.firestore';
+import firestoreService from '../../services/firebase.service.firestore';
 import { arrayUnion } from 'firebase/firestore';
 
 export const addUser =  async (user : UserType) => {
@@ -52,6 +52,7 @@ export const updateUser= async (user : UserType) => {
         usersSnap.forEach(async (docRef) => {
             if (docRef.id !== user.id) {
                 let otherUser = docRef.data();
+                
                 if (otherUser.chats){
                     chatsOfUser = [];
 
@@ -124,9 +125,9 @@ export const addNewChat= async (user : UserType, otherUser : UserType) => {
         await firestoreService.updateDocRef('users', otherUser.id, {
             chats: arrayUnion({
                 chatId: newChat.id,
-                title: otherUser.displayName,
-                image: otherUser.photoURL,
-                with: otherUser.id
+                title: user.displayName,
+                image: user.photoURL,
+                with: user.id
             })
         });
     }
@@ -257,7 +258,7 @@ export const existChat= async (userId : string, otherUserId : string) : Promise<
     return docSnapshot.docs.some(d => d.data().users[0] == otherUserId || d.data().users[1] == otherUserId);
 };
 
-export const getChatsUser= async (userId : string) : Promise<any[]> => {
+export const getChatsUser= async (userId : string) : Promise<ChatUserItem[]> => {
     const userSnap = await firestoreService.getDocRef('users', userId);
 
     if (userSnap.exists()) {
