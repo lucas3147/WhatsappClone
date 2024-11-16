@@ -3,7 +3,7 @@ import * as Auth from "@/services/firebase.service.auth";
 export const githubPopup = async () => {
     let githubCredential;
 
-    Auth.signInWithPopupGithub((credential, user) => {
+    await Auth.signInWithPopupGithub((credential, user) => {
         if (credential) {
             githubCredential = {
                 ...user,
@@ -17,7 +17,7 @@ export const githubPopup = async () => {
 }
 
 export const signOut = async () : Promise<boolean> => {
-    const result = Auth.signOutAuth();
+    const result = await Auth.signOutAuth();
 
     if (!result) {
         alert('Ocorreu um erro ao sair!');

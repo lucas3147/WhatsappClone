@@ -1,8 +1,8 @@
+
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import '@/styles/globals.css'
 import NoSsr from '@/components/NoSsr'
-import { ActiveChatProvider } from '@/contexts/ActiveChatContext'
 import { GeneralOptionsProvider } from '@/contexts/generalOptionsContext'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -21,13 +21,9 @@ export default function RootLayout({
     <html lang="pt-br">
       <body className="bg-greenish-white m-0 font-sans text-black">
         <NoSsr>
-          <ActiveChatProvider>
-            <GeneralOptionsProvider>
-              <div className={inter.className}>
-                {children}
-              </div>
-            </GeneralOptionsProvider>
-          </ActiveChatProvider>
+          <div className={inter.className}>
+            {children}
+          </div>
         </NoSsr>
       </body>
     </html>

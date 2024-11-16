@@ -1,13 +1,10 @@
 "use client"
 
 import { ChangeEvent, MouseEvent, useEffect, useState } from "react";
-import { useRouter } from "next/router";
 import { UserType } from "@/types/User/UserType";
 import { ChatUserItem } from "@/types/Chat/ChatType";
 import { Unsubscribe } from "firebase/auth";
 import { MainMenuProps } from "@/types/Menu/MenuType";
-import { useActiveChat } from "@/contexts/ActiveChatContext";
-import { useGeneralOptions } from "@/contexts/generalOptionsContext";
 import DropDownOptions from "../Options/DropDownOptions";
 import NewChat from "../Chats/NewChat";
 import Perfil from "../Perfil/Perfil";
@@ -16,10 +13,8 @@ import ChatListItem from "../Chats/ChatListItem";
 import * as Firebase from '@/communication/firebase/firestore';
 import * as Auth from '@/communication/firebase/authorization';
 
-export const MainMenu = ({user, setUser, setOtherUser, setShowOtherPerfil, setShowUserOptions} : MainMenuProps) => {
+export const MainMenu = ({userState, showGeneralOptionsState, onClickChatListItem, activeChatId} : MainMenuProps) => {
 
-    const activeChatContext = useActiveChat();
-    const generalOptionsContext = useGeneralOptions();
     const [chatList, setChatList] = useState<ChatUserItem[]>([]);
     const [listUsersToConnect, setListUsersToConnect] = useState<UserType[]>([]);
     const [showNewChat, setShowNewChat] = useState(false);
@@ -27,7 +22,6 @@ export const MainMenu = ({user, setUser, setOtherUser, setShowOtherPerfil, setSh
     const [chatSearch, setChatSearch] = useState<string>('');
     const [listenerChats, setListenerChats] = useState<boolean>();
     const [listenerUsers, setListenerUsers] = useState<boolean>();
-    const router = useRouter();
 
     useEffect(() => {
       let unsubscribeChats : Unsubscribe;
@@ -46,12 +40,12 @@ export const MainMenu = ({user, setUser, setOtherUser, setShowOtherPerfil, setSh
         });
       };
       
-      if (user !== null && listenerChats) {
-        onChatList(user.id);
+      if (userState.state !== null && listenerChats) {
+        onChatList(userState.state.id);
       }
 
-      if (user !== null && listenerUsers) {
-        onUserList(user.id);
+      if (userState.state !== null && listenerUsers) {
+        onUserList(userState.state.id);
       }
 
       return () => {
@@ -68,7 +62,7 @@ export const MainMenu = ({user, setUser, setOtherUser, setShowOtherPerfil, setSh
     const handleListeners = () => {
         setListenerChats(true);
         setListenerUsers(true);
-        handleUsersToConnect(user.id);
+        handleUsersToConnect(userState.state.id);
     }
 
     const handleSortChats = (chats : ChatUserItem[]) => {
@@ -103,9 +97,9 @@ export const MainMenu = ({user, setUser, setOtherUser, setShowOtherPerfil, setSh
     }
 
     const handleAddNewChat = async (otherUser: UserType) => {
-      if (user) {
+      if (userState.state) {
         setShowNewChat(false);
-        await Firebase.addNewChat(user, otherUser);
+        await Firebase.addNewChat(userState.state, otherUser);
         setListenerChats(false);
         setListenerChats(true);
       }
@@ -114,20 +108,13 @@ export const MainMenu = ({user, setUser, setOtherUser, setShowOtherPerfil, setSh
     const handleSignOut = async () => {
       var logout = await Auth.signOut();
       if (logout) {
-        setUser(null);
+        userState.setState(null);
       }
     }
 
-    const handleGeneralOptions = (e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>) => {
+    const handleGeneralOptions = (e: MouseEvent) => {
       e.preventDefault();
-      generalOptionsContext?.setShow(!generalOptionsContext.show);
-    }
-
-    const handleOtherUser = async (userId : string) => {
-      const user = await Firebase.getUser(userId);
-      if (user) {
-        setOtherUser(user);
-      }
+      showGeneralOptionsState.setState(!showGeneralOptionsState.state);
     }
 
     const handleChatSearch = async (e : ChangeEvent<HTMLInputElement>) => {
@@ -140,15 +127,15 @@ export const MainMenu = ({user, setUser, setOtherUser, setShowOtherPerfil, setSh
             <DropDownOptions
               options={
                 [
-                  { id: 1, name: 'Visite a página do Dev', action: () => router.push('https://github.com/lucas3147')},
+                  { id: 1, name: 'Visite a página do Dev', action: () => window.location.href = 'https://github.com/lucas3147'},
                   { id: 2, name: 'Configurações', action: () => alert('Em desenvolvimento...') },
                   { id: 3, name: 'Desconectar', action: () => handleSignOut() }
                 ]
               }
               right={20}
               stateOption={{
-                open: generalOptionsContext?.show ?? null,
-                setOpen: generalOptionsContext?.setShow as any
+                open: showGeneralOptionsState.state,
+                setOpen: showGeneralOptionsState.setState
               }}
             />
           </div>
@@ -162,15 +149,15 @@ export const MainMenu = ({user, setUser, setOtherUser, setShowOtherPerfil, setSh
             <Perfil
               show={showPerfil}
               setShow={setShowPerfil}
-              user={user}
-              setUser={setUser}
+              user={userState.state}
+              setUser={userState.setState}
             />
             <div >
               <header className="h-16 px-4 flex justify-between items-center bg-[#F6F6F6]">
                 <div onClick={handlePerfil}>
                   <img
                     className="w-10 h-10 rounded-[20px] cursor-pointer"
-                    src={user.photoURL ? user.photoURL : ""}
+                    src={userState.state.photoURL ? userState.state.photoURL : ""}
                     alt="icone do avatar" />
                 </div>
                 <div className="flex">
@@ -232,13 +219,8 @@ export const MainMenu = ({user, setUser, setOtherUser, setShowOtherPerfil, setSh
                     <ChatListItem
                       key={key}
                       chatItem={item}
-                      active={activeChatContext?.chat?.chatId == item.chatId}
-                      onClick={() => {
-                        activeChatContext?.setChat(item);
-                        setShowOtherPerfil(false);
-                        setShowUserOptions(null);
-                        handleOtherUser(item.with);
-                      }}
+                      active={activeChatId == item.chatId}
+                      onClick={() => onClickChatListItem(item)}
                     />
                 ))}
               </div>

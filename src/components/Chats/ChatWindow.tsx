@@ -10,8 +10,6 @@ import DropDownOptions from "../Options/DropDownOptions";
 import { MessageItemType } from "@/types/Chat/MessageType";
 import { Timestamp } from "firebase/firestore";
 
-
-
 const ChatWindow = ({user, activeChat, stateOption, setViewPerfil}: ChatWindowProps) => {
     const [emojiOpen, setEmojiOpen] = useState(false);
     const [text, setText] = useState('');
