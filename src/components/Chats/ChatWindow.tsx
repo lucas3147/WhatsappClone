@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, MouseEvent } from "react";
+import { useState, useEffect, useRef, MouseEvent, FocusEventHandler } from "react";
 import IconItem from "../Icons/IconItem";
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
@@ -169,7 +169,7 @@ const ChatWindow = ({user, activeChat, stateOption, setViewPerfil}: ChatWindowPr
                     onEmojiSelect={handleEmojiClick}
                     theme={'light'} />
             </div>
-            <div className="h-[62px] flex items-center">
+            <div className={`h-[62px] flex items-center`}>
                 <div className="flex my-0 mx-4" onClick={() => setEmojiOpen(!emojiOpen)}>
                     <IconItem
                         className="iconTheme"
