@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "uiemulator": "firebase emulators:start --only firestore",
-    "test": "set NODE_ENV=test& set EMULATOR=true& jest --runInBand",
+    "test": "set EMULATOR=true& jest --runInBand",
     "dev": "set NODE_ENV=test& next dev",
     "emulatordev": "set NODE_ENV=test&set EMULATOR=true& next dev",
     "build": "next build",

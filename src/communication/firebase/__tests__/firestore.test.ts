@@ -1,11 +1,11 @@
-import * as apiFirebase from '../../communication/firebase/firestore';
-import { UserType } from "../../types/User/UserType";
-import { generateId } from '../../library/resources';
+import * as apiFirebase from '../firestore';
+import { UserType } from "../../../types/User/UserType";
+import { generateId } from '../../../library/resources';
 import { ChatUserItem } from '@/types/Chat/ChatType';
 import { MessageItemType } from '@/types/Chat/MessageType';
 import { Timestamp } from 'firebase/firestore';
 
-describe('Testing firebase services', () => {
+describe('Testing firestore database', () => {
 
     let user : UserType;
     let otherUser: UserType;
@@ -15,14 +15,16 @@ describe('Testing firebase services', () => {
             id: generateId(),
             displayName: 'Lucas L.',
             photoURL: 'teste_2.img',
-            note: 'Meu recado 1'
+            note: 'Meu recado 1',
+            uid: ''
         };
 
         otherUser = {
             id: generateId(),
             displayName: 'Gustavo L.',
             photoURL: 'teste_2.img',
-            note: 'Meu recado 2'
+            note: 'Meu recado 2',
+            uid: ''
         }
     });
     
@@ -147,5 +149,25 @@ describe('Testing firebase services', () => {
 
         expect(result).toBeTruthy();
         expect(existUser).toBeFalsy();
+    });
+
+    it.skip('should all users import', async () => {
+        let users = await apiFirebase.getUsers();
+        
+        if (users) {
+            console.log(users);
+            users.forEach(async (user) => {
+                if (user.id) {
+                    await apiFirebase.addUser({
+                        displayName: user.displayName, 
+                        photoURL: user.photoURL, 
+                        note: user.note,
+                        id: user.id
+                    });
+                }
+            })
+        }
+
+        expect(users?.length).toBeGreaterThan(0);
     });
 });

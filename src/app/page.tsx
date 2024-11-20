@@ -27,7 +27,6 @@ export default function Home() {
 
   useEffect(() => {
     const handleResize = () => {
-      console.log(window.innerWidth);
       setWindowSize({
         width: window.innerWidth,
         height: window.innerHeight,

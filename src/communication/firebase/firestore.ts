@@ -39,6 +39,26 @@ export const getUser= async (userId : string) : Promise<UserType | undefined> =>
     return user;
 };
 
+export const getUsers= async () : Promise<UserType[]> => {
+    const usersSnap = await firestoreService.getDocsRef('users');
+    let users : UserType[] = [];
+
+    if (usersSnap) {
+        usersSnap.forEach((docRef) => {
+            const user = docRef.data();
+
+            users.push({
+                id: docRef.id,
+                photoURL: user.photoUrl,
+                displayName: user.name,
+                note: user.note
+            });
+        });
+    }
+
+    return users;
+};
+
 export const updateUser= async (user : UserType) => {
     await firestoreService.updateDocRef('users', user.id, {
         name: user.displayName,
