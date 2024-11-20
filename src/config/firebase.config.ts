@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import { getAuth } from "firebase/auth";
-import { FirebaseOptions, initializeApp, getApps, getApp } from 'firebase/app';
+import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
 import apiCredentials from './firebase.credentials';
 
