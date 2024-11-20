@@ -246,8 +246,10 @@ h2.epr-emoji-category-label{
 }
 
 .otherPerfil {
-  min-width: 520px;
+  overflow-x: hidden;
   overflow-y: auto;
+  flex: 1;
+  box-sizing: border-box;
 }
 
 .otherPerfil::-webkit-scrollbar {

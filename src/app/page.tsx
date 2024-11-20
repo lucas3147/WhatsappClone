@@ -114,7 +114,7 @@ export default function Home() {
               }}
             />
           }
-          <div className="flex-1 overflow-x-hidden">
+          <div className="flex-1 h-full overflow-hidden">
             {activeChat?.chatId !== undefined &&
               <div className="h-full w-full relative">
                 <ChatWindow
