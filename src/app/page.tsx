@@ -49,6 +49,14 @@ export default function Home() {
     setUser(user);
   }
 
+  const handleLoginTest = async () => {
+    const user = await Firebase.getUser('54Afzw9Oo1XuVKqqJ6JccAzeho23');
+    if (user) {
+      console.log('passando aqui')
+      setUser(user);
+    }
+  }
+
   const handleDisableFeatures = (e: MouseEvent) => {
     e.preventDefault();
     var divElement: any = e.target;
@@ -107,7 +115,7 @@ export default function Home() {
               }}
             />
           }
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-x-hidden">
             {activeChat?.chatId !== undefined &&
               <div className="h-full w-full relative">
                 <ChatWindow
