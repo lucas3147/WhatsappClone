@@ -9,7 +9,7 @@ const Login = ({ onReceive }: LoginProps) => {
 			let user = await Firestore.getUser(userGithub.uid);
 			onReceive({
 				id: userGithub.uid,
-				displayName: userGithub.displayName,
+				displayName: userGithub.displayName ?? 'usuário',
 				photoURL: userGithub.photoURL,
 				note: user?.note
 			});
