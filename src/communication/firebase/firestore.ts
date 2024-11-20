@@ -10,7 +10,8 @@ export const addUser =  async (user : UserType) => {
 
     const userData = {
         name: user.displayName,
-        photoUrl: user.photoURL
+        photoUrl: user.photoURL,
+        note: ''
     }
 
     try { 
