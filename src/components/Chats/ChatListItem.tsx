@@ -1,4 +1,4 @@
-import { ChatListItemProps, ChatUserItem } from "@/types/Chat/ChatType"
+import { ChatListItemProps } from "@/types/Chat/ChatType"
 
 const ChatListItem = ({onClick, active, chatItem}: ChatListItemProps) => {
     return (
@@ -14,9 +14,7 @@ const ChatListItem = ({onClick, active, chatItem}: ChatListItemProps) => {
             <div
                 className="flex flex-1 flex-col flex-wrap min-w-0 h-full justify-center border-b-2 border-[#EEE] pr-4 ml-4"
             >
-                <div
-                    className="flex justify-between items-center w-full"
-                >
+                <div className="flex justify-between items-center w-full">
                     <div className="text-base text-[#111B21] overflow-hidden whitespace-nowrap text-ellipsis m-0 select-none">
                         {chatItem.title}
                     </div>

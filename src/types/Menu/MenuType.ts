@@ -1,3 +1,4 @@
+import { ReactNode } from "react"
 import { ChatUserItem } from "../Chat/ChatType"
 import { UserType } from "../User/UserType"
 
@@ -15,5 +16,6 @@ export type MainMenuProps = {
 }
 
 export type ClosedMenuProps = {
-    handleOpenMenu: () => void
+    handleOpenMenu: () => void,
+    children: ReactNode
 }

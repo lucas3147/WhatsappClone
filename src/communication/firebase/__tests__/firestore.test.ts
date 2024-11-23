@@ -15,16 +15,14 @@ describe('Testing firestore database', () => {
             id: generateId(),
             displayName: 'Lucas L.',
             photoURL: 'teste_2.img',
-            note: 'Meu recado 1',
-            uid: ''
+            note: 'Meu recado 1'
         };
 
         otherUser = {
             id: generateId(),
             displayName: 'Gustavo L.',
             photoURL: 'teste_2.img',
-            note: 'Meu recado 2',
-            uid: ''
+            note: 'Meu recado 2'
         }
     });
     

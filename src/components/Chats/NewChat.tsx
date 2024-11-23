@@ -1,25 +1,17 @@
 import { NewChatProps } from "@/types/Chat/NewChatType";
 import IconItem from "../Icons/IconItem";
+import SliderCardLeft from "../Sliders/SliderCardLeft";
+import SliderCardLeftTitle from "../Sliders/SliderCardLeftTitle";
 
 const NewChat = ({ addNewChat, listUsers, show, setShow }: NewChatProps) => {
 	return (
-		<div
-			className={`transition-all duration-500 w-full border-[#DDD] bg-[white] flex flex-col border-r-[1px] verticalFlap absolute top-0 bottom-0 left-0 ${show ? 'openFlap translate-x-0' : 'closeFlap translate-x-[-100%]'}`}
+		<SliderCardLeft
+			show={show}
 		>
-			<div className="flex bg-[#008069] items-center px-4 pb-4 pt-[60px]">
-
-				<div onClick={() => setShow(false)}>
-					<IconItem
-						className="iconTheme"
-						type="ArrowBackIcon"
-						style={{ color: '#FFF' }}
-					/>
-				</div>
-
-				<div className="text-[19px] leading-10 h-10 flex-1 font-bold text-white ml-5">
-					Nova conversa
-				</div>
-			</div>
+			<SliderCardLeftTitle
+				title='Nova conversa'
+				handleShow={setShow}
+			/>
 
 			<div className="newChat--list">
 				{listUsers.map((item, key) => (
@@ -41,7 +33,7 @@ const NewChat = ({ addNewChat, listUsers, show, setShow }: NewChatProps) => {
 					</div>
 				))}
 			</div>
-		</div>
+		</SliderCardLeft>
 	)
 }
 

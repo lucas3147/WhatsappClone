@@ -10,6 +10,7 @@ import ChatWindow from '@/components/Chats/ChatWindow';
 import OtherPerfil from '@/components/Perfil/OtherPerfil';
 import * as Firebase from '@/communication/firebase/firestore';
 import { ClosedMenu } from '@/components/Menu/ClosedMenu';
+import IconItem from '@/components/Icons/IconItem';
 
 export default function Home() {
 
@@ -93,7 +94,20 @@ export default function Home() {
                 setOtherUser(null);
                 setActiveChat(null);
               }}
-            />
+            >
+              <IconItem
+                type="SettingsIcon"
+                style={{ color: '#919191' }}
+                className="iconTheme mb-4"
+                onclick={() => alert('Em desenvolvimento...')}
+              />
+
+              <img
+                className="w-[35px] h-[35px] rounded-[20px] cursor-pointer"
+                src={user.photoURL ? user.photoURL : ""}
+                alt="icone do avatar" 
+              />
+            </ClosedMenu>
           }
           {(windowSize.width > 700 || !otherUser) &&
             <MainMenu

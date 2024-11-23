@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, MouseEvent, FocusEventHandler } from "react";
+import { useState, useEffect, useRef, MouseEvent } from "react";
 import IconItem from "../Icons/IconItem";
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
@@ -9,6 +9,8 @@ import * as Firebase from "@/communication/firebase/firestore";
 import DropDownOptions from "../Options/DropDownOptions";
 import { MessageItemType } from "@/types/Chat/MessageType";
 import { Timestamp } from "firebase/firestore";
+import { recognition, startSpeechRecognition } from "@/utils/AccessMicrophone";
+import { CutText } from "../General/CutText";
 
 const ChatWindow = ({user, activeChat, stateOption, setViewPerfil}: ChatWindowProps) => {
     const [emojiOpen, setEmojiOpen] = useState(false);
@@ -18,13 +20,8 @@ const ChatWindow = ({user, activeChat, stateOption, setViewPerfil}: ChatWindowPr
     const [users, setUsers] = useState<UsersIdType>([]);
     const body = useRef<HTMLInputElement>(null);
 
-    let recognition:SpeechRecognition;
-    let SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-    if (SpeechRecognition !== undefined) {
-        recognition = new SpeechRecognition();
-    }
-
+    startSpeechRecognition();
+    
     useEffect(() => {
         if (body.current && body.current.scrollHeight > body.current.offsetHeight){
             body.current.scrollTop = body.current.scrollHeight - body.current.offsetHeight;
@@ -56,7 +53,7 @@ const ChatWindow = ({user, activeChat, stateOption, setViewPerfil}: ChatWindowPr
                 setListening(false);
             }
             recognition.onresult = (e) => {
-                setText( e.results[0][0].transcript );
+                setText(e.results[0][0].transcript);
             }
 
             recognition.start();
@@ -122,33 +119,36 @@ const ChatWindow = ({user, activeChat, stateOption, setViewPerfil}: ChatWindowPr
                         src={activeChat.image}
                         alt=""
                     />
-                    <div
-                        className="text-base text-black"
-                    >
-                        {activeChat.title}
-                    </div>
                 </div>
-
-                <div className="flex items-center mr-4">
-                    <IconItem
-                        className="iconTheme"
-                        type="SearchIcon"
-                        style={{ color: '#919191' }}
-                    />
-                    <IconItem
-                        className="iconTheme"
-                        type="AttachFileIcon"
-                        style={{ color: '#919191' }}
-                    />
-                    <div 
-                        onClick={(e) => handleUserOptions(e)}
-                        style={{pointerEvents: stateOption.open ? 'none' : 'auto'}}
-                     >
-                        <IconItem
-                            className="iconTheme"
-                            type="MoreVertIcon"
-                            style={{ color: '#919191' }}
+                <div className="flex flex-1 min-w-0 flex-wrap justify-center">
+                    <div className="flex justify-between items-center w-full">
+                        <CutText 
+                            text={activeChat.title} 
+                            className={"text-base text-black"} 
+                            onClick={viewerPerfil}
                         />
+                        <div className="flex items-center mr-4">
+                            <IconItem
+                                className="iconTheme"
+                                type="SearchIcon"
+                                style={{ color: '#919191' }}
+                            />
+                            <IconItem
+                                className="iconTheme"
+                                type="AttachFileIcon"
+                                style={{ color: '#919191' }}
+                            />
+                            <div
+                                onClick={(e) => handleUserOptions(e)}
+                                style={{ pointerEvents: stateOption.open ? 'none' : 'auto' }}
+                            >
+                                <IconItem
+                                    className="iconTheme"
+                                    type="MoreVertIcon"
+                                    style={{ color: '#919191' }}
+                                />
+                            </div>
+                        </div>
                     </div>
 
                 </div>
@@ -162,8 +162,7 @@ const ChatWindow = ({user, activeChat, stateOption, setViewPerfil}: ChatWindowPr
                     />
                 ))}
             </div>
-            <div 
-                className={"chatWindow--emojiArea " + (emojiOpen ? "h-[437px]" : "h-0")}>
+            <div className={"chatWindow--emojiArea " + (emojiOpen ? "h-[437px]" : "h-0")}>
                 <Picker 
                     data={data} 
                     onEmojiSelect={handleEmojiClick}
