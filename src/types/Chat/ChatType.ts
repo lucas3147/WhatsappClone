@@ -2,6 +2,7 @@ import { Timestamp } from "firebase/firestore"
 import { UsersIdType, UserType } from "../User/UserType"
 import { MessageItemType } from "../Chat/MessageType"
 import { OptionsStateType } from "../Options/OptionsStateType"
+import { ReactNode } from "react"
 
 export type ChatUserItem = {
     chatId: string,
@@ -19,18 +20,22 @@ export type ChatMessagesItem = {
 
 export type ChatListItemProps = {
     onClick: () => void,
-    active: boolean,
     chatItem: ChatUserItem
 }
 
 export type ChatWindowProps = {
     user: UserType,
-    activeChat: ChatUserItem,
     setViewPerfil: (viewPerfil: boolean) => void
     stateOption: OptionsStateType,
 }
 
 export type ActiveChatContextType = {
-    chat: ChatUserItem | null;
-    setChat: (chat: ChatUserItem | null) => void
+    activeChat: ChatUserItem | null;
+    setActiveChat: (chat: ChatUserItem | null) => void
+}
+
+export type ActiveChatContextProps = {
+    activeChat: ChatUserItem | null;
+    setActiveChat: (chat: ChatUserItem | null) => void,
+    children: ReactNode
 }

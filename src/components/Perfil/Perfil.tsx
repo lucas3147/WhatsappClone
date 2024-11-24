@@ -4,6 +4,8 @@ import { ChangeEvent, useState } from "react";
 import * as Auth from "@/communication/firebase/authorization";
 import * as Firestore from "@/communication/firebase/firestore";
 import { PerfilProps } from "@/types/User/PerfilType";
+import SliderCardLeft from "../Sliders/SliderCardLeft";
+import SliderCardLeftTitle from "../Sliders/SliderCardLeftTitle";
 
 const Perfil = ({show , setShow, user, setUser}: PerfilProps) => {
     let nameUser = user.displayName ?? '';
@@ -63,32 +65,17 @@ const Perfil = ({show , setShow, user, setUser}: PerfilProps) => {
     }
 
     return (
-        <div
-            className={`transition-all duration-500 w-full bg-[white] flex flex-col border-r-[1px] border-[#DDD] verticalFlap absolute top-0 bottom-0 left-0 ${show ? 'openFlap translate-x-0' : 'closeFlap translate-x-[-100%]'}`}>
-            <div
-                className="flex bg-[#008069] items-center px-4 pb-4 pt-[60px]">
+        <SliderCardLeft show={show}>
 
-                <div onClick={handleClose}>
-                    <IconItem
-                        className="iconTheme"
-                        type="ArrowBackIcon"
-                        style={{ color: '#FFF' }}
-                    />
-                </div>
-
-                <div 
-                    className="text-[19px] leading-10 h-10 flex-1 font-bold text-white ml-5"
-                >
-                    Perfil
-                </div>
-            </div>
+            <SliderCardLeftTitle
+                title='Perfil'
+                handleShow={handleClose}
+            />
             
-            <div
-                className="my-[28px] w-full ">
-                <div
-                    className="relative w-[200px] h-[200px] m-[auto]">
+            <div className="my-[28px] w-full ">
+                <div className="relative w-[200px] h-[200px] m-[auto]">
                     <img
-                        src={user.photoURL ? user.photoURL : 'https://c0.klipartz.com/pngpicture/178/595/gratis-png-perfil-de-usuario-iconos-de-computadora-inicio-de-sesion-avatares-de-usuario.png'}
+                        src={user.photoURL}
                         alt="Foto do perfil"
                         className="rounded-[50%]"
                     />
@@ -103,14 +90,10 @@ const Perfil = ({show , setShow, user, setUser}: PerfilProps) => {
                     </div>
                 </div>
             </div>
-            <div
-                className="grid grid-rows-2 gap-y-16 w-full px-[30px] pt-[14px] pb-[10px]"
-            >
+            <div className="grid grid-rows-2 gap-y-16 w-full px-[30px] pt-[14px] pb-[10px]">
                 <div>
                     <p className="mb-[14px] text-[#008069] text-[14px] flex">Seu nome</p>
-                    <div
-                        className={`w-full h-[34px] flex ${showConfirm ? 'border-b-2 border-b-[#667781]' : 'border-b-0'}`}
-                    >
+                    <div className={`w-full h-[34px] flex ${showConfirm ? 'border-b-2 border-b-[#667781]' : 'border-b-0'}`}>
                         <input
                             className="flex-1 inline text-[#3B4A54] text-[16px] border-0 outline-none" 
                             type="text" 
@@ -169,7 +152,7 @@ const Perfil = ({show , setShow, user, setUser}: PerfilProps) => {
                     </div>
                 </div>
             </div>
-        </div>
+        </SliderCardLeft>
     )
 }
 

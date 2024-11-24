@@ -16,7 +16,8 @@ import {
     Autorenew as AutorenewIcon,
     CloseOutlined as CloseOutlinedIcon,
     VideoCameraFrontRounded as VideoCameraFrontRoundedIcon,
-    Menu as MenuIcon
+    Menu as MenuIcon,
+    Settings as SettingsIcon
 } from '@mui/icons-material';
 
 type IconType = keyof typeof iconMap;
@@ -46,5 +47,6 @@ export const iconMap = {
     AutorenewIcon,
     CloseOutlinedIcon,
     VideoCameraFrontRoundedIcon,
-    MenuIcon
+    MenuIcon,
+    SettingsIcon
 };

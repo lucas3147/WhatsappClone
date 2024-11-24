@@ -313,4 +313,5 @@ h2.epr-emoji-category-label{
   flex-direction: column;
   border-right-width: 2px;
   border-color: #ddd;
+  justify-content: space-between;
 }

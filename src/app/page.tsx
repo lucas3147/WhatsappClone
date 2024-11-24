@@ -2,23 +2,24 @@
 
 import { MouseEvent, useEffect, useState } from 'react';
 import { UserType } from '@/types/User/UserType';
-import { MainMenu } from '@/components/Menu/MainMenu';
 import { ChatUserItem } from '@/types/Chat/ChatType';
 import Login from '@/components/Login/Login';
 import ChatIntro from '@/components/Chats/ChatIntro';
 import ChatWindow from '@/components/Chats/ChatWindow';
 import OtherPerfil from '@/components/Perfil/OtherPerfil';
 import * as Firebase from '@/communication/firebase/firestore';
-import { ClosedMenu } from '@/components/Menu/ClosedMenu';
+import { ScaleMenu } from '@/components/Menu/ScaleMenu';
+import { DropDownOptionsProvider } from '@/contexts/DropDownOptionsContext';
+import { ActiveChatProvider } from '@/contexts/ActiveChatContext';
 
 export default function Home() {
 
-  const [activeChat, setActiveChat] = useState<ChatUserItem | null>();
+  const [activeChat, setActiveChat] = useState<ChatUserItem | null>(null);
   const [user, setUser] = useState<UserType | null>(null);
-  const [otherUser, setOtherUser] = useState<UserType | null>(null);
   const [showOtherPerfil, setShowOtherPerfil] = useState(false);
   const [showUserOptions, setShowUserOptions] = useState<boolean | null>(null);
   const [showGeneralOptions, setShowGeneralOptions] = useState<boolean | null>(null);
+  const [otherUser, setOtherUser] = useState<UserType | null>(null);
 
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
@@ -86,40 +87,38 @@ export default function Home() {
     <div className="hiddenComponents">
       <div className="absolute w-screen h-[141px] bg-[#00A884] top-0">
       </div>
-        <div className="home" onClick={(e) => handleDisableFeatures(e)}>
-          {windowSize.width <= 700 && otherUser && 
-            <ClosedMenu
-              handleOpenMenu={() => {
-                setOtherUser(null);
-                setActiveChat(null);
-              }}
-            />
-          }
-          {(windowSize.width > 700 || !otherUser) &&
-            <MainMenu
+      <div className="home" onClick={handleDisableFeatures}>
+        <ActiveChatProvider
+          activeChat={activeChat}
+          setActiveChat={setActiveChat}
+        >
+          <DropDownOptionsProvider
+            show={showGeneralOptions}
+            setShow={setShowGeneralOptions}
+          >
+            <ScaleMenu
+              isOpenMainMenu={(windowSize.width > 700 || otherUser == null)}
               userState={{
                 state: user,
                 setState: setUser
               }}
-              showGeneralOptionsState={{
-                state: showGeneralOptions,
-                setState: setShowGeneralOptions
+              handleOpenClosedMenu={() => {
+                setOtherUser(null);
+                setActiveChat(null);
               }}
-              activeChatId={activeChat?.chatId!}
-              onClickChatListItem={(chatUserItem) => {
+              handleClickChatItem={(chatUserItem) => {
                 setActiveChat(chatUserItem);
                 setShowOtherPerfil(false);
                 setShowUserOptions(null);
                 handleOtherUser(chatUserItem.with);
               }}
             />
-          }
+          </DropDownOptionsProvider>
           <div className="flex-1 h-full overflow-hidden">
             {activeChat?.chatId !== undefined &&
               <div className="h-full w-full relative">
                 <ChatWindow
                   user={user}
-                  activeChat={activeChat}
                   setViewPerfil={setShowOtherPerfil}
                   stateOption={{
                     open: showUserOptions,
@@ -140,7 +139,8 @@ export default function Home() {
               <ChatIntro />
             }
           </div>
-        </div>
+        </ActiveChatProvider>
+      </div>
     </div>
   )
 }
