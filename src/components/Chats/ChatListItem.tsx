@@ -1,9 +1,12 @@
+import { useActiveChat } from "@/contexts/ActiveChatContext"
 import { ChatListItemProps } from "@/types/Chat/ChatType"
 
-const ChatListItem = ({onClick, active, chatItem}: ChatListItemProps) => {
+const ChatListItem = ({onClick, chatItem}: ChatListItemProps) => {
+    const { activeChat } = useActiveChat()!;
+
     return (
         <div 
-            className={"h-[68px] flex cursor-pointer items-center hover:bg-[#F5F5F5] " + (active ? "bg-[#EBEBEB]" : "")}
+            className={"h-[68px] flex cursor-pointer items-center hover:bg-[#F5F5F5] " + (chatItem.chatId == activeChat?.chatId ? "bg-[#EBEBEB]" : "")}
             onClick={onClick}
             >
             <img

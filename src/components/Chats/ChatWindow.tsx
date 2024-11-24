@@ -11,8 +11,12 @@ import { MessageItemType } from "@/types/Chat/MessageType";
 import { Timestamp } from "firebase/firestore";
 import { recognition, startSpeechRecognition } from "@/utils/AccessMicrophone";
 import { CutText } from "../General/CutText";
+import { useActiveChat } from "@/contexts/ActiveChatContext";
 
-const ChatWindow = ({user, activeChat, stateOption, setViewPerfil}: ChatWindowProps) => {
+const ChatWindow = ({user, stateOption, setViewPerfil}: ChatWindowProps) => {
+
+    const { activeChat, setActiveChat } = useActiveChat()!;
+
     const [emojiOpen, setEmojiOpen] = useState(false);
     const [text, setText] = useState('');
     const [listening, setListening] = useState(false);
@@ -30,7 +34,7 @@ const ChatWindow = ({user, activeChat, stateOption, setViewPerfil}: ChatWindowPr
 
     useEffect(() => {
         const onChatContent = async () => {
-            return Firebase.onChatContent(activeChat.chatId, (chat) => {
+            return Firebase.onChatContent(activeChat!.chatId, (chat) => {
                 setListMessages([]);
                 setListMessages(chat.messages);
                 setUsers(chat.users);
@@ -38,7 +42,7 @@ const ChatWindow = ({user, activeChat, stateOption, setViewPerfil}: ChatWindowPr
         }
 
         onChatContent();
-    }, [activeChat.chatId]);
+    }, [activeChat?.chatId]);
 
     const handleEmojiClick = (data: any) => {
         setText(text + data.native);
@@ -68,7 +72,7 @@ const ChatWindow = ({user, activeChat, stateOption, setViewPerfil}: ChatWindowPr
             setText('');
             setEmojiOpen(false);
             const message : MessageItemType = { author: user.id, body: text, date: Timestamp.fromDate(new Date()), type: 'text'};
-            await Firebase.sendMessage(activeChat.chatId, message, users);
+            await Firebase.sendMessage(activeChat!.chatId, message, users);
         }
     }
 
@@ -116,14 +120,14 @@ const ChatWindow = ({user, activeChat, stateOption, setViewPerfil}: ChatWindowPr
                 >
                     <img
                         className="h-10 w-10 rounded-[50%] ml-4 mr-4"
-                        src={activeChat.image}
+                        src={activeChat?.image}
                         alt=""
                     />
                 </div>
                 <div className="flex flex-1 min-w-0 flex-wrap justify-center">
                     <div className="flex justify-between items-center w-full">
                         <CutText 
-                            text={activeChat.title} 
+                            text={activeChat!.title} 
                             className={"text-base text-black"} 
                             onClick={viewerPerfil}
                         />

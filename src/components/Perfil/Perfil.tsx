@@ -72,10 +72,8 @@ const Perfil = ({show , setShow, user, setUser}: PerfilProps) => {
                 handleShow={handleClose}
             />
             
-            <div
-                className="my-[28px] w-full ">
-                <div
-                    className="relative w-[200px] h-[200px] m-[auto]">
+            <div className="my-[28px] w-full ">
+                <div className="relative w-[200px] h-[200px] m-[auto]">
                     <img
                         src={user.photoURL}
                         alt="Foto do perfil"
@@ -92,14 +90,10 @@ const Perfil = ({show , setShow, user, setUser}: PerfilProps) => {
                     </div>
                 </div>
             </div>
-            <div
-                className="grid grid-rows-2 gap-y-16 w-full px-[30px] pt-[14px] pb-[10px]"
-            >
+            <div className="grid grid-rows-2 gap-y-16 w-full px-[30px] pt-[14px] pb-[10px]">
                 <div>
                     <p className="mb-[14px] text-[#008069] text-[14px] flex">Seu nome</p>
-                    <div
-                        className={`w-full h-[34px] flex ${showConfirm ? 'border-b-2 border-b-[#667781]' : 'border-b-0'}`}
-                    >
+                    <div className={`w-full h-[34px] flex ${showConfirm ? 'border-b-2 border-b-[#667781]' : 'border-b-0'}`}>
                         <input
                             className="flex-1 inline text-[#3B4A54] text-[16px] border-0 outline-none" 
                             type="text" 

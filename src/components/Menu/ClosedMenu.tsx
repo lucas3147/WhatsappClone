@@ -1,7 +1,7 @@
 import { ClosedMenuProps } from "@/types/Menu/MenuType"
 import IconItem from "../Icons/IconItem"
 
-export const ClosedMenu = ({handleOpenMenu, children} : ClosedMenuProps) => {
+export const ClosedMenu = ({handleOpenMenu} : ClosedMenuProps) => {
     return (
         <div className="closed-menu-section">
             <IconItem
@@ -10,10 +10,6 @@ export const ClosedMenu = ({handleOpenMenu, children} : ClosedMenuProps) => {
                 className="iconTheme"
                 onclick={handleOpenMenu}
             />
-
-            <div className="flex flex-col items-center mb-3">
-                {children}
-            </div>
         </div>
     )
 }

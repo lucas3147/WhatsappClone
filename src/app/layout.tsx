@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import '@/styles/globals.css'
 import NoSsr from '@/components/NoSsr'
-import { GeneralOptionsProvider } from '@/contexts/generalOptionsContext'
+import { DropDownOptionsProvider } from '@/contexts/DropDownOptionsContext'
 
 const inter = Inter({ subsets: ['latin'] })
 

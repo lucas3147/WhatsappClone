@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { OptionsStateType } from "./OptionsStateType";
 
 export type OptionsType = {
@@ -16,4 +17,10 @@ export type DropDownOptionsProps = {
 export type optionsStateType = {
     show: boolean | null,
     setShow: (show: boolean | null) => void
+}
+
+export type DropDownOptionsContextProps = {
+    show: boolean | null,
+    setShow: (show: boolean | null) => void,
+    children: ReactNode
 }
