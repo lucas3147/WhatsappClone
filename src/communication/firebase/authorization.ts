@@ -1,4 +1,5 @@
 import * as Auth from "@/services/firebase.service.auth";
+import { User } from "firebase/auth";
 
 export const githubPopup = async () => {
     let githubCredential;
@@ -14,6 +15,14 @@ export const githubPopup = async () => {
     });
 
     return githubCredential;
+}
+
+export const onAuthenticateUser = async (submit : (user : User) => void) => {
+    return Auth.onAuthConnected(
+        (user) => {
+            submit(user);
+        }
+    );
 }
 
 export const signOut = async () : Promise<boolean> => {
