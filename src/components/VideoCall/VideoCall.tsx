@@ -191,61 +191,62 @@ const VideoCall = ({show, setShow} : VideoCallProps) => {
             <CloseAreaRight
                 closeClick={() => setShow(false)}
             />
-            <div className="flex-1 bg-[white]">
-                <div className={`w-[430px] h-[220px] bg-zinc-600 rounded-md flex p-1 absolute left-10 bottom-10 z-10 border-2 ${connectionServerOn ? 'border-green-600' : 'border-none'}`}>
-                    <div
-                        className="w-[420px] h-[210px] bg-zinc-900 relative rounded-md flex justify-center"
-                    >
-                        <div className="uppercase w-16 h-8 absolute top-0 bg-zinc-600 rounded-bl-md rounded-br-md flex items-center justify-center z-20">
-                            you
-                            {videoOn && connectionServerOn &&
-                                <div className="w-4 h-4 rounded-[8px] bg-green-600 absolute top-0 right-[-8px]"></div>
-                            }
-                        </div>
-                        <video
-                            ref={myWebCamRef}
-                            width={420}
-                            height={210}
-                            autoPlay
-                            muted
-                            style={{ display: videoOn ? 'block' : 'none' }}
+            <div className="flex-1 bg-[white] flex items-center justify-center">
+                <div className="absolute">
+                    <div className={`w-[410px] h-[200px] bg-zinc-600 rounded-md flex p-1 absolute left-[-20px] bottom-[-100px] z-10 border-2 ${connectionServerOn ? 'border-green-600' : 'border-none'}`}>
+                        <div
+                            className="w-[400px] h-[190px] bg-zinc-900 relative rounded-md flex justify-center"
                         >
-                        </video>
+                            <div className="uppercase w-16 h-8 absolute top-0 bg-zinc-600 text-stone-50 rounded-bl-md rounded-br-md flex items-center justify-center z-20">
+                                you
+                                {videoOn && connectionServerOn &&
+                                    <div className="w-4 h-4 rounded-[8px] bg-green-600 absolute top-0 right-[-8px]"></div>
+                                }
+                            </div>
+                            <video
+                                ref={myWebCamRef}
+                                width={420}
+                                height={210}
+                                autoPlay
+                                muted
+                                style={{ display: videoOn ? 'block' : 'none' }}
+                            >
+                            </video>
+                        </div>
+                    </div>
+                    
+                    <div className={`w-[1124px] h-[564] bg-zinc-600 rounded-md flex p-1 relative top-[-50px]`}>
+
+                        <div
+                            className="w-[1120px] h-[560px] bg-zinc-900 rounded-md relative flex justify-center z-0"
+                        >
+                            <div className="uppercase w-16 h-8 absolute top-0 bg-zinc-600 text-stone-50 rounded-bl-md rounded-br-md flex items-center justify-center z-40">
+                                other
+                                {otherWebcamOn &&
+                                    <div className="w-4 h-4 rounded-[8px] bg-green-600 absolute top-0 right-[-8px]"></div>
+                                }
+                            </div>
+                            <video
+                                ref={otherWebCamRef}
+                                width={1120}
+                                height={560}
+                                autoPlay
+                                style={{ display: otherWebcamOn ? 'block' : 'none' }}
+                            >
+                            </video>
+                        </div>
                     </div>
                 </div>
                 
-                <div className={`w-[1124px] h-[564] bg-zinc-600 rounded-md flex p-1 relative`}>
-
-                    <div
-                        className="w-[1120px] h-[560px] bg-zinc-900 rounded-md relative flex justify-center z-0"
-                    >
-                        <div className="uppercase w-16 h-8 absolute top-0 bg-zinc-600 rounded-bl-md rounded-br-md flex items-center justify-center z-40">
-                            other
-                            {otherWebcamOn &&
-                                <div className="w-4 h-4 rounded-[8px] bg-green-600 absolute top-0 right-[-8px]"></div>
-                            }
-                        </div>
-                        <video
-                            ref={otherWebCamRef}
-                            width={1120}
-                            height={560}
-                            autoPlay
-                            style={{ display: otherWebcamOn ? 'block' : 'none' }}
-                        >
-                        </video>
-                    </div>
-                </div>
-
-                <div className="flex justify-between items-center px-1 w-44 h-16 rounded-[40px] bg-zinc-800 border-2 absolute bottom-8">
+                <div className="flex justify-between items-center px-1 w-44 h-16 rounded-[40px] bg-[#F5F5F5] border-2 absolute bottom-8 shadow-[1px_1px_12px_4px_#ddd]">
                     <IconItem
                         type={videoOn == true ? 'NoPhotographyIcon' : 'MonochromePhotosOutlinedIcon'}
                         style={{
-                            width: '50px',
-                            height: '50px',
-                            backgroundColor: videoOn == true ? 'red' : 'blue',
+                            width: '45px',
+                            height: '45px',
                             padding: '5px',
                             borderRadius: '25px',
-                            border: '2px solid white',
+                            color: '#91918F',
                             cursor: 'pointer'
                         }}
                         onclick={() => setVideoOn(!videoOn)}
@@ -254,29 +255,27 @@ const VideoCall = ({show, setShow} : VideoCallProps) => {
                     <IconItem
                         type={audioOn == true ? 'MicOffIcon' : 'KeyboardVoiceIcon'}
                         style={{
-                            width: '50px',
-                            height: '50px',
-                            backgroundColor: audioOn == true ? 'red' : 'blue',
+                            width: '45px',
+                            height: '45px',
                             padding: '5px',
                             borderRadius: '25px',
-                            border: '2px solid white',
+                            color: '#91918F',
                             cursor: 'pointer'
                         }}
                         onclick={() => setAudioOn(!audioOn)}
                     />
 
                     <IconItem
-                        type={connectionServerOn == true ? 'LeakRemoveIcon' : 'LeakAddIcon'}
+                        type='VideocamOff'
                         style={{
-                            width: '50px',
-                            height: '50px',
-                            backgroundColor: connectionServerOn == true ? 'red' : 'green',
+                            width: '45px',
+                            height: '45px',
                             padding: '5px',
                             borderRadius: '25px',
-                            border: '2px solid white',
+                            color: '#a7004ef6',
                             cursor: 'pointer'
                         }}
-                        onclick={() => connectionServerOn == true ? handlePeerDisconnect() : handleConnectServer()}
+                        onclick={handlePeerDisconnect}
                     />
 
                 </div>

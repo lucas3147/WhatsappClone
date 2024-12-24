@@ -17,11 +17,9 @@ export const githubPopup = async () => {
     return githubCredential;
 }
 
-export const onAuthenticateUser = async (submit : (user : User) => void) => {
+export const onAuthenticateUser = async (doWhenAuthorized : (user : User) => void, doWhenNotAuthorized: () => void) => {
     return Auth.onAuthConnected(
-        (user) => {
-            submit(user);
-        }
+        (user) => doWhenAuthorized(user), () => doWhenNotAuthorized()
     );
 }
 

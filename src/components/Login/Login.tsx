@@ -16,6 +16,7 @@ const Login = ({ onReceive }: LoginProps) => {
 		const onAuthenticate = async () => {
 			unsubscribeUserAuthenticate = await Auth.onAuthenticateUser(async (User) => {
 				loadUserProfile(User);
+			}, () => {
 				setIsLoading(false);
 			});
 		};
