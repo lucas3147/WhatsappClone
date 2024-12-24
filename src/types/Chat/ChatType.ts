@@ -25,7 +25,8 @@ export type ChatListItemProps = {
 
 export type ChatWindowProps = {
     user: UserType,
-    setViewPerfil: (viewPerfil: boolean) => void
+    setShowOtherPerfil: (showOtherPerfil: boolean) => void,
+    setShowVideoCall: (showVideoCall: boolean) => void,
     stateOption: OptionsStateType,
 }
 
