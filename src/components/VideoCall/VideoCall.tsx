@@ -4,11 +4,15 @@ import { CloseAreaRight } from "../Containers/CloseAreaRight";
 import IconItem from "../Icons/IconItem";
 import * as WebRTC from "@/communication/webrtc/WebRTC";
 import { useEffect, useRef, useState } from "react";
+import { generateId } from "@/utils/GenerateId";
 
 const VideoCall = ({show, setShow} : VideoCallProps) => {
     
     const myWebCamRef = useRef<any>();
     const otherWebCamRef = useRef<any>();
+    const sectionCamRef = useRef<any>();
+    const otherVideoCamRef = useRef<any>();
+    const myVideoCamRef = useRef<any>();
 
     const [videoOn, setVideoOn] = useState(false);
     const [audioOn, setAudioOn] = useState(false);
@@ -24,7 +28,51 @@ const VideoCall = ({show, setShow} : VideoCallProps) => {
         {
             handleDisconnectWebcam();
         }
-    }, [videoOn, audioOn])
+    }, [videoOn, audioOn]);
+
+    useEffect(() => {
+        const handleResize = () => {
+            redimensionarVideos();
+        };
+
+        redimensionarVideos();
+        handleConnectServer();
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            setVideoOn(false);
+            setAudioOn(false);
+            handlePeerDisconnect();
+        };
+    }, []);
+
+    function redimensionarVideos() {
+        const sectionCamPaddingW = 20;
+        const sectionCamWidth = sectionCamRef.current.offsetWidth - sectionCamPaddingW;
+        const sectionCamHeight = sectionCamRef.current.offsetHeight;
+    
+        let otherVideoCamWidth = otherVideoCamRef.current.offsetWidth;
+        let otherVideoCamHeight = otherVideoCamRef.current.offsetHeight;
+    
+        const proporcaoFilha = otherVideoCamWidth / otherVideoCamHeight;
+    
+        if (otherVideoCamWidth / sectionCamWidth > otherVideoCamHeight / sectionCamHeight) {
+            otherVideoCamWidth = sectionCamWidth;
+            otherVideoCamHeight = otherVideoCamWidth / proporcaoFilha;
+        } else {
+            otherVideoCamHeight = sectionCamHeight;
+            otherVideoCamWidth = otherVideoCamHeight * proporcaoFilha;
+        }
+
+        const escalaIrma = myVideoCamRef.current.offsetWidth / otherVideoCamRef.current.offsetWidth;;
+    
+        otherVideoCamRef.current.style.width = `${otherVideoCamWidth}px`;
+        otherVideoCamRef.current.style.height = `${otherVideoCamHeight}px`;
+
+        myVideoCamRef.current.style.width = `${otherVideoCamWidth * escalaIrma}px`;
+        myVideoCamRef.current.style.height = `${otherVideoCamHeight * escalaIrma}px`;
+    }
 
     async function handleConnectWebcam()  {
         try {
@@ -44,28 +92,37 @@ const VideoCall = ({show, setShow} : VideoCallProps) => {
     const handleConnectServer = () => {
         try
         {
+            let clientId = localStorage.getItem('clientId');
+
+            if (!clientId) {
+                clientId = generateId(); 
+                localStorage.setItem('clientId', clientId); 
+            }
+
             const endpointSocket = 'ws://localhost:3001';
             //const endpointSocket = 'wss://socket-webrtc.onrender.com';
             const socketClient = new WebSocket(endpointSocket);
         
             socketClient.addEventListener('open', () => {
-                WebRTC.createLocalConnection();
-                WebRTC.handleNegotiationNeeded((localDescription) => socketClient.send(JSON.stringify({type: 'offer', data: localDescription})));
-                WebRTC.handleICECandidateEvent((candidate) => socketClient.send(JSON.stringify({type: 'ice-candidate', data: candidate})));
-                WebRTC.handleICEConnectionStateChangeEvent(closeVideoCall);
-                WebRTC.handleTrackReceive((event) => {
-                    if (event.streams[0]) {
-                        PlayOtherWebcam(event.streams[0]);
-                    }
-                });
-                WebRTC.handleSignalingStateChange(closeVideoCall);
+                socketClient.send(JSON.stringify({ type: 'register', data: clientId }));
             });
         
             socketClient.addEventListener('message', (event) => {
                 const response = JSON.parse(event.data);
                 
                 if (response.type === 'open') {
+                    WebRTC.createLocalConnection();
+                    WebRTC.handleNegotiationNeeded((localDescription) => socketClient.send(JSON.stringify({type: 'offer', data: localDescription})));
+                    WebRTC.handleICECandidateEvent((candidate) => socketClient.send(JSON.stringify({type: 'ice-candidate', data: candidate})));
+                    WebRTC.handleICEConnectionStateChangeEvent(closeVideoCall);
+                    WebRTC.handleTrackReceive((event) => {
+                        if (event.streams[0]) {
+                            PlayOtherWebcam(event.streams[0]);
+                        }
+                    });
+                    WebRTC.handleSignalingStateChange(closeVideoCall);
                     setConnectionServerOn(true);
+                    console.log('Meu client Id: ', response.data);
                 }
                 if (response.type === 'ice-candidate') {
                     WebRTC.addIceCandidate(response.data);
@@ -105,14 +162,14 @@ const VideoCall = ({show, setShow} : VideoCallProps) => {
             });
 
             setSocketClient(socketClient);
-
-            
         } 
         catch (e) 
         {
             console.log('Não foi possível estabelecer conexão com o servidor', e);
         }
     }
+
+    
 
     const closeVideoCall = () => {
         closeOtherWebcam();
@@ -163,15 +220,17 @@ const VideoCall = ({show, setShow} : VideoCallProps) => {
     }
 
     const closeOtherWebcam = () => {
-        const mediaStream = otherWebCamRef.current.srcObject as MediaStream;
-        if (mediaStream) {
-            mediaStream
-            .getTracks()
-            .forEach(track => track.stop());
+        if (otherWebCamRef.current){
+            const mediaStream = otherWebCamRef.current.srcObject as MediaStream;
+            if (mediaStream) {
+                mediaStream
+                .getTracks()
+                .forEach(track => track.stop());
+            }
+            otherWebCamRef.current.removeAttribute("src");
+            otherWebCamRef.current.removeAttribute("srcObject");
+            setOtherWebcamOn(false);
         }
-        otherWebCamRef.current.removeAttribute("src");
-        otherWebCamRef.current.removeAttribute("srcObject");
-        setOtherWebcamOn(false);
     }
 
     const closeMyWebcam = () => {
@@ -187,15 +246,15 @@ const VideoCall = ({show, setShow} : VideoCallProps) => {
     }
 
     return (
-        <SliderRightContainer className={show ? 'openFlap' : 'closeFlap'}>
+        <SliderRightContainer onLoad={() => console.log('Ativando...')} className={show ? 'openFlap' : 'closeFlap'}>
             <CloseAreaRight
-                closeClick={() => setShow(false)}
+                closeClick={() => {setShow(false);} }
             />
-            <div className="flex-1 bg-[white] flex items-center justify-center">
+            <div ref={sectionCamRef} className="flex-1 bg-[white] flex items-center justify-center">
                 <div className="absolute">
-                    <div className={`w-[410px] h-[200px] bg-zinc-600 rounded-md flex p-1 absolute left-[-20px] bottom-[-100px] z-10 border-2 ${connectionServerOn ? 'border-green-600' : 'border-none'}`}>
+                    <div ref={myVideoCamRef} className={`w-[410px] h-[200px] p-[4px] bg-zinc-600 rounded-md flex  absolute left-[20px] bottom-[-20px] z-10 border-2 ${connectionServerOn ? 'border-green-600' : 'border-none'}`}>
                         <div
-                            className="w-[400px] h-[190px] bg-zinc-900 relative rounded-md flex justify-center"
+                            className="w-full h-full bg-zinc-900 relative rounded-md flex justify-center"
                         >
                             <div className="uppercase w-16 h-8 absolute top-0 bg-zinc-600 text-stone-50 rounded-bl-md rounded-br-md flex items-center justify-center z-20">
                                 you
@@ -215,10 +274,10 @@ const VideoCall = ({show, setShow} : VideoCallProps) => {
                         </div>
                     </div>
                     
-                    <div className={`w-[1124px] h-[564] bg-zinc-600 rounded-md flex p-1 relative top-[-50px]`}>
+                    <div ref={otherVideoCamRef} className={`w-[1124px] h-[564px] bg-zinc-600 rounded-md flex p-1 relative top-[-50px]`}>
 
                         <div
-                            className="w-[1120px] h-[560px] bg-zinc-900 rounded-md relative flex justify-center z-0"
+                            className="w-full h-full bg-zinc-900 rounded-md relative flex justify-center z-0"
                         >
                             <div className="uppercase w-16 h-8 absolute top-0 bg-zinc-600 text-stone-50 rounded-bl-md rounded-br-md flex items-center justify-center z-40">
                                 other

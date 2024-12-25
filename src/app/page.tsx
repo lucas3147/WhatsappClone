@@ -118,10 +118,13 @@ export default function Home() {
                   />
                 }
 
-                <VideoCall
-                  show={showVideoCall}
-                  setShow={setShowVideoCall}
-                />  
+                {showVideoCall && 
+                  <VideoCall
+                    show={showVideoCall}
+                    setShow={setShowVideoCall}
+                  />  
+                }
+                
               </div>
             }
             {activeChat?.chatId == undefined &&
