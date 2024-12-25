@@ -100,7 +100,7 @@ const VideoCall = ({show, setShow} : VideoCallProps) => {
             }
 
             const endpointSocket = 'ws://localhost:3001';
-            //const endpointSocket = 'wss://socket-webrtc.onrender.com';
+            
             const socketClient = new WebSocket(endpointSocket);
         
             socketClient.addEventListener('open', () => {
