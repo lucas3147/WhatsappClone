@@ -5,6 +5,7 @@
   "scripts": {
     "uiemulator": "firebase emulators:start --only firestore",
     "test": "set EMULATOR=true& jest --runInBand",
+    "testAndroid": "set NEXT_PUBLIC_NODE_ENV=testAndroid&next dev",
     "dev": "set NODE_ENV=test& next dev",
     "emulatordev": "set NODE_ENV=test&set EMULATOR=true& next dev",
     "build": "next build",

@@ -15,6 +15,7 @@ import TopBar from '@/components/General/TopBar';
 import VideoCall from '@/components/VideoCall/VideoCall';
 import { HomeContainer } from '@/components/StyledComponents/Containers/Home';
 import { HiddenComponentsContainer } from '@/components/StyledComponents/Containers/HiddenComponents';
+import LoginTest from '@/components/Login/LoginTest';
 
 export default function Home() {
 
@@ -35,11 +36,8 @@ export default function Home() {
     setUser(user);
   }
 
-  const handleLoginTest = async () => {
-    const user = await Firebase.getUser('54Afzw9Oo1XuVKqqJ6JccAzeho23');
-    if (user) {
-      setUser(user);
-    }
+  const handleLoginTest = async (user: UserType) => {
+    setUser(user);
   }
 
   const handleDisableFeatures = (e: MouseEvent) => {
@@ -63,9 +61,16 @@ export default function Home() {
   }
 
   if (user === null) {
-    return (
-      <Login onReceive={handleLoginData}/>
-    );
+    if (process.env.NEXT_PUBLIC_NODE_ENV !== 'testAndroid') {
+      return (
+        <Login onReceive={handleLoginData}/>
+      );
+    }
+    else {
+      return (
+        <LoginTest onReceive={handleLoginTest}/>
+      );
+    }
   }
 
   return (

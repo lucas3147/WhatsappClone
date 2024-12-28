@@ -98,10 +98,8 @@ const VideoCall = ({show, setShow} : VideoCallProps) => {
                 clientId = generateId(); 
                 localStorage.setItem('clientId', clientId); 
             }
-
-            const endpointSocket = 'ws://localhost:3001';
             
-            const socketClient = new WebSocket(endpointSocket);
+            const socketClient = new WebSocket(getEndpointSocket());
         
             socketClient.addEventListener('open', () => {
                 socketClient.send(JSON.stringify({ type: 'register', data: clientId }));
@@ -169,7 +167,20 @@ const VideoCall = ({show, setShow} : VideoCallProps) => {
         }
     }
 
-    
+    const getEndpointSocket = () : string => {
+        switch (process.env.NEXT_PUBLIC_NODE_ENV) {
+            case 'production':
+                return process.env.NEXT_PUBLIC_ENDPOINT_SOCKET_WEBRTC ?? '';
+            case 'test':
+                return process.env.NEXT_PUBLIC_ENDPOINT_SOCKET_WEBRTC_DEV ?? '';
+            case 'development':
+                return process.env.NEXT_PUBLIC_ENDPOINT_SOCKET_WEBRTC_DEV ?? '';
+            case 'testAndroid':
+                return process.env.NEXT_PUBLIC_ENDPOINT_SOCKET_WEBRTC_ANDROID ?? '';
+            default:
+                return '';
+        }
+    }
 
     const closeVideoCall = () => {
         closeOtherWebcam();
