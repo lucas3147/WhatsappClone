@@ -13,10 +13,9 @@ import { recognition, startSpeechRecognition } from "@/utils/AccessMicrophone";
 import { CutText } from "../General/CutText";
 import { useActiveChat } from "@/contexts/ActiveChatContext";
 
-const ChatWindow = ({user, stateOption, setViewPerfil}: ChatWindowProps) => {
+const ChatWindow = ({user, stateOption, setShowOtherPerfil, setShowVideoCall}: ChatWindowProps) => {
 
-    const { activeChat, setActiveChat } = useActiveChat()!;
-
+    const { activeChat } = useActiveChat()!;
     const [emojiOpen, setEmojiOpen] = useState(false);
     const [text, setText] = useState('');
     const [listening, setListening] = useState(false);
@@ -96,10 +95,6 @@ const ChatWindow = ({user, stateOption, setViewPerfil}: ChatWindowProps) => {
         }
     }
 
-    const viewerPerfil = () => {
-        setViewPerfil(true);
-    }
-
     return (
         <div className="flex flex-col absolute w-full h-full">
 
@@ -116,7 +111,7 @@ const ChatWindow = ({user, stateOption, setViewPerfil}: ChatWindowProps) => {
             <div className="h-16 border-b-2 border-[#CCC] flex justify-between items-center no-select">
                 <div
                     className="flex items-center cursor-pointer"
-                    onClick={viewerPerfil}
+                    onClick={() => setShowOtherPerfil(true)}
                 >
                     <img
                         className="h-10 w-10 rounded-[50%] ml-4 mr-4"
@@ -129,17 +124,18 @@ const ChatWindow = ({user, stateOption, setViewPerfil}: ChatWindowProps) => {
                         <CutText 
                             text={activeChat!.title} 
                             className={"text-base text-black"} 
-                            onClick={viewerPerfil}
+                            onClick={() => setShowOtherPerfil(true)}
                         />
                         <div className="flex items-center mr-4">
                             <IconItem
                                 className="iconTheme"
-                                type="SearchIcon"
+                                type="VideoCamIcon"
                                 style={{ color: '#919191' }}
+                                onclick={() => setShowVideoCall(true)}
                             />
                             <IconItem
                                 className="iconTheme"
-                                type="AttachFileIcon"
+                                type="SearchIcon"
                                 style={{ color: '#919191' }}
                             />
                             <div

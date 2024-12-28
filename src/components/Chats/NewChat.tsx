@@ -1,12 +1,11 @@
 import { NewChatProps } from "@/types/Chat/NewChatType";
-import IconItem from "../Icons/IconItem";
-import SliderCardLeft from "../Sliders/SliderCardLeft";
 import SliderCardLeftTitle from "../Sliders/SliderCardLeftTitle";
+import { SliderLeftContainer } from "../StyledComponents/Containers/Slider";
 
 const NewChat = ({ addNewChat, listUsers, show, setShow }: NewChatProps) => {
 	return (
-		<SliderCardLeft
-			show={show}
+		<SliderLeftContainer
+			className={show ? 'openFlap' : 'closeFlap'}
 		>
 			<SliderCardLeftTitle
 				title='Nova conversa'
@@ -33,7 +32,7 @@ const NewChat = ({ addNewChat, listUsers, show, setShow }: NewChatProps) => {
 					</div>
 				))}
 			</div>
-		</SliderCardLeft>
+		</SliderLeftContainer>
 	)
 }
 

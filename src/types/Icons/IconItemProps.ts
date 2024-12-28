@@ -17,7 +17,15 @@ import {
     CloseOutlined as CloseOutlinedIcon,
     VideoCameraFrontRounded as VideoCameraFrontRoundedIcon,
     Menu as MenuIcon,
-    Settings as SettingsIcon
+    Settings as SettingsIcon,
+    Videocam as VideoCamIcon,
+    NoPhotography as NoPhotographyIcon,
+    MonochromePhotosOutlined as MonochromePhotosOutlinedIcon,
+    MicOff as MicOffIcon,
+    KeyboardVoice as KeyboardVoiceIcon,
+    LeakRemove as LeakRemoveIcon,
+    LeakAdd as LeakAddIcon,
+    VideocamOff
 } from '@mui/icons-material';
 
 type IconType = keyof typeof iconMap;
@@ -48,5 +56,13 @@ export const iconMap = {
     CloseOutlinedIcon,
     VideoCameraFrontRoundedIcon,
     MenuIcon,
-    SettingsIcon
+    SettingsIcon,
+    VideoCamIcon,
+    NoPhotographyIcon,
+    MonochromePhotosOutlinedIcon,
+    MicOffIcon,
+    KeyboardVoiceIcon,
+    LeakRemoveIcon,
+    LeakAddIcon,
+    VideocamOff
 };

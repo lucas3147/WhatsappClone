@@ -8,37 +8,24 @@ import ChatIntro from '@/components/Chats/ChatIntro';
 import ChatWindow from '@/components/Chats/ChatWindow';
 import OtherPerfil from '@/components/Perfil/OtherPerfil';
 import * as Firebase from '@/communication/firebase/firestore';
-import { ScaleMenu } from '@/components/Menu/ScaleMenu';
+import { ScaledMenu } from '@/components/Menu/ScaledMenu';
 import { DropDownOptionsProvider } from '@/contexts/DropDownOptionsContext';
 import { ActiveChatProvider } from '@/contexts/ActiveChatContext';
+import TopBar from '@/components/General/TopBar';
+import VideoCall from '@/components/VideoCall/VideoCall';
+import { HomeContainer } from '@/components/StyledComponents/Containers/Home';
+import { HiddenComponentsContainer } from '@/components/StyledComponents/Containers/HiddenComponents';
+import LoginTest from '@/components/Login/LoginTest';
 
 export default function Home() {
 
   const [activeChat, setActiveChat] = useState<ChatUserItem | null>(null);
   const [user, setUser] = useState<UserType | null>(null);
   const [showOtherPerfil, setShowOtherPerfil] = useState(false);
+  const [showVideoCall, setShowVideoCall] = useState(false);
   const [showUserOptions, setShowUserOptions] = useState<boolean | null>(null);
   const [showGeneralOptions, setShowGeneralOptions] = useState<boolean | null>(null);
   const [otherUser, setOtherUser] = useState<UserType | null>(null);
-
-  const [windowSize, setWindowSize] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
-  });
-
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowSize({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    };
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
 
   const handleLoginData = async (user: UserType) => {
     let existUser = await Firebase.existUser(user.id);
@@ -49,12 +36,8 @@ export default function Home() {
     setUser(user);
   }
 
-  const handleLoginTest = async () => {
-    const user = await Firebase.getUser('54Afzw9Oo1XuVKqqJ6JccAzeho23');
-    if (user) {
-      console.log('passando aqui')
-      setUser(user);
-    }
+  const handleLoginTest = async (user: UserType) => {
+    setUser(user);
   }
 
   const handleDisableFeatures = (e: MouseEvent) => {
@@ -78,16 +61,22 @@ export default function Home() {
   }
 
   if (user === null) {
-    return (
-      <Login onReceive={handleLoginData}/>
-    );
+    if (process.env.NEXT_PUBLIC_NODE_ENV !== 'testAndroid') {
+      return (
+        <Login onReceive={handleLoginData}/>
+      );
+    }
+    else {
+      return (
+        <LoginTest onReceive={handleLoginTest}/>
+      );
+    }
   }
 
   return (
-    <div className="hiddenComponents">
-      <div className="absolute w-screen h-[141px] bg-[#00A884] top-0">
-      </div>
-      <div className="home" onClick={handleDisableFeatures}>
+    <HiddenComponentsContainer>
+      <TopBar />
+      <HomeContainer onClick={handleDisableFeatures}>
         <ActiveChatProvider
           activeChat={activeChat}
           setActiveChat={setActiveChat}
@@ -96,8 +85,7 @@ export default function Home() {
             show={showGeneralOptions}
             setShow={setShowGeneralOptions}
           >
-            <ScaleMenu
-              isOpenMainMenu={(windowSize.width > 700 || otherUser == null)}
+            <ScaledMenu
               userState={{
                 state: user,
                 setState: setUser
@@ -119,7 +107,8 @@ export default function Home() {
               <div className="h-full w-full relative">
                 <ChatWindow
                   user={user}
-                  setViewPerfil={setShowOtherPerfil}
+                  setShowOtherPerfil={setShowOtherPerfil}
+                  setShowVideoCall={setShowVideoCall}
                   stateOption={{
                     open: showUserOptions,
                     setOpen: setShowUserOptions
@@ -133,6 +122,14 @@ export default function Home() {
                     show={showOtherPerfil}
                   />
                 }
+
+                {showVideoCall && 
+                  <VideoCall
+                    show={showVideoCall}
+                    setShow={setShowVideoCall}
+                  />  
+                }
+                
               </div>
             }
             {activeChat?.chatId == undefined &&
@@ -140,7 +137,7 @@ export default function Home() {
             }
           </div>
         </ActiveChatProvider>
-      </div>
-    </div>
+      </HomeContainer>
+    </HiddenComponentsContainer>
   )
 }

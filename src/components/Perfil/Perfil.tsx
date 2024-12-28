@@ -4,8 +4,8 @@ import { ChangeEvent, useState } from "react";
 import * as Auth from "@/communication/firebase/authorization";
 import * as Firestore from "@/communication/firebase/firestore";
 import { PerfilProps } from "@/types/User/PerfilType";
-import SliderCardLeft from "../Sliders/SliderCardLeft";
 import SliderCardLeftTitle from "../Sliders/SliderCardLeftTitle";
+import { SliderLeftContainer } from "../StyledComponents/Containers/Slider";
 
 const Perfil = ({show , setShow, user, setUser}: PerfilProps) => {
     let nameUser = user.displayName ?? '';
@@ -65,7 +65,9 @@ const Perfil = ({show , setShow, user, setUser}: PerfilProps) => {
     }
 
     return (
-        <SliderCardLeft show={show}>
+        <SliderLeftContainer
+			className={show ? 'openFlap' : 'closeFlap'}
+		>
 
             <SliderCardLeftTitle
                 title='Perfil'
@@ -152,7 +154,7 @@ const Perfil = ({show , setShow, user, setUser}: PerfilProps) => {
                     </div>
                 </div>
             </div>
-        </SliderCardLeft>
+        </SliderLeftContainer>
     )
 }
 

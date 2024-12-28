@@ -15,7 +15,6 @@ export type ClosedMenuProps = {
 }
 
 export type ScaleMenuProps = {
-    isOpenMainMenu: boolean,
     userState: {
         state: UserType,
         setState: (user: UserType | null) => void

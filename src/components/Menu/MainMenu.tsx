@@ -159,7 +159,7 @@ export const MainMenu = ({ userState, onClickChatListItem }: MainMenuProps) => {
             <div onClick={handlePerfil}>
               <img
                 className="w-10 h-10 rounded-[20px] cursor-pointer"
-                src={userState.state.photoURL ? userState.state.photoURL : ""}
+                src={userState.state.photoURL ?? ""}
                 alt="icone do avatar" />
             </div>
             <div className="flex">
@@ -186,7 +186,7 @@ export const MainMenu = ({ userState, onClickChatListItem }: MainMenuProps) => {
           </header>
 
           <div className="bg-[#F6F6F6] border-b-2 border-[#EEE] py-1 px-4">
-            <div className="relative bg-[white] h-10 rounded-[20px] flex items-center py-0 px-[10px]">
+            <div className="bg-[white] h-10 rounded-[20px] flex items-center py-0 px-[10px]">
               <IconItem
                 className="iconTheme"
                 type='SearchIcon'
