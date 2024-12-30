@@ -123,10 +123,11 @@ export default function Home() {
                   />
                 }
 
-                {showVideoCall && 
+                {otherUser && showVideoCall && 
                   <VideoCall
                     show={showVideoCall}
                     setShow={setShowVideoCall}
+                    otherUser={otherUser}
                   />  
                 }
                 

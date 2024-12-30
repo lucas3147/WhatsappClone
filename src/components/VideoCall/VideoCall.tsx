@@ -6,7 +6,7 @@ import * as WebRTC from "@/communication/webrtc/WebRTC";
 import { useEffect, useRef, useState } from "react";
 import { generateId } from "@/utils/GenerateId";
 
-const VideoCall = ({show, setShow} : VideoCallProps) => {
+const VideoCall = ({show, setShow, otherUser} : VideoCallProps) => {
     
     const myWebCamRef = useRef<any>();
     const otherWebCamRef = useRef<any>();
@@ -263,44 +263,31 @@ const VideoCall = ({show, setShow} : VideoCallProps) => {
             />
             <div ref={sectionCamRef} className="flex-1 bg-[white] flex items-center justify-center">
                 <div className="absolute">
-                    <div ref={myVideoCamRef} className={`w-[410px] h-[200px] p-[4px] bg-zinc-600 rounded-md flex  absolute left-[20px] bottom-[-20px] z-10 border-2 ${connectionServerOn ? 'border-green-600' : 'border-none'}`}>
-                        <div
-                            className="w-full h-full bg-zinc-900 relative rounded-md flex justify-center"
-                        >
-                            <div className="uppercase w-16 h-8 absolute top-0 bg-zinc-600 text-stone-50 rounded-bl-md rounded-br-md flex items-center justify-center z-20">
-                                you
-                                {videoOn && connectionServerOn &&
-                                    <div className="w-4 h-4 rounded-[8px] bg-green-600 absolute top-0 right-[-8px]"></div>
-                                }
-                            </div>
+                    <div ref={myVideoCamRef} className={`w-[320px] h-[180px] p-[4px] bg-zinc-600 rounded-md flex justify-center absolute left-[20px] bottom-[-20px] z-10 border-2 ${connectionServerOn ? 'border-green-600' : 'border-none'}`}>
+                        <div className="w-full h-full bg-zinc-900 relative rounded-md inline-block overflow-hidden">
                             <video
                                 ref={myWebCamRef}
-                                width={420}
-                                height={210}
                                 autoPlay
                                 muted
+                                className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-full h-auto"
                                 style={{ display: videoOn ? 'block' : 'none' }}
                             >
                             </video>
                         </div>
                     </div>
                     
-                    <div ref={otherVideoCamRef} className={`w-[1124px] h-[564px] bg-zinc-600 rounded-md flex p-1 relative top-[-50px]`}>
-
-                        <div
-                            className="w-full h-full bg-zinc-900 rounded-md relative flex justify-center z-0"
-                        >
-                            <div className="uppercase w-16 h-8 absolute top-0 bg-zinc-600 text-stone-50 rounded-bl-md rounded-br-md flex items-center justify-center z-40">
-                                other
-                                {otherWebcamOn &&
-                                    <div className="w-4 h-4 rounded-[8px] bg-green-600 absolute top-0 right-[-8px]"></div>
-                                }
-                            </div>
+                    <div ref={otherVideoCamRef} className="w-[1124px] h-[564px] bg-zinc-600 rounded-md flex justify-center p-1 relative top-[-50px]">
+                        <div className="uppercase w-auto py-1 px-2 absolute top-0 text-center  bg-zinc-600 text-sm text-stone-50 rounded-bl-md rounded-br-md z-40">
+                            {otherUser.displayName}
+                            {otherWebcamOn &&
+                                <div className="w-4 h-4 rounded-[8px] bg-green-600 absolute top-0 right-[-8px]"></div>
+                            }
+                        </div>
+                        <div className="w-full h-full bg-zinc-900 rounded-md relative inline-block overflow-hidden">
                             <video
                                 ref={otherWebCamRef}
-                                width={1120}
-                                height={560}
                                 autoPlay
+                                className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-full h-auto"
                                 style={{ display: otherWebcamOn ? 'block' : 'none' }}
                             >
                             </video>
