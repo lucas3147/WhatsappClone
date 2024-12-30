@@ -5,6 +5,7 @@ import IconItem from "../Icons/IconItem";
 import * as WebRTC from "@/communication/webrtc/WebRTC";
 import { useEffect, useRef, useState } from "react";
 import { generateId } from "@/utils/GenerateId";
+import { delimitChildBoxDimensions } from "@/utils/BoxDimensions";
 
 const VideoCall = ({show, setShow, otherUser} : VideoCallProps) => {
     
@@ -48,30 +49,25 @@ const VideoCall = ({show, setShow, otherUser} : VideoCallProps) => {
     }, []);
 
     function redimensionarVideos() {
-        const sectionCamPaddingW = 20;
-        const sectionCamWidth = sectionCamRef.current.offsetWidth - sectionCamPaddingW;
-        const sectionCamHeight = sectionCamRef.current.offsetHeight;
-    
-        let otherVideoCamWidth = otherVideoCamRef.current.offsetWidth;
-        let otherVideoCamHeight = otherVideoCamRef.current.offsetHeight;
-    
-        const proporcaoFilha = otherVideoCamWidth / otherVideoCamHeight;
-    
-        if (otherVideoCamWidth / sectionCamWidth > otherVideoCamHeight / sectionCamHeight) {
-            otherVideoCamWidth = sectionCamWidth;
-            otherVideoCamHeight = otherVideoCamWidth / proporcaoFilha;
-        } else {
-            otherVideoCamHeight = sectionCamHeight;
-            otherVideoCamWidth = otherVideoCamHeight * proporcaoFilha;
-        }
+        const containerCamPaddingW = 20;
+        
+        const changedSizes = delimitChildBoxDimensions(
+        {
+            width: sectionCamRef.current.offsetWidth - containerCamPaddingW, 
+            height: sectionCamRef.current.offsetHeight
+        },
+        {
+            width: otherVideoCamRef.current.offsetWidth, 
+            height: otherVideoCamRef.current.offsetHeight
+        });
 
         const escalaIrma = myVideoCamRef.current.offsetWidth / otherVideoCamRef.current.offsetWidth;;
     
-        otherVideoCamRef.current.style.width = `${otherVideoCamWidth}px`;
-        otherVideoCamRef.current.style.height = `${otherVideoCamHeight}px`;
+        otherVideoCamRef.current.style.width = `${changedSizes.width}px`;
+        otherVideoCamRef.current.style.height = `${changedSizes.height}px`;
 
-        myVideoCamRef.current.style.width = `${otherVideoCamWidth * escalaIrma}px`;
-        myVideoCamRef.current.style.height = `${otherVideoCamHeight * escalaIrma}px`;
+        myVideoCamRef.current.style.width = `${changedSizes.width * escalaIrma}px`;
+        myVideoCamRef.current.style.height = `${changedSizes.height * escalaIrma}px`;
     }
 
     async function handleConnectWebcam()  {
