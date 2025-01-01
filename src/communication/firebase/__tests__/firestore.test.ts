@@ -1,6 +1,6 @@
 import * as apiFirebase from '../firestore';
 import { UserType } from "../../../types/User/UserType";
-import { generateId } from '../../../library/resources';
+import { generateId } from '../../../utils/GenerateId';
 import { ChatUserItem } from '@/types/Chat/ChatType';
 import { MessageItemType } from '@/types/Chat/MessageType';
 import { Timestamp } from 'firebase/firestore';

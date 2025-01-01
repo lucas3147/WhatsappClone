@@ -145,6 +145,16 @@ export async function addTracksOnPeerConnection(track: any) {
     }
 }
 
+export async function removeTracksMyStream() {
+    if (localStream) {
+        localStream
+        .getTracks()
+        .forEach(track => track.stop());
+        
+        localStream = null;
+    }
+}
+
 export async function setLocalStream(stream: MediaStream | null) {
     localStream = stream;
 }
