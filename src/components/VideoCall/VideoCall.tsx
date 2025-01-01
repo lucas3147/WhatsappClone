@@ -23,7 +23,7 @@ const VideoCall = ({show, setShow, otherUser} : VideoCallProps) => {
 
     useEffect(() => {
         if (videoOn == true || audioOn == true) {
-            handleConnectWebcam();
+            handleUpdateWebcam();
         }
         else 
         {
@@ -70,18 +70,41 @@ const VideoCall = ({show, setShow, otherUser} : VideoCallProps) => {
         myVideoCamRef.current.style.height = `${changedSizes.height * escalaIrma}px`;
     }
 
-    async function handleConnectWebcam()  {
+    async function handleUpdateWebcam() {
         try {
-            restartMyWebcam();
-            const stream = await navigator.mediaDevices.getUserMedia({video: videoOn, audio: audioOn});
-            playMyWebcam(stream);
+            if (!WebRTC.localStream) {
+                let stream = await navigator.mediaDevices.getUserMedia({
+                    video: videoOn,
+                    audio: audioOn,
+                });
 
-            if (connectionServerOn) {
-                WebRTC.addTransceiver(stream);
+                WebRTC.setLocalStream(stream);
+
+                playMyWebcam(stream); 
+                
+                if (connectionServerOn) {
+                    WebRTC.addTransceiver(stream);
+                }
+            } else {
+                const videoTrack = WebRTC.localStream.getVideoTracks()[0];
+                const audioTrack = WebRTC.localStream.getAudioTracks()[0];
+    
+                if (videoTrack) {
+                    videoTrack.enabled = videoOn;
+                } else if (videoOn) {
+                    const newVideoTrack = (await navigator.mediaDevices.getUserMedia({ video: true })).getVideoTracks()[0];
+                    WebRTC.addTracksOnPeerConnection(newVideoTrack);
+                }
+    
+                if (audioTrack) {
+                    audioTrack.enabled = audioOn;
+                } else if (audioOn) {
+                    const newAudioTrack = (await navigator.mediaDevices.getUserMedia({ audio: true })).getAudioTracks()[0];
+                    WebRTC.addTracksOnPeerConnection(newAudioTrack);
+                }
             }
-
         } catch (error) {
-            console.error('Erro ao enviar mídia:', error);
+            console.error('Erro ao atualizar mídia:', error);
         }
     }
 
@@ -221,9 +244,14 @@ const VideoCall = ({show, setShow, otherUser} : VideoCallProps) => {
         myWebCamRef.current.srcObject = stream;
     }
 
-    const handleDisconnectWebcam = () => {
-        closeMyWebcam();
-        sendToServer({type: 'close-other-webcam'});
+    function handleDisconnectWebcam() {
+        if (WebRTC.localStream) {
+            // Desativa todas as tracks do stream sem reiniciar a conexão
+            WebRTC.localStream.getTracks().forEach(track => track.stop());
+            WebRTC.setLocalStream(null);
+            sendToServer({ type: 'close-other-webcam' });
+        }
+        closeMyWebcam(); // Fechar visualização local
     }
 
     const closeOtherWebcam = () => {

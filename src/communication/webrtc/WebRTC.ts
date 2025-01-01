@@ -1,6 +1,7 @@
 export var localConnection: RTCPeerConnection;
 export var sendChannel: RTCDataChannel;
 export var remoteDescription: RTCSessionDescription | null;
+export var localStream: MediaStream | null;
 var contraints: MediaStreamConstraints | undefined;
 var transceiver: (track: any) => RTCRtpTransceiver;
 
@@ -135,6 +136,17 @@ export async function addTransceiver(stream: MediaStream) {
     stream.getTracks().forEach(
         transceiver = track => localConnection.addTransceiver(track, {streams: [stream]})
     );
+}
+
+export async function addTracksOnPeerConnection(track: any) {
+    if (localStream) {
+        localStream.addTrack(track);
+        localConnection.addTrack(track, localStream);
+    }
+}
+
+export async function setLocalStream(stream: MediaStream | null) {
+    localStream = stream;
 }
 
 function handleCreateDescriptionError(error: any) {
