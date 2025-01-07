@@ -19,7 +19,7 @@ const VideoCall = ({show, setShow, otherUser, setShowMenu} : VideoCallProps) => 
     const [otherWebcamOn, setOtherWebcamOn] = useState(false);
     const [connectionServerOn, setConnectionServerOn] = useState(false);
     const [socketClient, setSocketClient] = useState<WebSocket | undefined>();
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         if (videoOn == true || audioOn == true) {
@@ -259,7 +259,7 @@ const VideoCall = ({show, setShow, otherUser, setShowMenu} : VideoCallProps) => 
             <div ref={sectionCamRef} className="flex-1 bg-[white] flex items-center justify-center relative p-2">
                 {!isLoading &&
                     <div className="w-full h-full p-2">
-                        <div style={{width: "20vw", height: "20vh"}} className={`p-[2px] bg-zinc-600 flex justify-center rounded-md absolute right-6 bottom-[100px] z-10`}>
+                        <div style={{width: "20vw", height: "20svh"}} className={`p-[2px] bg-zinc-600 flex justify-center rounded-md absolute right-6 bottom-[100px] z-10`}>
                             <div className="w-full h-full bg-zinc-900 relative inline-block overflow-hidden rounded-md">
                                 <video
                                     ref={myWebCamRef}
