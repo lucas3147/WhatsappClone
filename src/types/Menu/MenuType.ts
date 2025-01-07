@@ -20,5 +20,6 @@ export type ScaleMenuProps = {
         setState: (user: UserType | null) => void
     },
     handleOpenClosedMenu: () => void,
-    handleClickChatItem: (chatUserItem: ChatUserItem) => void
+    handleClickChatItem: (chatUserItem: ChatUserItem) => void,
+    showMenu: boolean
 }

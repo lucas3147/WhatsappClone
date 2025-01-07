@@ -5,23 +5,21 @@ import IconItem from "../Icons/IconItem";
 import * as WebRTC from "@/communication/webrtc/WebRTC";
 import { useEffect, useRef, useState } from "react";
 import { setUuidOnSessionStorage } from "@/utils/GenerateId";
-import { delimitChildBoxDimensions } from "@/utils/BoxDimensions";
 import { CircularProgress } from "@mui/material";
 
-const VideoCall = ({show, setShow, otherUser} : VideoCallProps) => {
+const VideoCall = ({show, setShow, otherUser, setShowMenu} : VideoCallProps) => {
     
+
     const myWebCamRef = useRef<any>();
     const otherWebCamRef = useRef<any>();
     const sectionCamRef = useRef<any>();
-    const otherVideoCamRef = useRef<any>();
-    const myVideoCamRef = useRef<any>();
 
     const [videoOn, setVideoOn] = useState(false);
     const [audioOn, setAudioOn] = useState(false);
     const [otherWebcamOn, setOtherWebcamOn] = useState(false);
     const [connectionServerOn, setConnectionServerOn] = useState(false);
     const [socketClient, setSocketClient] = useState<WebSocket | undefined>();
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         if (videoOn == true || audioOn == true) {
@@ -34,11 +32,13 @@ const VideoCall = ({show, setShow, otherUser} : VideoCallProps) => {
     }, [videoOn, audioOn]);
 
     useEffect(() => {
-        
+
         handleConnectServer();
+        setShowMenu(false);
 
         return () => {
             handlePeerDisconnect();
+            setShowMenu(true);
         };
     }, []);
 
@@ -258,9 +258,9 @@ const VideoCall = ({show, setShow, otherUser} : VideoCallProps) => {
             />
             <div ref={sectionCamRef} className="flex-1 bg-[white] flex items-center justify-center relative p-2">
                 {!isLoading &&
-                    <div className="w-full h-full">
-                        <div ref={myVideoCamRef} className={`w-[320px] h-[180px] p-[2px] bg-zinc-600 flex justify-center absolute left-[20px] bottom-5 z-10`}>
-                            <div className="w-full h-full bg-zinc-900 relative inline-block overflow-hidden">
+                    <div className="w-full h-full p-2">
+                        <div style={{width: "20vw", height: "20vh"}} className={`p-[2px] bg-zinc-600 flex justify-center rounded-md absolute right-6 bottom-[100px] z-10`}>
+                            <div className="w-full h-full bg-zinc-900 relative inline-block overflow-hidden rounded-md">
                                 <video
                                     ref={myWebCamRef}
                                     autoPlay
@@ -272,8 +272,8 @@ const VideoCall = ({show, setShow, otherUser} : VideoCallProps) => {
                             </div>
                         </div>
 
-                        <div className="w-full h-full bg-zinc-600 flex justify-center p-[2px] ">
-                            <div className="w-full h-full bg-zinc-900 relative inline-block overflow-hidden">
+                        <div className="w-full h-full bg-zinc-600 flex justify-center p-[2px] rounded-md">
+                            <div className="w-full h-full bg-zinc-900 inline-block overflow-hidden rounded-md">
                                 <video
                                     ref={otherWebCamRef}
                                     autoPlay
@@ -290,7 +290,7 @@ const VideoCall = ({show, setShow, otherUser} : VideoCallProps) => {
                         <CircularProgress style={{ color: "#00A884" }} />
                     </>
                 }
-                <div className="flex justify-between items-center px-1 w-44 h-16 rounded-[40px] bg-zinc-600 border-2 absolute z-20 bottom-8 shadow-[1px_1px_12px_4px_#48484f]">
+                <div className="flex justify-between items-center px-1 w-44 h-16 rounded-[40px] bg-zinc-600 border-2 absolute z-20 bottom-6">
                     <IconItem
                         type={videoOn == true ? 'NoPhotographyIcon' : 'MonochromePhotosOutlinedIcon'}
                         style={{

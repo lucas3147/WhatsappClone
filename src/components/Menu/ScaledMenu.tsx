@@ -4,7 +4,7 @@ import { MainMenu } from "./MainMenu";
 import { ScaleMenuProps } from "@/types/Menu/MenuType";
 import { useActiveChat } from "@/contexts/ActiveChatContext";
 
-export const ScaledMenu = ({userState, handleOpenClosedMenu, handleClickChatItem} : ScaleMenuProps) => {
+export const ScaledMenu = ({userState, handleOpenClosedMenu, handleClickChatItem, showMenu} : ScaleMenuProps) => {
     const { activeChat } = useActiveChat()!;
     const [widthPage, setWidthPage] = useState(window.innerWidth);
 
@@ -22,7 +22,7 @@ export const ScaledMenu = ({userState, handleOpenClosedMenu, handleClickChatItem
 
     return (
         <>
-            {!(widthPage > 700 || activeChat == null) &&
+            {!(widthPage > 700 || activeChat == null) && showMenu &&
                 <ClosedMenu
                     handleOpenMenu={handleOpenClosedMenu}
                 />
