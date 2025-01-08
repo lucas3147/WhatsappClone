@@ -5,3 +5,18 @@ export const generateId = () : string => {
       .replace(/-/g, "")
       .substring(0, 16);
 }
+
+export const setUuidOnSessionStorage = () => {
+    let uuid = getUuidOnSessionStorage();
+
+    if (!uuid) {
+        uuid = generateId(); 
+        sessionStorage.setItem('uuid', uuid); 
+    }
+
+    return uuid;
+}
+
+export const getUuidOnSessionStorage = () : string | null => {
+    return sessionStorage.getItem('uuid');
+}

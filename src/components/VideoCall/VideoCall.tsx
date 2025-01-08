@@ -4,22 +4,22 @@ import { CloseAreaRight } from "../Containers/CloseAreaRight";
 import IconItem from "../Icons/IconItem";
 import * as WebRTC from "@/communication/webrtc/WebRTC";
 import { useEffect, useRef, useState } from "react";
-import { generateId } from "@/utils/GenerateId";
-import { delimitChildBoxDimensions } from "@/utils/BoxDimensions";
+import { setUuidOnSessionStorage } from "@/utils/GenerateId";
+import { CircularProgress } from "@mui/material";
 
-const VideoCall = ({show, setShow, otherUser} : VideoCallProps) => {
+const VideoCall = ({show, setShow, otherUser, setShowMenu} : VideoCallProps) => {
     
+
     const myWebCamRef = useRef<any>();
     const otherWebCamRef = useRef<any>();
     const sectionCamRef = useRef<any>();
-    const otherVideoCamRef = useRef<any>();
-    const myVideoCamRef = useRef<any>();
 
     const [videoOn, setVideoOn] = useState(false);
     const [audioOn, setAudioOn] = useState(false);
     const [otherWebcamOn, setOtherWebcamOn] = useState(false);
     const [connectionServerOn, setConnectionServerOn] = useState(false);
     const [socketClient, setSocketClient] = useState<WebSocket | undefined>();
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         if (videoOn == true || audioOn == true) {
@@ -32,43 +32,15 @@ const VideoCall = ({show, setShow, otherUser} : VideoCallProps) => {
     }, [videoOn, audioOn]);
 
     useEffect(() => {
-        const handleResize = () => {
-            redimensionarVideos();
-        };
 
-        redimensionarVideos();
         handleConnectServer();
-        window.addEventListener('resize', handleResize);
+        setShowMenu(false);
 
         return () => {
-            window.removeEventListener('resize', handleResize);
-            setVideoOn(false);
-            setAudioOn(false);
             handlePeerDisconnect();
+            setShowMenu(true);
         };
     }, []);
-
-    function redimensionarVideos() {
-        const containerCamPaddingW = 20;
-        
-        const changedSizes = delimitChildBoxDimensions(
-        {
-            width: sectionCamRef.current.offsetWidth - containerCamPaddingW, 
-            height: sectionCamRef.current.offsetHeight
-        },
-        {
-            width: otherVideoCamRef.current.offsetWidth, 
-            height: otherVideoCamRef.current.offsetHeight
-        });
-
-        const escalaIrma = myVideoCamRef.current.offsetWidth / otherVideoCamRef.current.offsetWidth;;
-    
-        otherVideoCamRef.current.style.width = `${changedSizes.width}px`;
-        otherVideoCamRef.current.style.height = `${changedSizes.height}px`;
-
-        myVideoCamRef.current.style.width = `${changedSizes.width * escalaIrma}px`;
-        myVideoCamRef.current.style.height = `${changedSizes.height * escalaIrma}px`;
-    }
 
     async function handleUpdateWebcam() {
         try {
@@ -111,19 +83,14 @@ const VideoCall = ({show, setShow, otherUser} : VideoCallProps) => {
     const handleConnectServer = () => {
         try
         {
-            let clientId = localStorage.getItem('clientId');
-
-            if (!clientId) {
-                clientId = generateId(); 
-                localStorage.setItem('clientId', clientId); 
-            }
+            const uuid = setUuidOnSessionStorage();
 
             const endpointWebSocket = getEndpointSocket();
 
             const socketClient = new WebSocket(endpointWebSocket);
         
             socketClient.addEventListener('open', () => {
-                socketClient.send(JSON.stringify({ type: 'register', data: clientId }));
+                socketClient.send(JSON.stringify({ type: 'register', data: uuid }));
             });
         
             socketClient.addEventListener('message', (event) => {
@@ -141,7 +108,7 @@ const VideoCall = ({show, setShow, otherUser} : VideoCallProps) => {
                     });
                     WebRTC.handleSignalingStateChange(closeVideoCall);
                     setConnectionServerOn(true);
-                    console.log('Meu client Id: ', response.data);
+                    setIsLoading(false);
                 }
                 if (response.type === 'ice-candidate') {
                     WebRTC.addIceCandidate(response.data);
@@ -184,7 +151,7 @@ const VideoCall = ({show, setShow, otherUser} : VideoCallProps) => {
         } 
         catch (e) 
         {
-            console.log('Não foi possível estabelecer conexão com o servidor', e);
+            alert('Não foi possível estabelecer conexão com o servidor');
         }
     }
 
@@ -233,12 +200,6 @@ const VideoCall = ({show, setShow, otherUser} : VideoCallProps) => {
         setOtherWebcamOn(true);
     }
 
-    const restartMyWebcam = () => {
-        if (myWebCamRef.current && myWebCamRef.current.srcObject) {
-            handleDisconnectWebcam();
-        }
-    }
-
     const playMyWebcam = (stream: MediaStream) => {
         myWebCamRef.current.load();
         myWebCamRef.current.srcObject = stream;
@@ -246,12 +207,10 @@ const VideoCall = ({show, setShow, otherUser} : VideoCallProps) => {
 
     function handleDisconnectWebcam() {
         if (WebRTC.localStream) {
-            // Desativa todas as tracks do stream sem reiniciar a conexão
-            WebRTC.localStream.getTracks().forEach(track => track.stop());
-            WebRTC.setLocalStream(null);
+            WebRTC.removeTracksMyStream();
             sendToServer({ type: 'close-other-webcam' });
         }
-        closeMyWebcam(); // Fechar visualização local
+        closeMyWebcam();
     }
 
     const closeOtherWebcam = () => {
@@ -269,57 +228,69 @@ const VideoCall = ({show, setShow, otherUser} : VideoCallProps) => {
     }
 
     const closeMyWebcam = () => {
-        myWebCamRef.current.pause();
-        const mediaStream = myWebCamRef.current.srcObject as MediaStream;
-        if (mediaStream) {
-            mediaStream
-            .getTracks()
-            .forEach(track => track.stop());
+        if (myWebCamRef.current) {
+            myWebCamRef.current.pause();
+            const mediaStream = myWebCamRef.current.srcObject as MediaStream;
+            if (mediaStream) {
+                mediaStream
+                .getTracks()
+                .forEach(track => track.stop());
+            }
+            myWebCamRef.current.removeAttribute("src");
+            myWebCamRef.current.removeAttribute("srcObject");
         }
-        myWebCamRef.current.removeAttribute("src");
-        myWebCamRef.current.removeAttribute("srcObject");
+    }
+
+    const handleCloseVideoCall = () => {
+        WebRTC.removeTracksMyStream();
+
+        if (connectionServerOn) {
+            handlePeerDisconnect();
+        }
+        
+        setShow(false);
     }
 
     return (
-        <SliderRightContainer onLoad={() => console.log('Ativando...')} className={show ? 'openFlap' : 'closeFlap'}>
+        <SliderRightContainer className={show ? 'openFlap' : 'closeFlap'}>
             <CloseAreaRight
-                closeClick={() => {setShow(false);} }
+                closeClick={handleCloseVideoCall}
             />
-            <div ref={sectionCamRef} className="flex-1 bg-[white] flex items-center justify-center">
-                <div className="absolute">
-                    <div ref={myVideoCamRef} className={`w-[320px] h-[180px] p-[4px] bg-zinc-600 rounded-md flex justify-center absolute left-[20px] bottom-[-20px] z-10 border-2 ${connectionServerOn ? 'border-green-600' : 'border-none'}`}>
-                        <div className="w-full h-full bg-zinc-900 relative rounded-md inline-block overflow-hidden">
-                            <video
-                                ref={myWebCamRef}
-                                autoPlay
-                                muted
-                                className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-full h-auto"
-                                style={{ display: videoOn ? 'block' : 'none' }}
-                            >
-                            </video>
+            <div ref={sectionCamRef} className="flex-1 bg-[white] flex items-center justify-center relative p-2">
+                {!isLoading &&
+                    <div className="w-full h-full p-2">
+                        <div className={`w-[20vw] h-[20svh] p-[2px] bg-zinc-600 flex justify-center rounded-md right-6 absolute bottom-[100px] z-10`}>
+                            <div className="w-full h-full bg-zinc-900 inline-block overflow-hidden rounded-md">
+                                <video
+                                    ref={myWebCamRef}
+                                    autoPlay
+                                    muted
+                                    className="relative top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-full h-auto"
+                                    style={{ display: videoOn ? 'block' : 'none' }}
+                                >
+                                </video>
+                            </div>
+                        </div>
+
+                        <div className="w-full h-full bg-zinc-600 flex justify-center p-[2px] rounded-md">
+                            <div className="w-full h-full bg-zinc-900 inline-block overflow-hidden rounded-md">
+                                <video
+                                    ref={otherWebCamRef}
+                                    autoPlay
+                                    className="relative top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-auto h-full"
+                                    style={{ display: otherWebcamOn ? 'block' : 'none' }}
+                                >
+                                </video>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div ref={otherVideoCamRef} className="w-[1124px] h-[564px] bg-zinc-600 rounded-md flex justify-center p-1 relative top-[-50px]">
-                        <div className="uppercase w-auto py-1 px-2 absolute top-0 text-center  bg-zinc-600 text-sm text-stone-50 rounded-bl-md rounded-br-md z-40">
-                            {otherUser.displayName}
-                            {otherWebcamOn &&
-                                <div className="w-4 h-4 rounded-[8px] bg-green-600 absolute top-0 right-[-8px]"></div>
-                            }
-                        </div>
-                        <div className="w-full h-full bg-zinc-900 rounded-md relative inline-block overflow-hidden">
-                            <video
-                                ref={otherWebCamRef}
-                                autoPlay
-                                className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-full h-auto"
-                                style={{ display: otherWebcamOn ? 'block' : 'none' }}
-                            >
-                            </video>
-                        </div>
-                    </div>
-                </div>
-                
-                <div className="flex justify-between items-center px-1 w-44 h-16 rounded-[40px] bg-[#F5F5F5] border-2 absolute bottom-8 shadow-[1px_1px_12px_4px_#ddd]">
+                }
+                {isLoading &&
+                    <>
+                        <CircularProgress style={{ color: "#00A884" }} />
+                    </>
+                }
+                <div className="flex justify-between items-center px-1 w-44 h-16 rounded-[40px] bg-zinc-600 border-2 absolute z-20 bottom-6">
                     <IconItem
                         type={videoOn == true ? 'NoPhotographyIcon' : 'MonochromePhotosOutlinedIcon'}
                         style={{
@@ -327,7 +298,7 @@ const VideoCall = ({show, setShow, otherUser} : VideoCallProps) => {
                             height: '45px',
                             padding: '5px',
                             borderRadius: '25px',
-                            color: '#91918F',
+                            color: '#fff',
                             cursor: 'pointer'
                         }}
                         onclick={() => setVideoOn(!videoOn)}
@@ -340,7 +311,7 @@ const VideoCall = ({show, setShow, otherUser} : VideoCallProps) => {
                             height: '45px',
                             padding: '5px',
                             borderRadius: '25px',
-                            color: '#91918F',
+                            color: '#fff',
                             cursor: 'pointer'
                         }}
                         onclick={() => setAudioOn(!audioOn)}
@@ -353,10 +324,10 @@ const VideoCall = ({show, setShow, otherUser} : VideoCallProps) => {
                             height: '45px',
                             padding: '5px',
                             borderRadius: '25px',
-                            color: '#a7004ef6',
+                            color: 'red',
                             cursor: 'pointer'
                         }}
-                        onclick={handlePeerDisconnect}
+                        onclick={handleCloseVideoCall}
                     />
 
                 </div>

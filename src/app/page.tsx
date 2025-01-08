@@ -23,6 +23,7 @@ export default function Home() {
   const [user, setUser] = useState<UserType | null>(null);
   const [showOtherPerfil, setShowOtherPerfil] = useState(false);
   const [showVideoCall, setShowVideoCall] = useState(false);
+  const [showMenu, setShowMenu] = useState(true);
   const [showUserOptions, setShowUserOptions] = useState<boolean | null>(null);
   const [showGeneralOptions, setShowGeneralOptions] = useState<boolean | null>(null);
   const [otherUser, setOtherUser] = useState<UserType | null>(null);
@@ -100,6 +101,7 @@ export default function Home() {
                 setShowUserOptions(null);
                 handleOtherUser(chatUserItem.with);
               }}
+              showMenu={showMenu}
             />
           </DropDownOptionsProvider>
           <div className="flex-1 h-full overflow-hidden">
@@ -128,6 +130,7 @@ export default function Home() {
                     show={showVideoCall}
                     setShow={setShowVideoCall}
                     otherUser={otherUser}
+                    setShowMenu={setShowMenu}
                   />  
                 }
                 
