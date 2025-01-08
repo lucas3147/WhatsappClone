@@ -259,13 +259,13 @@ const VideoCall = ({show, setShow, otherUser, setShowMenu} : VideoCallProps) => 
             <div ref={sectionCamRef} className="flex-1 bg-[white] flex items-center justify-center relative p-2">
                 {!isLoading &&
                     <div className="w-full h-full p-2">
-                        <div style={{width: "20vw", height: "20svh"}} className={`p-[2px] bg-zinc-600 flex justify-center rounded-md absolute right-6 bottom-[100px] z-10`}>
-                            <div className="w-full h-full bg-zinc-900 relative inline-block overflow-hidden rounded-md">
+                        <div className={`w-[20vw] h-[20svh] p-[2px] bg-zinc-600 flex justify-center rounded-md right-6 absolute bottom-[100px] z-10`}>
+                            <div className="w-full h-full bg-zinc-900 inline-block overflow-hidden rounded-md">
                                 <video
                                     ref={myWebCamRef}
                                     autoPlay
                                     muted
-                                    className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-full h-auto"
+                                    className="relative top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-full h-auto"
                                     style={{ display: videoOn ? 'block' : 'none' }}
                                 >
                                 </video>
@@ -277,7 +277,7 @@ const VideoCall = ({show, setShow, otherUser, setShowMenu} : VideoCallProps) => 
                                 <video
                                     ref={otherWebCamRef}
                                     autoPlay
-                                    className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-auto h-full"
+                                    className="relative top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-auto h-full"
                                     style={{ display: otherWebcamOn ? 'block' : 'none' }}
                                 >
                                 </video>
