@@ -5,11 +5,9 @@ import IconItem from "../Icons/IconItem";
 import * as WebRTC from "@/communication/webrtc/WebRTC";
 import { useEffect, useRef, useState } from "react";
 import { setUuidOnSessionStorage } from "@/utils/GenerateId";
-import { CircularProgress } from "@mui/material";
+import CircularProgressBasic from "../Progress/CircularProgressBasic";
 
 const VideoCall = ({show, setShow, otherUser, setShowMenu} : VideoCallProps) => {
-    
-
     const myWebCamRef = useRef<any>();
     const otherWebCamRef = useRef<any>();
     const sectionCamRef = useRef<any>();
@@ -20,6 +18,7 @@ const VideoCall = ({show, setShow, otherUser, setShowMenu} : VideoCallProps) => 
     const [connectionServerOn, setConnectionServerOn] = useState(false);
     const [socketClient, setSocketClient] = useState<WebSocket | undefined>();
     const [isLoading, setIsLoading] = useState(true);
+    const [messageLoading, setMessageLoading] = useState('Conectando ao servidor');
 
     useEffect(() => {
         if (videoOn == true || audioOn == true) {
@@ -258,6 +257,7 @@ const VideoCall = ({show, setShow, otherUser, setShowMenu} : VideoCallProps) => 
             />
             <div ref={sectionCamRef} className="flex-1 bg-[white] flex items-center justify-center relative p-2">
                 {!isLoading &&
+                <>
                     <div className="w-full h-full p-2">
                         <div className={`w-[20vw] h-[20svh] p-[2px] bg-zinc-600 flex justify-center rounded-md right-6 absolute bottom-[100px] z-10`}>
                             <div className="w-full h-full bg-zinc-900 inline-block overflow-hidden rounded-md">
@@ -284,53 +284,59 @@ const VideoCall = ({show, setShow, otherUser, setShowMenu} : VideoCallProps) => 
                             </div>
                         </div>
                     </div>
+                    <div className="flex justify-between items-center px-1 rounded-[40px] absolute z-20 bottom-6">
+                        <div className="p-[8px] bg-[#52525b] rounded-md mr-3 border-2">
+                            <IconItem
+                                type={videoOn == true ? 'NoPhotographyIcon' : 'LocalSeeIcon'}
+                                style={{
+                                    width: '35px',
+                                    height: '35px',
+                                    color: '#fff',
+                                    cursor: 'pointer',
+                                    backgroundColor: '#52525b'
+                                }}
+                                onclick={() => setVideoOn(!videoOn)}
+                            />
+                        </div>
+                        
+                        <div className="p-[8px] bg-[#52525b] rounded-md mr-3 border-2">
+                            <IconItem
+                                type={audioOn == true ? 'MicOffIcon' : 'KeyboardVoiceIcon'}
+                                style={{
+                                    width: '35px',
+                                    height: '35px',
+                                    color: '#fff',
+                                    cursor: 'pointer',
+                                    backgroundColor: '#52525b'
+                                }}
+                                onclick={() => setAudioOn(!audioOn)}
+                            />
+                        </div>
+
+                        <div className="p-[8px] bg-[#52525b] rounded-md border-2">
+                            <IconItem
+                                type='VideocamOff'
+                                style={{
+                                    width: '35px',
+                                    height: '35px',
+                                    color: 'red',
+                                    cursor: 'pointer',
+                                    backgroundColor: '#52525b'
+                                }}
+                                onclick={handleCloseVideoCall}
+                            />
+                        </div>
+                    </div>
+                </>
+                    
                 }
                 {isLoading &&
                     <>
-                        <CircularProgress style={{ color: "#00A884" }} />
+                        <CircularProgressBasic style={{ color: "#00A884" }}>
+                            <div className="text-[#00A884] text-lg font-semibold">{messageLoading}</div>
+                        </CircularProgressBasic>
                     </>
                 }
-                <div className="flex justify-between items-center px-1 w-44 h-16 rounded-[40px] bg-zinc-600 border-2 absolute z-20 bottom-6">
-                    <IconItem
-                        type={videoOn == true ? 'NoPhotographyIcon' : 'MonochromePhotosOutlinedIcon'}
-                        style={{
-                            width: '45px',
-                            height: '45px',
-                            padding: '5px',
-                            borderRadius: '25px',
-                            color: '#fff',
-                            cursor: 'pointer'
-                        }}
-                        onclick={() => setVideoOn(!videoOn)}
-                    />
-
-                    <IconItem
-                        type={audioOn == true ? 'MicOffIcon' : 'KeyboardVoiceIcon'}
-                        style={{
-                            width: '45px',
-                            height: '45px',
-                            padding: '5px',
-                            borderRadius: '25px',
-                            color: '#fff',
-                            cursor: 'pointer'
-                        }}
-                        onclick={() => setAudioOn(!audioOn)}
-                    />
-
-                    <IconItem
-                        type='VideocamOff'
-                        style={{
-                            width: '45px',
-                            height: '45px',
-                            padding: '5px',
-                            borderRadius: '25px',
-                            color: 'red',
-                            cursor: 'pointer'
-                        }}
-                        onclick={handleCloseVideoCall}
-                    />
-
-                </div>
             </div>
         </SliderRightContainer>
     )

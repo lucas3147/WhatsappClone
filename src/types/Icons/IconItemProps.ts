@@ -25,7 +25,8 @@ import {
     KeyboardVoice as KeyboardVoiceIcon,
     LeakRemove as LeakRemoveIcon,
     LeakAdd as LeakAddIcon,
-    VideocamOff
+    VideocamOff,
+    LocalSee as LocalSeeIcon
 } from '@mui/icons-material';
 
 type IconType = keyof typeof iconMap;
@@ -64,5 +65,6 @@ export const iconMap = {
     KeyboardVoiceIcon,
     LeakRemoveIcon,
     LeakAddIcon,
-    VideocamOff
+    VideocamOff,
+    LocalSeeIcon
 };
