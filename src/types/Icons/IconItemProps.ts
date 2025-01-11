@@ -26,7 +26,8 @@ import {
     LeakRemove as LeakRemoveIcon,
     LeakAdd as LeakAddIcon,
     VideocamOff,
-    LocalSee as LocalSeeIcon
+    LocalSee as LocalSeeIcon,
+    GitHub as GitHubIcon
 } from '@mui/icons-material';
 
 type IconType = keyof typeof iconMap;
@@ -66,5 +67,6 @@ export const iconMap = {
     LeakRemoveIcon,
     LeakAddIcon,
     VideocamOff,
-    LocalSeeIcon
+    LocalSeeIcon,
+    GitHubIcon
 };

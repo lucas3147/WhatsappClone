@@ -4,7 +4,8 @@ export type UserType = {
     id: string,
     photoURL: string | photoUrlEmpty,
     displayName: string | null,
-    note: string | undefined
+    note: string | undefined,
+    allowNotifications: boolean
 }
 
 export type UsersIdType = string[];

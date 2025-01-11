@@ -7,7 +7,8 @@ import Login from '@/components/Login/Login';
 import ChatIntro from '@/components/Chats/ChatIntro';
 import ChatWindow from '@/components/Chats/ChatWindow';
 import OtherPerfil from '@/components/Perfil/OtherPerfil';
-import * as Firebase from '@/communication/firebase/firestore';
+import * as Firebase from '@/communication/Firebase/firestore';
+import * as NotificationService from '@/communication/Notifications/notification';
 import { ScaledMenu } from '@/components/Menu/ScaledMenu';
 import { DropDownOptionsProvider } from '@/contexts/DropDownOptionsContext';
 import { ActiveChatProvider } from '@/contexts/ActiveChatContext';
@@ -29,11 +30,14 @@ export default function Home() {
   const [otherUser, setOtherUser] = useState<UserType | null>(null);
 
   const handleLoginData = async (user: UserType) => {
-    let existUser = await Firebase.existUser(user.id);
+    let allowNotifications : boolean = false;
+    let existUser : boolean = await Firebase.existUser(user.id);
+
     if (!existUser) 
     {
       await Firebase.addUser(user);
     }
+
     setUser(user);
   }
 

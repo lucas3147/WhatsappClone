@@ -5,7 +5,7 @@ import Picker from '@emoji-mart/react'
 import MessageItem from "./MessageItem";
 import { UsersIdType } from "@/types/User/UserType";
 import { ChatWindowProps } from "@/types/Chat/ChatType";
-import * as Firebase from "@/communication/firebase/firestore";
+import * as Firebase from "@/communication/Firebase/firestore";
 import DropDownOptions from "../Options/DropDownOptions";
 import { MessageItemType } from "@/types/Chat/MessageType";
 import { Timestamp } from "firebase/firestore";

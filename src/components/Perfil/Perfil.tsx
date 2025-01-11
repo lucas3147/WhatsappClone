@@ -1,8 +1,8 @@
 import { UserType } from "@/types/User/UserType";
 import IconItem from "../Icons/IconItem";
 import { ChangeEvent, useState } from "react";
-import * as Auth from "@/communication/firebase/authorization";
-import * as Firestore from "@/communication/firebase/firestore";
+import * as Auth from "@/communication/Firebase/authorization";
+import * as Firestore from "@/communication/Firebase/firestore";
 import { PerfilProps } from "@/types/User/PerfilType";
 import SliderCardLeftTitle from "../Sliders/SliderCardLeftTitle";
 import { SliderLeftContainer } from "../StyledComponents/Containers/Slider";
