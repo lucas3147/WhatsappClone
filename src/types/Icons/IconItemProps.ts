@@ -27,14 +27,15 @@ import {
     LeakAdd as LeakAddIcon,
     VideocamOff,
     LocalSee as LocalSeeIcon,
-    GitHub as GitHubIcon
+    GitHub as GitHubIcon,
+    ArrowForward as ArrowForwardIcon
 } from '@mui/icons-material';
 
 type IconType = keyof typeof iconMap;
 
 export type IconItemProps = {
     type: IconType;
-    style: React.CSSProperties;
+    style?: React.CSSProperties;
     className?: string;
     onclick?: () => void;
 };
@@ -68,5 +69,6 @@ export const iconMap = {
     LeakAddIcon,
     VideocamOff,
     LocalSeeIcon,
-    GitHubIcon
+    GitHubIcon,
+    ArrowForwardIcon
 };

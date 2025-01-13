@@ -1,5 +1,11 @@
 import styled, { css } from "styled-components";
 
+export type SideType = 'front' | 'back' | 'left' | 'right' | 'top' | 'bottom';
+
+interface CubeSceneProps {
+  side: SideType;
+}
+
 const container = css`
   display: flex;
   justify-content: center;
@@ -22,47 +28,76 @@ const face = css`
   width: 100%;
 `;
 
-const front = css` transform: rotateY(0deg) translateZ(200px); `;
-const back   = css` transform: rotateY(180deg) translateZ(200px); `;
-const right  = css` transform: rotateY(90deg)  translateZ(200px); `;
-const left   = css` transform: rotateY(-90deg) translateZ(200px); `;
-const top    = css` transform: rotateX(90deg)  translateZ(200px); `;
-const bottom = css` transform: rotateX(-90deg) translateZ(200px); `;
-
 export const CubeContainer = styled.div`
     ${container}
 `;
 
-export const CubeScene = styled.div`
+export const CubeScene = styled.div<CubeSceneProps>`
     ${scene}
+    transform: ${(props) => {
+        switch (props.side) {
+            case 'front':
+              return 'rotateX(0deg) rotateY(0deg)';
+            case 'back':
+              return 'rotateX(0deg) rotateY(180deg)';
+            case 'left':
+              return 'rotateX(0deg) rotateY(90deg)';
+            case 'right':
+              return 'rotateX(0deg) rotateY(-90deg) ';
+            case 'top':
+              return 'rotateX(-90deg) rotateY(0deg)';
+            case 'bottom':
+              return 'rotateX(90deg) rotateY(0deg) ';
+            default:
+              return 'rotateX(0deg) rotateY(0deg)';
+    }}}
 `;
 
 export const CubeFaceFront = styled.div`
     ${face}
-    ${front}
+    transform: rotateY(0deg) translateZ(140px);
+    @media (min-width: 640px) {
+        transform: rotateY(0deg) translateZ(200px);
+    }
 `;
 
 export const CubeFaceBack = styled.div`
     ${face}
-    ${back}
+    transform: rotateY(180deg) translateZ(140px);
+    @media (min-width: 640px) {
+        transform: rotateY(180deg) translateZ(200px);
+    }
 `;
 
 export const CubeFaceRight = styled.div`
     ${face}
-    ${right}
+    transform: rotateY(90deg) translateZ(140px);
+    @media (min-width: 640px) {
+        transform: rotateY(90deg) translateZ(200px);
+    }
 `;
 
 export const CubeFaceLeft = styled.div`
     ${face}
-    ${left}
+    transform: rotateY(-90deg) translateZ(140px);
+    @media (min-width: 640px) {
+        transform: rotateY(-90deg) translateZ(200px);
+    }
 `;
 
 export const CubeFaceTop = styled.div`
     ${face}
-    ${top}
+    transform: rotateY(90deg) translateZ(140px);
+    @media (min-width: 640px) {
+        transform: rotateY(90deg) translateZ(200px);
+    }
 `;
 
 export const CubeFaceBottom = styled.div`
     ${face}
-    ${bottom}
+    transform: rotateY(-90deg) translateZ(140px);
+    @media (min-width: 640px) {
+        transform: rotateY(-90deg) translateZ(200px);
+    }
 `;
+
