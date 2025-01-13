@@ -1,6 +1,6 @@
 import 'firebase/auth';
 import 'firebase/firestore';
-import { collection, addDoc, onSnapshot, query, where, getDocs, doc, updateDoc, deleteDoc, setDoc, getDoc, DocumentReference, DocumentData, WhereFilterOp, DocumentSnapshot, QuerySnapshot } from 'firebase/firestore';
+import { collection, addDoc, onSnapshot, query, where, getDocs, doc, updateDoc, deleteDoc, setDoc, getDoc, DocumentReference, DocumentData, WhereFilterOp, DocumentSnapshot, QuerySnapshot, QueryConstraint } from 'firebase/firestore';
 import { useFirebase } from '../config/firebase.config';
 
 const getRef = async (path: string, pathSegments: string) => {
@@ -43,9 +43,9 @@ export default {
         const ref = await getRef(path, pathSegments);
         await deleteDoc(ref);
     },
-    getDocsQuery: async (path: string, fieldPath: string, opStr: WhereFilterOp, value: unknown) => {
+    getDocsQuery: async (path: string, ...queryConstraints: QueryConstraint[]) => {
         const collectionRef = await getCollectionRef(path);
-        const q = query(collectionRef, where(fieldPath, opStr, value));
+        const q = query(collectionRef, ...queryConstraints);
         return await getDocs(q);
     },
     onSnapShot: async (path: string, pathSegments: string, submit: (doc: DocumentSnapshot) => void) => {

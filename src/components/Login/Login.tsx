@@ -4,19 +4,43 @@ import { LoginProps } from "@/types/Login/LoginType";
 import { Unsubscribe, User } from "firebase/auth";
 import { useEffect, useRef, useState } from "react";
 import IconItem from "../Icons/IconItem";
-import { CubeContainer, CubeFaceFront, CubeFaceLeft, CubeFaceRight, CubeScene } from "../StyledComponents/Cubo/Cube";
+import { CubeContainer, CubeFaceFront, CubeFaceLeft, CubeFaceRight, CubeScene, SideType } from "../StyledComponents/Cubo/Cube";
 import CircularProgressBasic from "../Progress/CircularProgressBasic";
 import { LoadingItem } from "@/types/Loading/LoadingItem";
+import { Button, TextField } from "@mui/material";
+import { Controller, SubmitHandler, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { SignInObject, SignInSchema, SignUpObject, SignUpSchema } from "@/schemas/Login/LoginSchemas";
+import { generateId } from "@/utils/GenerateId";
+import { photoUrlEmpty, UserType } from "@/types/User/UserType";
+import { hashPassword } from "@/utils/Crypt";
 
 const Login = ({ onReceive }: LoginProps) => {
-	const cube = useRef<any>();
-	const angleCube : number = 90;
-	let xRotationCube : number = 0;
-	let yRotationCube : number = 0;
+
+	const {
+		control: controlSignUp,
+		handleSubmit: handleSubmitSignUp,
+		setValue: setValueSignUp,
+		setError: setErrorSignUp,
+		clearErrors: clearErrorsSignUp
+	} = useForm<SignUpObject>({
+		resolver: zodResolver(SignUpSchema)
+	});
+
+	const {
+		control : controlSignIn,
+		handleSubmit : handleSubmitSignIn,
+		setValue: setValueSignIn,
+		setError : setErrorSignIn,
+		clearErrors : clearErrorsSignIn
+	} = useForm<SignInObject>({
+		resolver: zodResolver(SignInSchema)
+	});
 
 	const [loading, setLoading] = useState<LoadingItem>({active: true, message: 'Carregando'});
 	const [userName, setUserName] = useState('');
 	const [password, setPassword] = useState('');
+	const [sideCube, setSideCube] = useState<SideType>('front');
 
 	useEffect(() => {
 		let unsubscribeUserAuthenticate: Unsubscribe;
@@ -58,67 +82,251 @@ const Login = ({ onReceive }: LoginProps) => {
 		}
 	}
 
-	const rotateLeftCube = () => {
-		yRotationCube += angleCube;
-		if (cube.current) {
-			cube.current.style.transform = `rotateX(${xRotationCube}deg) rotateY(${yRotationCube}deg)`;
+	const handleSignUp : SubmitHandler<SignUpObject> = async ({userName, password}) => {
+		const salt = userName+":"+password;
+
+		const user : UserType = {
+			id: generateId(),
+			displayName: userName,
+			password: hashPassword(password, salt),
+			photoURL: photoUrlEmpty,
+			note: '',
+			allowNotifications: false
 		}
+
+		if (!await Firestore.existUserByCredential(user.displayName as string, user.password as string)) {
+			if (await Firestore.addUser(user)) {
+				GoAreaSignIn();
+			}
+			else {
+				alert('Algo deu errado ao cadastrar o usuário...');
+			}
+		}
+		else {
+			setErrorSignUp('userName', {
+				type: "manual",
+				message: "Usuário já cadastrado.",
+			});
+		}
+	}
+
+	const handleSignIn : SubmitHandler<SignInObject> = async({userName, password}) => {
+		const passwordCrypt = hashPassword(password, userName+":"+password);
+
+		if (await Firestore.existUserByCredential(userName as string, passwordCrypt)) {
+			let user = await Firestore.getUserByNameAndPassword(userName, passwordCrypt);
+
+			if (user) {
+				onReceive(user);
+			}
+		}
+		else {
+			setErrorSignIn('userName', {
+				type: "manual",
+				message: "Usuário não cadastrado.",
+			});
+		}
+	}
+
+	const GoAreaSignIn = () => {
+		setSideCube('front');
+		clearFieldsSignUp();
+		clearErrorsFieldsSignUp();
+	}
+
+	const GoAreaSignUp = () => {
+		setSideCube('left');
+		clearFieldsSignIn();
+		clearErrorsFieldsSignIn();
+	}
+
+	const clearFieldsSignUp = () => {
+		setValueSignUp('userName', '');
+		setValueSignUp('password', '');
+		setValueSignUp('confirmPassword', '');
+	}
+
+	const clearFieldsSignIn = () => {
+		setValueSignIn('userName', '');
+		setValueSignIn('password', '');
+	}
+
+	const clearErrorsFieldsSignUp = () => {
+		clearErrorsSignUp('userName');
+		clearErrorsSignUp('password');
+		clearErrorsSignUp('confirmPassword');
+	}
+
+	const clearErrorsFieldsSignIn = () => {
+		clearErrorsSignIn('userName');
+		clearErrorsSignIn('password');
 	}
 
 	return (
 		<CubeContainer>
 			<CubeScene
-				ref={cube}
-				className="w-[80vw] max-w-[400px] h-[70svh]"
-				onClick={rotateLeftCube}
+				className="sm:w-[400px] w-[280px] h-[70svh]"
+				side={sideCube}
 			>
 				<CubeFaceLeft
-					className="bg-white rounded-md"
+					className="flex flex-col justify-center items-center bg-white"
 				>
-					
+					<div className="w-full flex items-center justify-center flex-col px-10 py-8">
+						<div className="absolute top-4 right-4">
+							<IconItem
+								className="iconTheme"
+								type="ArrowForwardIcon"
+								onclick={GoAreaSignIn}
+							/>
+						</div>
+						<div className="text-2xl font-bold mb-10 select-none">Cadastro</div>
+						<div className="w-full flex flex-col items-center mb-10">
+							<form onSubmit={handleSubmitSignUp(handleSignUp)}>
+								<Controller
+									control={controlSignUp}
+									name="userName"
+									render={({field, fieldState}) => 
+										<TextField
+											{...field}
+											required
+											label="Nome de usuário"
+											variant="outlined"
+											style={{ 
+												marginBottom: '16px', 
+												width: '100%'
+											}}
+											error={fieldState.invalid}
+											helperText={fieldState.error?.message}
+										/>
+									}
+								/>
+
+								<Controller
+									control={controlSignUp}
+									name="password"
+									render={({field, fieldState}) => 
+										<TextField
+											required
+											{...field}
+											label="Senha"
+											variant="outlined"
+											type="password"
+											style={{ marginBottom: '16px', width: '100%' }}
+											error={fieldState.invalid}
+											helperText={fieldState.error?.message}
+										/>
+									}
+								/>
+
+								<Controller
+									control={controlSignUp}
+									name="confirmPassword"
+									render={({field, fieldState}) => 
+										<TextField
+											required
+											{...field}
+											label="Confirme a senha"
+											variant="outlined"
+											type="password"
+											style={{ marginBottom: '16px', width: '100%' }}
+											error={fieldState.invalid}
+											helperText={fieldState.error?.message}
+										/>
+									}
+								/>
+
+								<Button
+									type='submit'
+									variant="contained"
+									className="w-full text-white"
+									style={{
+										marginBottom: '16px',
+										background: '#6FB454'
+									}}
+								>
+									Logar
+								</Button>
+							</form>
+						</div>
+					</div>
 				</CubeFaceLeft>
 				<CubeFaceFront
-					className="flex flex-col justify-center items-center bg-white rounded-md"
+					className="flex flex-col justify-center items-center bg-white"
 				>
 					<div className="w-full flex items-center justify-center flex-col px-10 py-8">
 						<div className="text-2xl font-bold mb-10 select-none">Login</div>
 						<div className="w-full flex flex-col items-center mb-10">
-							<input
-								type="text"
-								placeholder="Nome de usuário"
-								className="w-full border-0 outline-none rounded-full bg-[#ddd] py-2 px-4 mb-4"
-								value={userName}
-								onChange={(e) => setUserName(e.target.value)}
-							/>
-							<input
-								type="password"
-								placeholder="Senha"
-								className="w-full border-0 outline-none rounded-full bg-[#ddd] py-2 px-4 mb-4"
-								value={password}
-								onChange={(e) => setPassword(e.target.value)}
-							/>
-							<button className="uppercase w-full py-2 px-4 rounded-full bg-[#6FB454] text-white mb-4">
-								Entrar
-							</button>
-							<p className="cursor-pointer text-sm text-[#686868] text-center">Cadastre-se</p>
+							<form onSubmit={handleSubmitSignIn(handleSignIn)}>
+								<Controller
+									control={controlSignIn}
+									name="userName"
+									render={({field, fieldState}) => 
+										<TextField
+											{...field}
+											label="Nome de usuário"
+											variant="outlined"
+											style={{ 
+												marginBottom: '16px', 
+												width: '100%'
+											}}
+											error={fieldState.invalid}
+											helperText={fieldState.error?.message}
+										/>
+									}
+								/>
+
+								<Controller
+									control={controlSignIn}
+									name="password"
+									render={({field, fieldState}) => 
+										<TextField
+											{...field}
+											label="Senha"
+											variant="outlined"
+											type="password"
+											style={{ marginBottom: '16px', width: '100%' }}
+											error={fieldState.invalid}
+											helperText={fieldState.error?.message}
+										/>
+									}
+								/>
+
+								<Button 
+									type='submit'
+									variant="contained"
+									className="w-full text-white"
+									style={{
+										marginBottom: '16px',
+										background: '#6FB454'
+									}}
+								>
+									Entrar
+								</Button>
+								<p 
+									className="cursor-pointer text-sm text-[#686868] text-center"
+									onClick={GoAreaSignUp}
+								>
+									Cadastre-se
+								</p>
+							</form>
 						</div>
-					</div>
-					<div className="relative bottom-4 flex flex-col items-center">
-						<p className="text-sm text-[#686868] mb-2 select-none">Entrar com outras plataformas</p>
-						<IconItem
-							type='GitHubIcon'
-							style={{
-								width: '35px',
-								height: '35px',
-								color: '#000',
-								cursor: 'pointer'
-							}}
-							onclick={handleLogin}
-						/>
+						<div className="absolute bottom-10 flex flex-col items-center">
+							<p className="text-[12px] text-[#686868] mb-2 select-none">Ou entre com</p>
+							<IconItem
+								type='GitHubIcon'
+								style={{
+									width: '35px',
+									height: '35px',
+									color: '#000',
+									cursor: 'pointer'
+								}}
+								onclick={handleLogin}
+							/>
+						</div>
 					</div>
 				</CubeFaceFront>
 				<CubeFaceRight
-					className="bg-white rounded-md"
+					className="bg-white"
 				>
 					{loading?.active &&
 						<CircularProgressBasic style={{ color: "#00A884" }}>

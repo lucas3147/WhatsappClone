@@ -3,13 +3,14 @@ import { UsersIdType, UserType } from '@/types/User/UserType';
 import { ChatMessagesItem, ChatUserItem } from '@/types/Chat/ChatType';
 import { MessageItemType } from '@/types/Chat/MessageType';
 import firestoreService from '../../services/firebase.service.firestore';
-import { arrayUnion } from 'firebase/firestore';
+import { arrayUnion, where } from 'firebase/firestore';
 
 export const addUser =  async (user : UserType) => {
     const docRef = await firestoreService.getRef('users', user.id);
 
     const userData = {
         name: user.displayName,
+        password: user.password,
         photoUrl: user.photoURL,
         note: ''
     }
@@ -40,6 +41,27 @@ export const getUser= async (userId : string) : Promise<UserType | undefined> =>
     return user;
 };
 
+export const getUserByNameAndPassword= async (userName : string, password : string) : Promise<UserType | undefined> => {
+    const docSnapshot = await firestoreService.getDocsQuery('users', where('name', '==', userName), where('password', '==', password));
+    let user : UserType | undefined;
+
+    if (docSnapshot.docs.length > 0) {
+        if (docSnapshot.docs[0].exists()) {
+            let data = docSnapshot.docs[0].data();
+    
+            user = {
+                id: docSnapshot.docs[0].id,
+                photoURL: data.photoUrl,
+                displayName: data.name,
+                note: data.note
+            }
+        }
+    }
+    
+
+    return user;
+};
+
 export const getUsers= async () : Promise<UserType[]> => {
     const usersSnap = await firestoreService.getDocsRef('users');
     let users : UserType[] = [];
@@ -64,7 +86,8 @@ export const updateUser= async (user : UserType) => {
     await firestoreService.updateDocRef('users', user.id, {
         name: user.displayName,
         photoUrl: user.photoURL,
-        note: user.note
+        note: user.note,
+        password: user.password,
     });
 
     const usersSnap = await firestoreService.getDocsRef('users');
@@ -125,7 +148,7 @@ export const getUsersToConnect= async (userId: string): Promise<UserType[]> => {
 };
 
 export const addNewChat= async (user : UserType, otherUser : UserType) => {
-    const docSnapshot = await firestoreService.getDocsQuery('chats', 'users', 'array-contains', user.id);
+    const docSnapshot = await firestoreService.getDocsQuery('chats', where('users', 'array-contains', user.id));
     let data = true;
     data = docSnapshot.docs.some(d => d.data().users[0] == otherUser.id || d.data().users[1] == otherUser.id);
     if (data == false) {
@@ -213,7 +236,7 @@ export const sendMessage= async (chatId : string, message : MessageItemType, use
 };
 
 export const deleteConversation= async (users : UsersIdType) => {
-    const docSnapshot = await firestoreService.getDocsQuery('chats', 'users', '==', users);
+    const docSnapshot = await firestoreService.getDocsQuery('chats', where('users', '==', users));
     let chatData = docSnapshot.docs[0];
     if (chatData.id) {
         await firestoreService.updateDocRef('chats', chatData.id, {
@@ -274,8 +297,19 @@ export const existUser= async (userId : string) => {
     }
 };
 
+export const existUserByCredential= async (userName: string, password: string) => {
+    try {
+        const docSnapshot = await firestoreService.getDocsQuery('users', where('name', '==', userName), where('password', '==', password));
+
+        return (docSnapshot.docs.length > 0);
+    } catch (error) {
+        console.error('Erro ao verificar o usuário ', userName, ':', error);
+        return false;
+    }
+};
+
 export const existChat= async (userId : string, otherUserId : string) : Promise<boolean> => {
-    const docSnapshot = await firestoreService.getDocsQuery('chats', 'users', 'array-contains', userId);
+    const docSnapshot = await firestoreService.getDocsQuery('chats', where('users', 'array-contains', userId));
     return docSnapshot.docs.some(d => d.data().users[0] == otherUserId || d.data().users[1] == otherUserId);
 };
 
