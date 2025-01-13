@@ -30,13 +30,6 @@ export default function Home() {
   const [otherUser, setOtherUser] = useState<UserType | null>(null);
 
   const handleLoginData = async (user: UserType) => {
-    let existUser : boolean = await Firebase.existUser(user.id);
-
-    if (!existUser) 
-    {
-      await Firebase.addUser(user);
-    }
-
     setUser(user);
   }
 

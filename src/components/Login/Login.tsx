@@ -10,7 +10,7 @@ import { LoadingItem } from "@/types/Loading/LoadingItem";
 import { Button, TextField } from "@mui/material";
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod";
-import { SignUpObject, SignUpSchema } from "@/schemas/Login/SignUpSchema";
+import { SignInObject, SignInSchema, SignUpObject, SignUpSchema } from "@/schemas/Login/LoginSchemas";
 import { generateId } from "@/utils/GenerateId";
 import { photoUrlEmpty, UserType } from "@/types/User/UserType";
 import { hashPassword } from "@/utils/Crypt";
@@ -18,13 +18,23 @@ import { hashPassword } from "@/utils/Crypt";
 const Login = ({ onReceive }: LoginProps) => {
 
 	const {
-		control,
-		handleSubmit,
-		setValue,
-		setError,
-		clearErrors
+		control: controlSignUp,
+		handleSubmit: handleSubmitSignUp,
+		setValue: setValueSignUp,
+		setError: setErrorSignUp,
+		clearErrors: clearErrorsSignUp
 	} = useForm<SignUpObject>({
 		resolver: zodResolver(SignUpSchema)
+	});
+
+	const {
+		control : controlSignIn,
+		handleSubmit : handleSubmitSignIn,
+		setValue: setValueSignIn,
+		setError : setErrorSignIn,
+		clearErrors : clearErrorsSignIn
+	} = useForm<SignInObject>({
+		resolver: zodResolver(SignInSchema)
 	});
 
 	const [loading, setLoading] = useState<LoadingItem>({active: true, message: 'Carregando'});
@@ -72,13 +82,13 @@ const Login = ({ onReceive }: LoginProps) => {
 		}
 	}
 
-	const handleSignUp : SubmitHandler<SignUpObject> = async (userData) => {
-		const salt = userData.userName+":"+userData.password;
+	const handleSignUp : SubmitHandler<SignUpObject> = async ({userName, password}) => {
+		const salt = userName+":"+password;
 
 		const user : UserType = {
 			id: generateId(),
-			displayName: userData.userName,
-			password: hashPassword(userData.password, salt),
+			displayName: userName,
+			password: hashPassword(password, salt),
 			photoURL: photoUrlEmpty,
 			note: '',
 			allowNotifications: false
@@ -86,36 +96,70 @@ const Login = ({ onReceive }: LoginProps) => {
 
 		if (!await Firestore.existUserByCredential(user.displayName as string, user.password as string)) {
 			if (await Firestore.addUser(user)) {
-				handleSignIn();
+				GoAreaSignIn();
 			}
 			else {
 				alert('Algo deu errado ao cadastrar o usuário...');
 			}
 		}
 		else {
-			setError('userName', {
+			setErrorSignUp('userName', {
 				type: "manual",
-				message: "Já existem usuários com esse nome e senha cadastrados.",
+				message: "Usuário já cadastrado.",
 			});
 		}
 	}
 
-	const handleSignIn = () => {
+	const handleSignIn : SubmitHandler<SignInObject> = async({userName, password}) => {
+		const passwordCrypt = hashPassword(password, userName+":"+password);
+
+		if (await Firestore.existUserByCredential(userName as string, passwordCrypt)) {
+			let user = await Firestore.getUserByNameAndPassword(userName, passwordCrypt);
+
+			if (user) {
+				onReceive(user);
+			}
+		}
+		else {
+			setErrorSignIn('userName', {
+				type: "manual",
+				message: "Usuário não cadastrado.",
+			});
+		}
+	}
+
+	const GoAreaSignIn = () => {
 		setSideCube('front');
-		setValue('userName', '');
-		setValue('password', '');
-		setValue('confirmPassword', '');
-		clearFields();
+		clearFieldsSignUp();
+		clearErrorsFieldsSignUp();
 	}
 
-	const handleBackInLogin = () => {
-
+	const GoAreaSignUp = () => {
+		setSideCube('left');
+		clearFieldsSignIn();
+		clearErrorsFieldsSignIn();
 	}
 
-	const clearFields = () => {
-		clearErrors('userName');
-		clearErrors('password');
-		clearErrors('confirmPassword');
+	const clearFieldsSignUp = () => {
+		setValueSignUp('userName', '');
+		setValueSignUp('password', '');
+		setValueSignUp('confirmPassword', '');
+	}
+
+	const clearFieldsSignIn = () => {
+		setValueSignIn('userName', '');
+		setValueSignIn('password', '');
+	}
+
+	const clearErrorsFieldsSignUp = () => {
+		clearErrorsSignUp('userName');
+		clearErrorsSignUp('password');
+		clearErrorsSignUp('confirmPassword');
+	}
+
+	const clearErrorsFieldsSignIn = () => {
+		clearErrorsSignIn('userName');
+		clearErrorsSignIn('password');
 	}
 
 	return (
@@ -132,14 +176,14 @@ const Login = ({ onReceive }: LoginProps) => {
 							<IconItem
 								className="iconTheme"
 								type="ArrowForwardIcon"
-								onclick={handleSignIn}
+								onclick={GoAreaSignIn}
 							/>
 						</div>
 						<div className="text-2xl font-bold mb-10 select-none">Cadastro</div>
 						<div className="w-full flex flex-col items-center mb-10">
-							<form onSubmit={handleSubmit(handleSignUp)}>
+							<form onSubmit={handleSubmitSignUp(handleSignUp)}>
 								<Controller
-									control={control}
+									control={controlSignUp}
 									name="userName"
 									render={({field, fieldState}) => 
 										<TextField
@@ -158,7 +202,7 @@ const Login = ({ onReceive }: LoginProps) => {
 								/>
 
 								<Controller
-									control={control}
+									control={controlSignUp}
 									name="password"
 									render={({field, fieldState}) => 
 										<TextField
@@ -175,7 +219,7 @@ const Login = ({ onReceive }: LoginProps) => {
 								/>
 
 								<Controller
-									control={control}
+									control={controlSignUp}
 									name="confirmPassword"
 									render={({field, fieldState}) => 
 										<TextField
@@ -212,37 +256,59 @@ const Login = ({ onReceive }: LoginProps) => {
 					<div className="w-full flex items-center justify-center flex-col px-10 py-8">
 						<div className="text-2xl font-bold mb-10 select-none">Login</div>
 						<div className="w-full flex flex-col items-center mb-10">
-							<TextField 
-								label="Nome de usuário" 
-								variant="outlined" 
-								className="w-full"
-								style={{marginBottom: '16px'}}
-							/>
-							
-							<TextField 
-								label="Senha" 
-								variant="outlined" 
-          						type="password"
-								className="w-full"
-								style={{marginBottom: '16px'}}
-							/>
+							<form onSubmit={handleSubmitSignIn(handleSignIn)}>
+								<Controller
+									control={controlSignIn}
+									name="userName"
+									render={({field, fieldState}) => 
+										<TextField
+											{...field}
+											label="Nome de usuário"
+											variant="outlined"
+											style={{ 
+												marginBottom: '16px', 
+												width: '100%'
+											}}
+											error={fieldState.invalid}
+											helperText={fieldState.error?.message}
+										/>
+									}
+								/>
 
-							<Button 
-								variant="contained"
-								className="w-full text-white"
-								style={{
-									marginBottom: '16px',
-									background: '#6FB454'
-								}}
-							>
-								Entrar
-							</Button>
-							<p 
-								className="cursor-pointer text-sm text-[#686868] text-center"
-								onClick={() => setSideCube('left')}
-							>
-								Cadastre-se
-							</p>
+								<Controller
+									control={controlSignIn}
+									name="password"
+									render={({field, fieldState}) => 
+										<TextField
+											{...field}
+											label="Senha"
+											variant="outlined"
+											type="password"
+											style={{ marginBottom: '16px', width: '100%' }}
+											error={fieldState.invalid}
+											helperText={fieldState.error?.message}
+										/>
+									}
+								/>
+
+								<Button 
+									type='submit'
+									variant="contained"
+									className="w-full text-white"
+									style={{
+										marginBottom: '16px',
+										background: '#6FB454'
+									}}
+								>
+									Entrar
+								</Button>
+								<p 
+									className="cursor-pointer text-sm text-[#686868] text-center"
+									onClick={GoAreaSignUp}
+								>
+									Cadastre-se
+								</p>
+							</form>
 						</div>
 						<div className="absolute bottom-10 flex flex-col items-center">
 							<p className="text-[12px] text-[#686868] mb-2 select-none">Ou entre com</p>

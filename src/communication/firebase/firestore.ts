@@ -41,6 +41,27 @@ export const getUser= async (userId : string) : Promise<UserType | undefined> =>
     return user;
 };
 
+export const getUserByNameAndPassword= async (userName : string, password : string) : Promise<UserType | undefined> => {
+    const docSnapshot = await firestoreService.getDocsQuery('users', where('name', '==', userName), where('password', '==', password));
+    let user : UserType | undefined;
+
+    if (docSnapshot.docs.length > 0) {
+        if (docSnapshot.docs[0].exists()) {
+            let data = docSnapshot.docs[0].data();
+    
+            user = {
+                id: docSnapshot.docs[0].id,
+                photoURL: data.photoUrl,
+                displayName: data.name,
+                note: data.note
+            }
+        }
+    }
+    
+
+    return user;
+};
+
 export const getUsers= async () : Promise<UserType[]> => {
     const usersSnap = await firestoreService.getDocsRef('users');
     let users : UserType[] = [];
@@ -65,7 +86,8 @@ export const updateUser= async (user : UserType) => {
     await firestoreService.updateDocRef('users', user.id, {
         name: user.displayName,
         photoUrl: user.photoURL,
-        note: user.note
+        note: user.note,
+        password: user.password,
     });
 
     const usersSnap = await firestoreService.getDocsRef('users');
@@ -279,7 +301,7 @@ export const existUserByCredential= async (userName: string, password: string) =
     try {
         const docSnapshot = await firestoreService.getDocsQuery('users', where('name', '==', userName), where('password', '==', password));
 
-        return !docSnapshot.empty;
+        return (docSnapshot.docs.length > 0);
     } catch (error) {
         console.error('Erro ao verificar o usuário ', userName, ':', error);
         return false;

@@ -15,3 +15,12 @@ export const SignUpSchema = z
 
 
 export type SignUpObject = z.infer<typeof SignUpSchema>;
+
+export const SignInSchema = z
+  .object({
+    userName: z.string(),
+    password: z.string()
+  })
+
+
+export type SignInObject = z.infer<typeof SignInSchema>;

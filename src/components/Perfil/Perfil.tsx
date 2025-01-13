@@ -83,11 +83,10 @@ const Perfil = ({show , setShow, user, setUser}: PerfilProps) => {
                     />
                     <div
                         onClick={handleSynchronizeUser}
-                        className="absolute right-[15px] bottom-0">
+                        className="absolute right-[30px] bottom-[10px] p-2 w-[45px] h-[45px] flex justify-center items-center bg-white rounded-full cursor-pointer hover:bg-zinc-200">
                         <IconItem
-                            type="AutorenewIcon"
-                            style={{ color: '#8696A0', width: '30px', height: '30px', marginBottom: '10px', backgroundColor: 'white', borderRadius: '50%' }}
-                            className="iconTheme"
+                            type="AddPhotoAlternateIcon"
+                            style={{ color: '#8696A0', width: '100%', height: '100%'}}
                         />
                     </div>
                 </div>
@@ -95,9 +94,9 @@ const Perfil = ({show , setShow, user, setUser}: PerfilProps) => {
             <div className="grid grid-rows-2 gap-y-16 w-full px-[30px] pt-[14px] pb-[10px]">
                 <div>
                     <p className="mb-[14px] text-[#008069] text-[14px] flex">Seu nome</p>
-                    <div className={`w-full h-[34px] flex ${showConfirm ? 'border-b-2 border-b-[#667781]' : 'border-b-0'}`}>
+                    <div className={`w-full h-[34px] flex ${showConfirm ? 'border-b-2 border-b-[#667781] ' : 'border-b-0'}`}>
                         <input
-                            className="flex-1 inline text-[#3B4A54] text-[16px] border-0 outline-none" 
+                            className={`flex-1 inline text-[#3B4A54] text-[16px] border-0 outline-none ${showConfirm ? ' pointer-events-auto' : ' pointer-events-none'}`} 
                             type="text" 
                             name=""
                             value={displayName}
@@ -127,7 +126,7 @@ const Perfil = ({show , setShow, user, setUser}: PerfilProps) => {
                     <p className="mb-[14px] text-[#008069] text-[14px] flex">Recado</p>
                     <div className="w-full h-[34px] flex" style={{borderBottom: showNote ? '2px solid #667781' : 'none'}}>
                         <input
-                            className="flex-1 inline text-[#3B4A54] text-[16px] border-0 outline-none" 
+                            className={`flex-1 inline text-[#3B4A54] text-[16px] border-0 outline-none ${showNote ? ' pointer-events-auto' : ' pointer-events-none'}`} 
                             type="text" 
                             name=""
                             value={note}
