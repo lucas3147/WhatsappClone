@@ -306,8 +306,6 @@ export const existUserByPrivateName= async (privateName: String) => {
     try {
         const docSnapshot = await firestoreService.getDocsQuery('users', where('privateName', '==', privateName));
 
-        console.log(docSnapshot.docs);
-
         return (docSnapshot.docs.length > 0);
     } catch (error) {
         console.error('Erro ao verificar o usuário ', privateName, ':', error);
