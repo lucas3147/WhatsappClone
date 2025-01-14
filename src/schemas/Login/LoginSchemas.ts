@@ -18,8 +18,8 @@ export type SignUpObject = z.infer<typeof SignUpSchema>;
 
 export const SignInSchema = z
   .object({
-    userName: z.string(),
-    password: z.string()
+    userName: z.string().min(1, "Informe o nome de usuário"),
+    password: z.string().min(1, "Informe a senha")
   })
 
 

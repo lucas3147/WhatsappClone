@@ -16,6 +16,7 @@ export const SliderLeftContainer = styled.div`
   border-right: 1px solid #DDD;
   background-color: white;
   left: 0;
+  overflow-y: scroll;
 
   &.openFlap {
     z-index: 10;
@@ -25,6 +26,16 @@ export const SliderLeftContainer = styled.div`
   &.closeFlap {
     transform: translateX(-100%);
     z-index: -1;
+  }
+
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 25%;
   }
 `;
 

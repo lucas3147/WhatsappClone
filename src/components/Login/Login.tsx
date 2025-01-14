@@ -5,7 +5,6 @@ import { Unsubscribe, User } from "firebase/auth";
 import { useEffect, useRef, useState } from "react";
 import IconItem from "../Icons/IconItem";
 import { CubeContainer, CubeFaceFront, CubeFaceLeft, CubeFaceRight, CubeScene, SideType } from "../StyledComponents/Cubo/Cube";
-import CircularProgressBasic from "../Progress/CircularProgressBasic";
 import { LoadingItem } from "@/types/Loading/LoadingItem";
 import { Button, TextField } from "@mui/material";
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
@@ -179,7 +178,7 @@ const Login = ({ onReceive }: LoginProps) => {
 								onclick={GoAreaSignIn}
 							/>
 						</div>
-						<div className="text-2xl font-bold mb-10 select-none">Cadastro</div>
+						<div className="text-2xl font-bold mb-10 select-none">Cadastre-se</div>
 						<div className="w-full flex flex-col items-center mb-10">
 							<form onSubmit={handleSubmitSignUp(handleSignUp)}>
 								<Controller
@@ -256,7 +255,7 @@ const Login = ({ onReceive }: LoginProps) => {
 					<div className="w-full flex items-center justify-center flex-col px-10 py-8">
 						<div className="text-2xl font-bold mb-10 select-none">Login</div>
 						<div className="w-full flex flex-col items-center mb-10">
-							<form onSubmit={handleSubmitSignIn(handleSignIn)}>
+							<form onSubmit={handleSubmitSignIn(handleSignIn)} >
 								<Controller
 									control={controlSignIn}
 									name="userName"
@@ -296,22 +295,26 @@ const Login = ({ onReceive }: LoginProps) => {
 									variant="contained"
 									className="w-full text-white"
 									style={{
-										marginBottom: '16px',
+										marginBottom: '8px',
 										background: '#6FB454'
 									}}
 								>
 									Entrar
 								</Button>
-								<p 
-									className="cursor-pointer text-sm text-[#686868] text-center"
-									onClick={GoAreaSignUp}
-								>
-									Cadastre-se
-								</p>
 							</form>
+							<p 
+								className="inline-block cursor-pointer text-sm text-[#686868] hover:text-[#000] underline underline-offset-2"
+								onClick={GoAreaSignUp}
+							>
+								Cadastre-se
+							</p>
 						</div>
-						<div className="absolute bottom-10 flex flex-col items-center">
-							<p className="text-[12px] text-[#686868] mb-2 select-none">Ou entre com</p>
+						<div className="absolute bottom-6 flex flex-col items-center w-full px-10">
+							<div className="flex items-center mb-1 w-full">
+								<span className="w-[35%] h-[1px] bg-[#686868] mr-2"></span>
+								<p className="text-[12px] text-[#686868] select-none">Ou entre com</p>
+								<span className="ml-2 w-[35%] h-[1px] bg-[#686868]"></span>
+							</div>
 							<IconItem
 								type='GitHubIcon'
 								style={{
@@ -330,7 +333,7 @@ const Login = ({ onReceive }: LoginProps) => {
 				>
 					{loading?.active &&
 						<DotsLoading 
-							style={{backgroundColor: "#00A884"}}
+							style={{backgroundColor: "#6FB454"}}
 						/>
 					}
 				</CubeFaceRight>
