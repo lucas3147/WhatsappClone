@@ -86,8 +86,7 @@ export const updateUser= async (user : UserType) => {
     await firestoreService.updateDocRef('users', user.id, {
         name: user.displayName,
         photoUrl: user.photoURL,
-        note: user.note,
-        password: user.password,
+        note: user.note
     });
 
     const usersSnap = await firestoreService.getDocsRef('users');

@@ -311,9 +311,9 @@ const Login = ({ onReceive }: LoginProps) => {
 						</div>
 						<div className="absolute bottom-6 flex flex-col items-center w-full px-10">
 							<div className="flex items-center mb-1 w-full">
-								<span className="w-[35%] h-[1px] bg-[#686868] mr-2"></span>
+								<span className="w-[35%] h-[1px] bg-[#686868] mr-1"></span>
 								<p className="text-[12px] text-[#686868] select-none">Ou entre com</p>
-								<span className="ml-2 w-[35%] h-[1px] bg-[#686868]"></span>
+								<span className="ml-1 w-[35%] h-[1px] bg-[#686868]"></span>
 							</div>
 							<IconItem
 								type='GitHubIcon'
