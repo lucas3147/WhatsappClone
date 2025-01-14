@@ -2,7 +2,7 @@ import { VideoCallProps } from "@/types/VideoCall/VideoCallType";
 import { SliderRightContainer } from "../StyledComponents/Containers/Slider"
 import { CloseAreaRight } from "../Containers/CloseAreaRight";
 import IconItem from "../Icons/IconItem";
-import * as WebRTC from "@/communication/webrtc/WebRTC";
+import * as WebRTC from "@/communication/Webrtc/WebRTC";
 import { useEffect, useRef, useState } from "react";
 import { setUuidOnSessionStorage } from "@/utils/GenerateId";
 import CircularProgressBasic from "../Progress/CircularProgressBasic";

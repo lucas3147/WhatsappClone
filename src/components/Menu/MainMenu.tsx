@@ -10,8 +10,8 @@ import NewChat from "../Chats/NewChat";
 import Perfil from "../Perfil/Perfil";
 import IconItem from "../Icons/IconItem";
 import ChatListItem from "../Chats/ChatListItem";
-import * as Firebase from '@/communication/firebase/firestore';
-import * as Auth from '@/communication/firebase/authorization';
+import * as Firebase from '@/communication/Firebase/firestore';
+import * as Auth from '@/communication/Firebase/authorization';
 import { useDropDownOptions } from "@/contexts/DropDownOptionsContext";
 
 export const MainMenu = ({ userState, onClickChatListItem }: MainMenuProps) => {

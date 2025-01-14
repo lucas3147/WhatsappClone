@@ -3,13 +3,15 @@ import { UsersIdType, UserType } from '@/types/User/UserType';
 import { ChatMessagesItem, ChatUserItem } from '@/types/Chat/ChatType';
 import { MessageItemType } from '@/types/Chat/MessageType';
 import firestoreService from '../../services/firebase.service.firestore';
-import { arrayUnion } from 'firebase/firestore';
+import { arrayUnion, where } from 'firebase/firestore';
 
 export const addUser =  async (user : UserType) => {
     const docRef = await firestoreService.getRef('users', user.id);
 
     const userData = {
         name: user.displayName,
+        privateName: user.privateName ?? null,
+        password: user.password,
         photoUrl: user.photoURL,
         note: ''
     }
@@ -37,6 +39,32 @@ export const getUser= async (userId : string) : Promise<UserType | undefined> =>
         }
     }
 
+    return user;
+};
+
+export const getUserByPrivateName= async (privateName: String) : Promise<UserType | null> => {
+    
+    let user : UserType | null = null;
+
+    try {
+        const docSnapshot = await firestoreService.getDocsQuery('users', where('privateName', '==', privateName));
+
+        if (docSnapshot.docs.length > 0) {
+            let data = docSnapshot.docs[0].data();
+
+            user = {
+                id: docSnapshot.docs[0].id,
+                photoURL: data.photoUrl,
+                displayName: data.name,
+                privateName: data.privateName ?? null,
+                password: data.password ?? null,
+                note: data.note
+            }
+        }
+    } catch (error) {
+        console.error('Erro ao verificar o usuário ', privateName, ':', error);
+    }
+    
     return user;
 };
 
@@ -125,7 +153,7 @@ export const getUsersToConnect= async (userId: string): Promise<UserType[]> => {
 };
 
 export const addNewChat= async (user : UserType, otherUser : UserType) => {
-    const docSnapshot = await firestoreService.getDocsQuery('chats', 'users', 'array-contains', user.id);
+    const docSnapshot = await firestoreService.getDocsQuery('chats', where('users', 'array-contains', user.id));
     let data = true;
     data = docSnapshot.docs.some(d => d.data().users[0] == otherUser.id || d.data().users[1] == otherUser.id);
     if (data == false) {
@@ -213,7 +241,7 @@ export const sendMessage= async (chatId : string, message : MessageItemType, use
 };
 
 export const deleteConversation= async (users : UsersIdType) => {
-    const docSnapshot = await firestoreService.getDocsQuery('chats', 'users', '==', users);
+    const docSnapshot = await firestoreService.getDocsQuery('chats', where('users', '==', users));
     let chatData = docSnapshot.docs[0];
     if (chatData.id) {
         await firestoreService.updateDocRef('chats', chatData.id, {
@@ -274,8 +302,19 @@ export const existUser= async (userId : string) => {
     }
 };
 
+export const existUserByPrivateName= async (privateName: String) => {
+    try {
+        const docSnapshot = await firestoreService.getDocsQuery('users', where('privateName', '==', privateName));
+
+        return (docSnapshot.docs.length > 0);
+    } catch (error) {
+        console.error('Erro ao verificar o usuário ', privateName, ':', error);
+        return false;
+    }
+};
+
 export const existChat= async (userId : string, otherUserId : string) : Promise<boolean> => {
-    const docSnapshot = await firestoreService.getDocsQuery('chats', 'users', 'array-contains', userId);
+    const docSnapshot = await firestoreService.getDocsQuery('chats', where('users', 'array-contains', userId));
     return docSnapshot.docs.some(d => d.data().users[0] == otherUserId || d.data().users[1] == otherUserId);
 };
 

@@ -1,6 +1,6 @@
 import { UserType } from "@/types/User/UserType";
-import * as Auth from "@/communication/firebase/authorization";
-import * as Firestore from "@/communication/firebase/firestore";
+import * as Auth from "@/communication/Firebase/authorization";
+import * as Firestore from "@/communication/Firebase/firestore";
 import { useEffect, useState } from "react";
 import { Unsubscribe, User } from "firebase/auth";
 
