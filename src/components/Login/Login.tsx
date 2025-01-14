@@ -38,6 +38,7 @@ const Login = ({ onReceive }: LoginProps) => {
 	});
 
 	const [loading, setLoading] = useState<LoadingItem>({active: true});
+	const [loadingSignUp, setLoadingSignUp] = useState(false);
 	const [sideCube, setSideCube] = useState<SideType>('right');
 
 	useEffect(() => {
@@ -82,7 +83,8 @@ const Login = ({ onReceive }: LoginProps) => {
 	}
 
 	const handleSignUp : SubmitHandler<SignUpObject> = async ({privateName, displayName, password}) => {
-
+		setLoadingSignUp(true);
+		
 		if (!await Firestore.existUserByPrivateName(privateName)) {
 			const passSalt = generateSalt();
 
@@ -108,6 +110,8 @@ const Login = ({ onReceive }: LoginProps) => {
 				message: "Já existe um usuário cadastrado com esse nome",
 			});
 		}
+
+		setLoadingSignUp(false);
 	}
 
 	const handleSignIn : SubmitHandler<SignInObject> = async({privateName, password}) => {
@@ -266,10 +270,17 @@ const Login = ({ onReceive }: LoginProps) => {
 									className="w-full text-white"
 									style={{
 										marginBottom: '16px',
-										background: '#6FB454'
+										background: '#6FB454',
+										pointerEvents: loadingSignUp ? 'none' : 'auto' 
 									}}
 								>
-									Logar
+									{loadingSignUp && 
+										<>Aguarde</>
+									}
+									{!loadingSignUp && 
+										<>Logar</>
+									}
+									
 								</Button>
 							</form>
 						</div>
