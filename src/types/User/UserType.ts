@@ -5,6 +5,7 @@ export type UserType = {
     photoURL: string,
     note: string | undefined,
     displayName: string | null,
+    privateName?: string,
     password?: string,
     allowNotifications?: boolean
 }

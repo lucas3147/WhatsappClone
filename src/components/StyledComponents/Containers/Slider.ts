@@ -16,7 +16,7 @@ export const SliderLeftContainer = styled.div`
   border-right: 1px solid #DDD;
   background-color: white;
   left: 0;
-  overflow-y: scroll;
+  overflow-y: auto;
 
   &.openFlap {
     z-index: 10;

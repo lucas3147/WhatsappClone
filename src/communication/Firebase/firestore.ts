@@ -10,6 +10,7 @@ export const addUser =  async (user : UserType) => {
 
     const userData = {
         name: user.displayName,
+        privateName: user.privateName ?? null,
         password: user.password,
         photoUrl: user.photoURL,
         note: ''
@@ -41,24 +42,29 @@ export const getUser= async (userId : string) : Promise<UserType | undefined> =>
     return user;
 };
 
-export const getUserByNameAndPassword= async (userName : string, password : string) : Promise<UserType | undefined> => {
-    const docSnapshot = await firestoreService.getDocsQuery('users', where('name', '==', userName), where('password', '==', password));
-    let user : UserType | undefined;
-
-    if (docSnapshot.docs.length > 0) {
-        if (docSnapshot.docs[0].exists()) {
-            let data = docSnapshot.docs[0].data();
+export const getUserByPrivateName= async (privateName: String) : Promise<UserType | null> => {
     
+    let user : UserType | null = null;
+
+    try {
+        const docSnapshot = await firestoreService.getDocsQuery('users', where('privateName', '==', privateName));
+
+        if (docSnapshot.docs.length > 0) {
+            let data = docSnapshot.docs[0].data();
+
             user = {
                 id: docSnapshot.docs[0].id,
                 photoURL: data.photoUrl,
                 displayName: data.name,
+                privateName: data.privateName ?? null,
+                password: data.password ?? null,
                 note: data.note
             }
         }
+    } catch (error) {
+        console.error('Erro ao verificar o usuário ', privateName, ':', error);
     }
     
-
     return user;
 };
 
@@ -296,13 +302,15 @@ export const existUser= async (userId : string) => {
     }
 };
 
-export const existUserByCredential= async (userName: string, password: string) => {
+export const existUserByPrivateName= async (privateName: String) => {
     try {
-        const docSnapshot = await firestoreService.getDocsQuery('users', where('name', '==', userName), where('password', '==', password));
+        const docSnapshot = await firestoreService.getDocsQuery('users', where('privateName', '==', privateName));
+
+        console.log(docSnapshot.docs);
 
         return (docSnapshot.docs.length > 0);
     } catch (error) {
-        console.error('Erro ao verificar o usuário ', userName, ':', error);
+        console.error('Erro ao verificar o usuário ', privateName, ':', error);
         return false;
     }
 };

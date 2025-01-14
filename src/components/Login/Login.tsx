@@ -12,7 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { SignInObject, SignInSchema, SignUpObject, SignUpSchema } from "@/schemas/Login/LoginSchemas";
 import { generateId } from "@/utils/GenerateId";
 import { photoUrlEmpty, UserType } from "@/types/User/UserType";
-import { hashPassword } from "@/utils/Crypt";
+import { combineHashAndSalt, generateSalt, hashPassword, separateHashAndSalt, verifyPassword } from "@/utils/Crypto";
 import DotsLoading from "../StyledComponents/Loading/DotsLoading";
 
 const Login = ({ onReceive }: LoginProps) => {
@@ -81,19 +81,20 @@ const Login = ({ onReceive }: LoginProps) => {
 		}
 	}
 
-	const handleSignUp : SubmitHandler<SignUpObject> = async ({userName, password}) => {
-		const salt = userName+":"+password;
+	const handleSignUp : SubmitHandler<SignUpObject> = async ({privateName, displayName, password}) => {
 
-		const user : UserType = {
-			id: generateId(),
-			displayName: userName,
-			password: hashPassword(password, salt),
-			photoURL: photoUrlEmpty,
-			note: '',
-			allowNotifications: false
-		}
+		if (!await Firestore.existUserByPrivateName(privateName)) {
+			const passSalt = generateSalt();
 
-		if (!await Firestore.existUserByCredential(user.displayName as string, user.password as string)) {
+			const user : UserType = {
+				id: generateId(),
+				displayName,
+				privateName,
+				password: combineHashAndSalt(hashPassword(password, passSalt), passSalt),
+				photoURL: photoUrlEmpty,
+				note: '',
+				allowNotifications: false
+			}
 			if (await Firestore.addUser(user)) {
 				GoAreaSignIn();
 			}
@@ -102,27 +103,32 @@ const Login = ({ onReceive }: LoginProps) => {
 			}
 		}
 		else {
-			setErrorSignUp('userName', {
+			setErrorSignUp('privateName', {
 				type: "manual",
-				message: "Usuário já cadastrado.",
+				message: "Já existe um usuário cadastrado com esse nome",
 			});
 		}
 	}
 
-	const handleSignIn : SubmitHandler<SignInObject> = async({userName, password}) => {
-		const passwordCrypt = hashPassword(password, userName+":"+password);
+	const handleSignIn : SubmitHandler<SignInObject> = async({privateName, password}) => {
+		let user : UserType | null = await Firestore.getUserByPrivateName(privateName);
 
-		if (await Firestore.existUserByCredential(userName as string, passwordCrypt)) {
-			let user = await Firestore.getUserByNameAndPassword(userName, passwordCrypt);
-
-			if (user) {
+		if (user) {
+			if (user.password && verifyPassword(password, user.password)) {
+				user.password = undefined;
 				onReceive(user);
+			}
+			else {
+				setErrorSignIn('privateName', {
+					type: "manual",
+					message: "O nome de usuário ou senha não correspondem",
+				});
 			}
 		}
 		else {
-			setErrorSignIn('userName', {
+			setErrorSignIn('privateName', {
 				type: "manual",
-				message: "Usuário não cadastrado.",
+				message: "Usuário não cadastrado",
 			});
 		}
 	}
@@ -140,24 +146,26 @@ const Login = ({ onReceive }: LoginProps) => {
 	}
 
 	const clearFieldsSignUp = () => {
-		setValueSignUp('userName', '');
+		setValueSignUp('privateName', '');
+		setValueSignUp('displayName', '');
 		setValueSignUp('password', '');
 		setValueSignUp('confirmPassword', '');
 	}
 
 	const clearFieldsSignIn = () => {
-		setValueSignIn('userName', '');
+		setValueSignIn('privateName', '');
 		setValueSignIn('password', '');
 	}
 
 	const clearErrorsFieldsSignUp = () => {
-		clearErrorsSignUp('userName');
+		clearErrorsSignUp('privateName');
+		clearErrorsSignUp('displayName');
 		clearErrorsSignUp('password');
 		clearErrorsSignUp('confirmPassword');
 	}
 
 	const clearErrorsFieldsSignIn = () => {
-		clearErrorsSignIn('userName');
+		clearErrorsSignIn('privateName');
 		clearErrorsSignIn('password');
 	}
 
@@ -183,12 +191,30 @@ const Login = ({ onReceive }: LoginProps) => {
 							<form onSubmit={handleSubmitSignUp(handleSignUp)}>
 								<Controller
 									control={controlSignUp}
-									name="userName"
+									name="privateName"
 									render={({field, fieldState}) => 
 										<TextField
 											{...field}
 											required
-											label="Nome de usuário"
+											label="Nome privado"
+											variant="outlined"
+											style={{ 
+												marginBottom: '16px', 
+												width: '100%'
+											}}
+											error={fieldState.invalid}
+											helperText={fieldState.error?.message}
+										/>
+									}
+								/>
+								<Controller
+									control={controlSignUp}
+									name="displayName"
+									render={({field, fieldState}) => 
+										<TextField
+											{...field}
+											required
+											label="Nome público"
 											variant="outlined"
 											style={{ 
 												marginBottom: '16px', 
@@ -258,7 +284,7 @@ const Login = ({ onReceive }: LoginProps) => {
 							<form onSubmit={handleSubmitSignIn(handleSignIn)} >
 								<Controller
 									control={controlSignIn}
-									name="userName"
+									name="privateName"
 									render={({field, fieldState}) => 
 										<TextField
 											{...field}
