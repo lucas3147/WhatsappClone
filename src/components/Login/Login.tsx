@@ -14,6 +14,7 @@ import { SignInObject, SignInSchema, SignUpObject, SignUpSchema } from "@/schema
 import { generateId } from "@/utils/GenerateId";
 import { photoUrlEmpty, UserType } from "@/types/User/UserType";
 import { hashPassword } from "@/utils/Crypt";
+import DotsLoading from "../StyledComponents/Loading/DotsLoading";
 
 const Login = ({ onReceive }: LoginProps) => {
 
@@ -37,10 +38,8 @@ const Login = ({ onReceive }: LoginProps) => {
 		resolver: zodResolver(SignInSchema)
 	});
 
-	const [loading, setLoading] = useState<LoadingItem>({active: true, message: 'Carregando'});
-	const [userName, setUserName] = useState('');
-	const [password, setPassword] = useState('');
-	const [sideCube, setSideCube] = useState<SideType>('front');
+	const [loading, setLoading] = useState<LoadingItem>({active: true});
+	const [sideCube, setSideCube] = useState<SideType>('right');
 
 	useEffect(() => {
 		let unsubscribeUserAuthenticate: Unsubscribe;
@@ -49,6 +48,7 @@ const Login = ({ onReceive }: LoginProps) => {
 			unsubscribeUserAuthenticate = await Auth.onAuthenticateUser(async (User) => {
 				loadUserProfile(User);
 			}, () => {
+				setSideCube('front');
 				setLoading({active: false});
 			});
 		};
@@ -326,12 +326,12 @@ const Login = ({ onReceive }: LoginProps) => {
 					</div>
 				</CubeFaceFront>
 				<CubeFaceRight
-					className="bg-white"
+					className="bg-white flex justify-center items-center"
 				>
 					{loading?.active &&
-						<CircularProgressBasic style={{ color: "#00A884" }}>
-							<div className="text-[#00A884] text-lg font-semibold">{loading?.message}</div>
-						</CircularProgressBasic>
+						<DotsLoading 
+							style={{backgroundColor: "#00A884"}}
+						/>
 					}
 				</CubeFaceRight>
 			</CubeScene>
