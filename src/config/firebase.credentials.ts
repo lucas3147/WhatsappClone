@@ -10,8 +10,8 @@ let apiCredentials = {
     app_id: process.env.APP_ID as string
 }
 
-if (process.env.NODE_ENV === 'test' || 
-    process.env.NODE_ENV === 'development') 
+if ((process.env.NODE_ENV === 'development') && 
+    (process.env.FIRESTORE != 'production')) 
 {
     apiCredentials = {
         api_key: process.env.API_TEST_KEY as string,

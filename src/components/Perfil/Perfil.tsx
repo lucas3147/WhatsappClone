@@ -53,8 +53,7 @@ const Perfil = ({show , setShow, user, setUser}: PerfilProps) => {
         }
     }
 
-    const handleSynchronizeUser = async () => {
-        console.log('dentro do handleSynchronizeUser');
+    const handleUpdateImagePerfil = async () => {
         const url = await Storage.getImageUrl('teste_img.png');
         var link = document.createElement('a');
         link.href = url;
@@ -87,7 +86,7 @@ const Perfil = ({show , setShow, user, setUser}: PerfilProps) => {
                         className="rounded-[50%]"
                     />
                     <div
-                        onClick={handleSynchronizeUser}
+                        onClick={handleUpdateImagePerfil}
                         className="absolute right-[30px] bottom-[10px] p-2 w-[45px] h-[45px] flex justify-center items-center bg-white rounded-full cursor-pointer hover:bg-zinc-200">
                         <IconItem
                             type="AddPhotoAlternateIcon"
