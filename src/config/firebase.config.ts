@@ -3,11 +3,13 @@ import { getAuth } from "firebase/auth";
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
 import apiCredentials from './firebase.credentials';
+import { getStorage } from 'firebase/storage';
 
 dotenv.config();
 
 let db; // Armazenar a instância do Firestore
 let auth; // Armazenar a instância de Auth
+let storage; // Armazenar a instância de Storage
 
 const getFirebaseConfig = async () => {
     if (typeof window !== "undefined") {
@@ -36,6 +38,7 @@ async function initializeFirebase() {
         
         db = getFirestore(app);
         auth = getAuth(app);
+        storage = getStorage(app);
 
         if (process.env.EMULATOR === 'true') {
             connectFirestoreEmulator(db, 'localhost', 8080);
@@ -45,9 +48,10 @@ async function initializeFirebase() {
     {
         db = getFirestore(getApp());
         auth = getAuth(getApp());
+        storage = getStorage(getApp());
     }
 
-    return { db, auth };
+    return { db, auth, storage };
 }
 
 export const useFirebase = async () => {

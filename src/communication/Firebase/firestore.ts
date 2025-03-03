@@ -110,7 +110,8 @@ export const updateUser= async (user : UserType) => {
                         {
                             chatsOfUser.push({
                                 ...chat,
-                                title: user.displayName as string
+                                title: user.displayName as string,
+                                image: user.photoURL as string,
                             });
                         } else {
                             chatsOfUser.push({

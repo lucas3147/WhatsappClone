@@ -29,7 +29,8 @@ import {
     LocalSee as LocalSeeIcon,
     GitHub as GitHubIcon,
     ArrowForward as ArrowForwardIcon,
-    AddPhotoAlternate as AddPhotoAlternateIcon
+    AddPhotoAlternate as AddPhotoAlternateIcon,
+    CameraAlt as CameraAltIcon,
 } from '@mui/icons-material';
 
 type IconType = keyof typeof iconMap;
@@ -72,5 +73,6 @@ export const iconMap = {
     LocalSeeIcon,
     GitHubIcon,
     ArrowForwardIcon,
-    AddPhotoAlternateIcon
+    AddPhotoAlternateIcon,
+    CameraAltIcon
 };

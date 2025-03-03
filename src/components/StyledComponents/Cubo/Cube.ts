@@ -3,7 +3,7 @@ import styled, { css } from "styled-components";
 export type SideType = 'front' | 'back' | 'left' | 'right' | 'top' | 'bottom';
 
 interface CubeSceneProps {
-  side: SideType;
+  $side: SideType;
 }
 
 const container = css`
@@ -35,7 +35,7 @@ export const CubeContainer = styled.div`
 export const CubeScene = styled.div<CubeSceneProps>`
     ${scene}
     transform: ${(props) => {
-        switch (props.side) {
+        switch (props.$side) {
             case 'front':
               return 'rotateX(0deg) rotateY(0deg)';
             case 'back':

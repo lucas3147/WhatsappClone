@@ -39,7 +39,7 @@ const Login = ({ onReceive }: LoginProps) => {
 
 	const [loading, setLoading] = useState<LoadingItem>({active: true});
 	const [loadingSignUp, setLoadingSignUp] = useState(false);
-	const [sideCube, setSideCube] = useState<SideType>('right');
+	const [sideCube, setSideCube] = useState<SideType>();
 
 	useEffect(() => {
 		let unsubscribeUserAuthenticate: Unsubscribe;
@@ -144,6 +144,7 @@ const Login = ({ onReceive }: LoginProps) => {
 	}
 
 	const GoAreaSignUp = () => {
+		console.log('dentro do GoAreaSignUp');
 		setSideCube('left');
 		clearFieldsSignIn();
 		clearErrorsFieldsSignIn();
@@ -177,7 +178,7 @@ const Login = ({ onReceive }: LoginProps) => {
 		<CubeContainer>
 			<CubeScene
 				className="sm:w-[400px] w-[280px] h-[70svh]"
-				side={sideCube}
+				$side={sideCube ?? 'right'}
 			>
 				<CubeFaceLeft
 					className="flex flex-col justify-center items-center bg-white"
