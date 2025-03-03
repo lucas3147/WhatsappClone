@@ -54,12 +54,22 @@ const Perfil = ({show , setShow, user, setUser}: PerfilProps) => {
     }
 
     const handleUpdateImagePerfil = async () => {
-        const url = await Storage.getImageUrl('teste_img.png');
-        var link = document.createElement('a');
-        link.href = url;
-        link.target = '_blank';
-        link.click();
-        link.remove();
+        var input = document.createElement('input');
+        input.type = 'file';
+        input.addEventListener('change', async () => {
+            const file = input.files?.[0];
+            if (file) {
+                const url = await Storage.uploadImage(file);
+                let newUser : UserType = {
+                    ...user,
+                    photoURL: url
+                }
+                await Firestore.updateUser(newUser);
+                setUser(newUser);
+            }
+        });
+        input.click();
+        input.remove();
     }
 
     const handleClose = () => {
@@ -87,11 +97,15 @@ const Perfil = ({show , setShow, user, setUser}: PerfilProps) => {
                     />
                     <div
                         onClick={handleUpdateImagePerfil}
-                        className="absolute right-[30px] bottom-[10px] p-2 w-[45px] h-[45px] flex justify-center items-center bg-white rounded-full cursor-pointer hover:bg-zinc-200">
+                        className="absolute top-0 p-2 w-full h-full flex justify-center items-center flex-col transition duration-150 ease-in-out opacity-0 hover:opacity-100 bg-opacity-30 bg-black rounded-full cursor-pointer">
                         <IconItem
-                            type="AddPhotoAlternateIcon"
-                            style={{ color: '#8696A0', width: '100%', height: '100%'}}
+                            className="iconTheme"
+                            type="CameraAltIcon"
+                            style={{ color: '#fff', marginBottom: '10px' }}
                         />
+                        <p className="uppercase text-sm text-white max-w-32">
+                            mudar foto do perfil
+                        </p>
                     </div>
                 </div>
             </div>
