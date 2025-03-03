@@ -10,9 +10,9 @@ export default {
         const storageRef = await getRef(urlPath);
         return await getDownloadURL(storageRef);
     },
-    uploadImage: async (file: File) : Promise<string> => {
+    uploadImage: async (file: File, fileName: string) : Promise<string> => {
         const storage = getStorage();
-        const storageRef = ref(storage, `images/${file.name}`);
+        const storageRef = ref(storage, `images/${fileName}`);
         const snapshot = await uploadBytes(storageRef, file);
         return await getDownloadURL(snapshot.ref);
     }

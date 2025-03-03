@@ -59,7 +59,7 @@ const Perfil = ({show , setShow, user, setUser}: PerfilProps) => {
         input.addEventListener('change', async () => {
             const file = input.files?.[0];
             if (file) {
-                const url = await Storage.uploadImage(file);
+                const url = await Storage.uploadImage(file, user.id + '.jpg');
                 let newUser : UserType = {
                     ...user,
                     photoURL: url
