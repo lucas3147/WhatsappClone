@@ -3,6 +3,7 @@ import IconItem from "../Icons/IconItem";
 import { ChangeEvent, useState } from "react";
 import * as Auth from "@/communication/Firebase/authorization";
 import * as Firestore from "@/communication/Firebase/firestore";
+import * as Storage from "@/communication/Firebase/storage";
 import { PerfilProps } from "@/types/User/PerfilType";
 import SliderCardLeftTitle from "../Sliders/SliderCardLeftTitle";
 import { SliderLeftContainer } from "../StyledComponents/Containers/Slider";
@@ -53,9 +54,13 @@ const Perfil = ({show , setShow, user, setUser}: PerfilProps) => {
     }
 
     const handleSynchronizeUser = async () => {
-        const user = await Auth.syncronizeUser();
-        if (user) {
-        }
+        console.log('dentro do handleSynchronizeUser');
+        const url = await Storage.getImageUrl('teste_img.png');
+        var link = document.createElement('a');
+        link.href = url;
+        link.target = '_blank';
+        link.click();
+        link.remove();
     }
 
     const handleClose = () => {

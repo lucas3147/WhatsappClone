@@ -144,6 +144,7 @@ const Login = ({ onReceive }: LoginProps) => {
 	}
 
 	const GoAreaSignUp = () => {
+		console.log('dentro do GoAreaSignUp');
 		setSideCube('left');
 		clearFieldsSignIn();
 		clearErrorsFieldsSignIn();

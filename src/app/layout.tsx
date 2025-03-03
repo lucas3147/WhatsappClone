@@ -20,11 +20,9 @@ export default function RootLayout({
   return (
     <html lang="pt-br">
       <body className="bg-gradient-to-r from-[#020024] to-[#00a884] m-0 font-sans text-black">
-        <NoSsr>
           <div className={inter.className}>
             {children}
           </div>
-        </NoSsr>
       </body>
     </html>
   )
